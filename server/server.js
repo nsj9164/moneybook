@@ -169,22 +169,70 @@ app.post('/logout', (req, res) => {
     // JWT 쿠키 삭제
     res.clearCookie('token');
     res.redirect('/');
-
-    // setTimeout(() => {
-    //     const token = req.cookies.token;
-    
-    //     if (!token) {
-    //         console.log("Token successfully removed.");
-    //     } else {
-    //         console.log("Failed to remove token, still exists:", token);
-    //     }
-
-    //     res.status(200).json({ message: '로그아웃 성공' });
-    // }, 100)
-
-        
-    
 })
+
+app.post('/fixedItemList', authenticateToken, function(req, res) {
+    db.query(`SELECT id
+                   , DATE_FORMAT(expense_date,"%Y-%m-%d") as expense_date
+                   , expense_desc
+                   , FORMAT(expense_amount,0) as expense_amount
+                   , expense_payment
+                   , expense_group1
+                   , expense_group2
+                   , reg_dt date
+                   , upd_dt date
+                FROM FIXCED_ITEM_LIST
+               WHERE USER_ID = ?
+               ORDER BY expense_date, ID`,
+    [req.user.userId],
+    function (err, results, fields) {
+        if(err) throw err;
+        res.send(results);
+    });
+});
+
+app.post('/fixedItemList/insert', authenticateToken, function(req, res) {
+    const userId = req.user.userId;
+    const data = req.body;
+
+    data.forEach(item => {
+        if(item.isNew) {
+            db.query('INSERT INTO FIXCED_ITEM_LIST (expense_date, expense_desc, expense_amount, expense_payment, expense_group1, expense_group2, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [item.date.replace(/-/g, ""), item.group1, item.group2, item.price1.replace(/,/g,""), item.price2.replace(/,/g,""), item.payment, item.remark, userId],
+            (err, result) => {
+                if(err) throw err;
+            });
+        } else if(item.isModified) {
+            db.query('UPDATE PAYLIST SET date = ?, group1 = ?, group2 = ?, price1 = ?, price2 = ?, payment = ?, remark = ? WHERE id = ?',
+            [item.date.replace(/-/g,""), item.group1, item.group2, item.price1.replace(/,/g,""), item.price2.replace(/,/g,""), item.payment, item.remark, item.id],
+            (err, result) => {
+                if(err) throw err;
+            });
+        }
+    });
+
+    res.send({ message: 'Data saved successfully!'});
+});
+
+app.post('/payList/delete', authenticateToken, function(req, res) {
+    const userId = req.user.userId;
+    const data = req.body;
+
+    data.forEach(item => {
+        db.query(`DELETE FROM PAYLIST
+                   WHERE user_id = ?
+                     AND id = ?`,
+        [userId, item.id],
+        (err, result) => {
+            if(err) throw err;
+        });
+    })
+});
+
+
+
+
+
 
 app.get('*', function(req, res) {
     res.sendFile(path.join(__dirname, '../account/build', 'index.html'));

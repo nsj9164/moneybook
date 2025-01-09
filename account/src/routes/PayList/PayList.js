@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useEffect, useRef, useState } from 'react';
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Table, Button, OverlayTrigger, Popover } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchData, saveData, deleteData } from '../../store/paySlice';
 import { nowCursor, restoreCursor, selectText, unformatNumber } from '../../util/util'
@@ -9,7 +9,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { startOfMonth, endOfMonth, format, subMonths, addMonths } from "date-fns";
 import PayListModal from "./Modal/PayListModal"
-import Table from '../../component/Table';
 
 const Input = styled.td.attrs({
     contentEditable: true,
@@ -30,7 +29,7 @@ function PayList() {
     const inputRefs = useRef([]);
     const payList = useSelector((state) => state.payList.items);
     const payListStatus = useSelector((state) => state.payList.status);
-    const [tempData, setTempData] = useState([]);
+    let [tempData, setTempData] = useState([]);
     const [checkedItems, setCheckedItems] = useState([]);
     const [checkedAll, setCheckedAll] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -103,7 +102,7 @@ function PayList() {
 
     // 데이터 수정
     const handleUpdate = (e, id, key) => {
-        const newItem = e.target.innerText;
+        const newItem = key === "date" ? e : e.target.innerText;
         console.log("handleUpdate:::", id, key, newItem)
         setTempData(prevData => prevData.map((item) => {
             console.log(item.id)
@@ -162,14 +161,18 @@ function PayList() {
     // 전체선택/해제
     useEffect(() => {
         (checkedItems.length === tempData.filter(item => !item.isDisabled).length && tempData.length > 1) ? setCheckedAll(true) : setCheckedAll(false)
+        console.log("checkedItems:::", checkedItems)
     }, [checkedItems, tempData])
 
     // 삭제
     const handleDelete = () => {
-        const delCheckedList = tempData.filter(item => checkedItems.includes(item.id));
+        const delCheckedList = checkedItems.filter(id => tempData.some(item => item.id === id));
+        console.log("delCheckedList::::", delCheckedList)
         dispatch(deleteData(delCheckedList));
-        const remains = tempData.filter(item => !checkedItems.includes(item.id));
-        setTempData(remains);
+
+        setTempData(prevData => prevData.map(item => {
+            return delCheckedList.includes(item.id) ? {...item, isDeleted: true} : item
+        }));
         setCheckedItems([]);
     }
 
@@ -241,16 +244,8 @@ function PayList() {
             }))
         }
     }
-
-    const columns = [  
-        { header: '날짜', accessor: 'date', width: '10%', type: 'date' },
-        { header: '분류', accessor: 'group1', width: '10%' },
-        { header: '항목', accessor: 'group2', width: 'auto' },
-        { header: '지출금액', accessor: 'price1', width: '12%' },
-        { header: '실지출금액', accessor: 'price2', width: '12%' },
-        { header: '결제수단', accessor: 'payment', width: '15%' },
-        { header: '비고', accessor: 'remark', width: '15%' }
-    ]
+    
+    const columns = ['date', 'group1', 'group2', 'price1', 'price2', 'payment', 'remark'];
     
     return (
         <div className="payList_contents">
@@ -277,11 +272,76 @@ function PayList() {
                 <Button variant="outline-dark" className="btn_month_next" onClick={()=>handleDate('next')}>&gt;</Button>
             </div>
             
-            <Table columns={columns} checkTr={true}/>
+            <Table bordered hover>
+                <colgroup>
+                    <col width={"5%"} />
+                    <col width={"10%"} />
+                    <col width={"10%"} />
+                    <col />
+                    <col width={"12%"} />
+                    <col width={"12%"} />
+                    <col width={"15%"} />
+                    <col width={"15%"} />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" checked={checkedAll} onChange={handleCheckedAll} /></th>
+                        <th>날짜</th>
+                        <th>분류</th>
+                        <th>항목</th>
+                        <th>지출금액</th>
+                        <th>실지출금액</th>
+                        <th>결제수단</th>
+                        <th>비고</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {payListStatus === 'loading' && <div>Loading...</div>}
+                    
+                    {payListStatus === 'succeeded' && (
+                        tempData.map((item, i) => !item.isDeleted ? (
+                                <tr key={i}>
+                                    <td><input type="checkbox" checked={checkedItems.includes(item.id)} onChange={() => handleCheck(item.id)} disabled={item.isDisabled} /></td>
+                                    {columns.map((col, idx) => (
+                                        col === "date" ? (
+                                            <td>
+                                                <DatePicker
+                                                    key={col}
+                                                    selected={item[col] ? new Date(item[col]) : new Date()}
+                                                    onKeyDown={(e) => {e.preventDefault();}}
+                                                    onChange={(date) => handleUpdate(date, item.id, col)}
+                                                    onFocus={(e) => setInitial(item, i * 7 + idx)}
+                                                    dateFormat="yyyy-MM-dd"
+                                                    className="input_date" />
+                                            </td>
+                                        ) : (
+                                            <Input
+                                                key={col}
+                                                ref={el => inputRefs.current[i * 7 + idx] = el}
+                                                onBlur={(e) => handleUpdate(e, item.id, col)}
+                                                onKeyDown={(e) => handleKeyDown(e, (i + 1) * 7 + idx, col)}
+                                                onFocus={(e) => setInitial(item, i * 7 + idx)}
+                                                onInput={(e) => handleInput(e, col)}>
+                                                    {item[col]}
+                                            </Input>
+                                        )
+                                    ))}
+                                </tr>
+                            ) : null)
+                    )}
+                    
+                    {payListStatus === 'failed' && (
+                        <tr>
+                            <td colspan="8">Error</td>
+                        </tr>
+                    )}
+                </tbody>
+            </Table>
+
             <div className="summary-group">
                 <div className="button-group">
-                    <Button variant="outline-dark" size="sm" disabled={checkedItems.length === 0} onClick={handleDelete}>선택삭제</Button>
-                    <Button variant="outline-dark" size="sm" disabled={checkedItems.length === 0} onClick={handleCopy}>선택복사</Button>
+                    <Button variant="outline-dark" size="sm" disabled={checkedItems.length === 0} onClick={handleDelete} className="cursor_pointer">선택삭제</Button>
+                    <Button variant="outline-dark" size="sm" disabled={checkedItems.length === 0} onClick={handleCopy} className="cursor_pointer">선택복사</Button>
                     <OverlayTrigger
                         trigger="click"
                         key="top"
@@ -295,9 +355,9 @@ function PayList() {
                             </Popover>
                         }
                         >
-                        <Button variant="outline-dark" size="sm" disabled={checkedItems.length === 0}>카드선택</Button>
+                        <Button variant="outline-dark" size="sm" disabled={checkedItems.length === 0} className="cursor_pointer">카드선택</Button>
                     </OverlayTrigger>
-                    <Button variant="outline-dark" size="sm" onClick={handleModal}>고정금액</Button>
+                    <Button variant="outline-dark" size="sm" onClick={handleModal} className="cursor_pointer">고정금액</Button>
                     <PayListModal show={isModalOpen} onClose={handleModal} />
                 </div>
                 <div className="summary-item item1">

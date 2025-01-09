@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Nav, Modal, Button } from "react-bootstrap";
-import MyAccount from "./MyAccount";
 import MyCard from "./MyCard";
 import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
@@ -28,9 +27,6 @@ const PayListModal = ({show, onClose}) => {
                         <Nav.Item>
                             <Nav.Link onClick={() => setActiveTab(3)}>카드관리</Nav.Link>
                         </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link onClick={() => setActiveTab(4)}>통장관리</Nav.Link>
-                        </Nav.Item>
                     </Nav>
                 </Modal.Header>
                 <Modal.Body>
@@ -38,7 +34,6 @@ const PayListModal = ({show, onClose}) => {
                         {activeTab === 1 && <MyFixedExpense />}
                         {activeTab === 2 && <MyCategory />}
                         {activeTab === 3 && <MyCard />}
-                        {activeTab === 4 && <MyAccount />}
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
