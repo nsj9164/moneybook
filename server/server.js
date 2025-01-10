@@ -179,11 +179,9 @@ app.get('/fixedItemList', authenticateToken, function(req, res) {
                    , expense_payment
                    , expense_group1
                    , expense_group2
-                   , reg_dt date
-                   , upd_dt date
                 FROM FIXCED_ITEM_LIST
                WHERE USER_ID = ?
-               ORDER BY expense_date, ID`,
+               ORDER BY expense_date, expense_id`,
     [req.user.userId],
     function (err, results, fields) {
         if(err) throw err;
@@ -229,10 +227,61 @@ app.post('/fixedItemList/delete', authenticateToken, function(req, res) {
     })
 });
 
+app.get('/cardList', authenticateToken, function(req, res) {
+    db.query(`SELECT card_id
+                   , card_company
+                   , card_name
+                   , card_type
+                   , payment_due_date
+                   , usage_period
+                   , active_status
+                FROM CARD_INFO
+               WHERE USER_ID = ?
+               ORDER BY card_id`,
+    [req.user.userId],
+    function (err, results, fields) {
+        if(err) throw err;
+        res.send(results);
+    });
+});
 
+app.post('/cardList/insert', authenticateToken, function(req, res) {
+    const userId = req.user.userId;
+    const data = req.body;
 
+    data.forEach(item => {
+        if(item.isNew) {
+            db.query('INSERT INTO CARD_INFO (card_company, card_name, card_type, payment_due_date, usage_period, active_status, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, SYSDATE(), ?)',
+            [item.card_company, item.card_name, item.card_type, item.payment_due_date, item.usage_period, item.active_status, userId],
+            (err, result) => {
+                if(err) throw err;
+            });
+        } else if(item.isModified) {
+            db.query('UPDATE CARD_INFO SET card_company = ?, card_name = ?, card_type = ?, payment_due_date = ?, usage_period = ?, active_status = ?, UPD_DT = SYSDATE() WHERE card_id = ?',
+            [item.card_company, item.card_name, item.card_type, item.payment_due_date, item.usage_period, item.active_status, item.card_id],
+            (err, result) => {
+                if(err) throw err;
+            });
+        }
+    });
 
+    res.send({ message: 'Data saved successfully!'});
+});
 
+app.post('/cardList/delete', authenticateToken, function(req, res) {
+    const userId = req.user.userId;
+    const data = req.body;
+
+    data.forEach(item => {
+        db.query(`DELETE FROM CARD_INFO
+                   WHERE user_id = ?
+                     AND card_id = ?`,
+        [userId, item.card_id],
+        (err, result) => {
+            if(err) throw err;
+        });
+    })
+});
 
 app.get('*', function(req, res) {
     res.sendFile(path.join(__dirname, '../account/build', 'index.html'));

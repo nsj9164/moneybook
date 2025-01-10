@@ -1,4 +1,4 @@
-function MyCategory() {
+function MyCategory({isLoggedIn}) {
     return <div>tab2</div>
 }
 

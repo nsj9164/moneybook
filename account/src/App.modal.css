@@ -1,3 +1,62 @@
+.modal-body {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-title {
+  font-family: 'Arial', sans-serif;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.custom-table th, .custom-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.custom-table th {
+  background-color: #f2f2f2;
+  color: #555;
+  font-weight: bold;
+}
+
+.custom-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.custom-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.custom-table input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.custom-table tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+.custom-table tbody tr td[colspan="6"] {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+}
+
+.modal-footer .btn {
+  margin-left: 10px; /* 버튼 간격 추가 */
+}
+
 .modal-summary-group {
   display: flex;
   justify-content: space-between;

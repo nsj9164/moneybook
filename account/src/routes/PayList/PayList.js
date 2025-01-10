@@ -358,7 +358,7 @@ function PayList() {
                         <Button variant="outline-dark" size="sm" disabled={checkedItems.length === 0} className="cursor_pointer">카드선택</Button>
                     </OverlayTrigger>
                     <Button variant="outline-dark" size="sm" onClick={handleModal} className="cursor_pointer">고정금액</Button>
-                    <PayListModal show={isModalOpen} onClose={handleModal} />
+                    <PayListModal show={isModalOpen} onClose={handleModal} isLoggedIn={isLoggedIn} />
                 </div>
                 <div className="summary-item item1">
                     <div>지출합계</div>

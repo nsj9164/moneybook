@@ -5,7 +5,7 @@ import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
 import '../../../App.modal.css'
 
-const PayListModal = ({show, onClose}) => {
+const PayListModal = ({show, onClose, isLoggedIn}) => {
     const [activeTab, setActiveTab] = useState(1);
     return (
         <div
@@ -38,9 +38,9 @@ const PayListModal = ({show, onClose}) => {
                 </Modal.Header>
                 <Modal.Body>
                     <div>
-                        {activeTab === 1 && <MyFixedExpense />}
-                        {activeTab === 2 && <MyCategory />}
-                        {activeTab === 3 && <MyCard />}
+                        {activeTab === 1 && <MyFixedExpense isLoggedIn={isLoggedIn} />}
+                        {activeTab === 2 && <MyCategory isLoggedIn={isLoggedIn} />}
+                        {activeTab === 3 && <MyCard isLoggedIn={isLoggedIn} />}
                     </div>
                 </Modal.Body>
                 <Modal.Footer>

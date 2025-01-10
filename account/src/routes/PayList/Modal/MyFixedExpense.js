@@ -1,19 +1,9 @@
 import { useEffect, useState } from "react";
 import { Table, Button, OverlayTrigger, Popover } from "react-bootstrap"
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { fetchData } from "../../../store/myDetailSlice";
+import { fixedItemListActions } from "../../../store/myDetailSlice"
 
-function MyFixedExpense() {
-    // login data
-    const navigate = useNavigate();
-    const isLoggedIn = useSelector(state => state.login.isLoggedIn);
-    useEffect(() => {
-        if(!isLoggedIn) {
-            navigate('/login');
-        }
-    }, [isLoggedIn, navigate])
-
+function MyFixedExpense({isLoggedIn}) {
     const dispatch = useDispatch();
     const fixedExpenseList = useSelector(state => state.myDetailList.items);
     const fixedExpenseListStatus = useSelector(state => state.myDetailList.status);
@@ -21,9 +11,9 @@ function MyFixedExpense() {
     // fiexed_expense
     useEffect(() => {
         if(isLoggedIn && fixedExpenseListStatus === 'idle') {
-            dispatch(fetchData())
+            dispatch(fixedItemListActions.fetchData())
         }
-        console.log(fixedExpenseList)
+        console.log("fixedExpenseList:::",fixedExpenseList)
     }, [fixedExpenseListStatus, dispatch]);
 
     const [checkedAll, setCheckedAll] = useState(false);
@@ -54,9 +44,9 @@ function MyFixedExpense() {
     }, [checkedItems])
 
     return (
-        <div>
-            <h2>고정항목 관리하기</h2>
-            <Table bordered hover>
+        <div class="modal-body">
+            <h2 class="modal-title">고정항목 관리하기</h2>
+            <Table class="custom-table" bordered hover>
                 <colgroup>
                     <col width={"8%"} />
                     <col width={"12%"} />
@@ -78,12 +68,14 @@ function MyFixedExpense() {
                 <tbody>
                     
                     {fixedExpenseListStatus === 'succeeded' && (
-                        <div>success</div>
+                        <tr>
+                            <td colspan="6">Success</td>
+                        </tr>
                     )}
                     
                     {fixedExpenseListStatus === 'failed' && (
                         <tr>
-                            <td colspan="8">Error</td>
+                            <td colspan="6">Error</td>
                         </tr>
                     )}
                 </tbody>
