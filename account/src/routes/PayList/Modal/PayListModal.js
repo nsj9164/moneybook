@@ -3,6 +3,7 @@ import { Nav, Modal, Button } from "react-bootstrap";
 import MyCard from "./MyCard";
 import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
+import '../../../App.modal.css'
 
 const PayListModal = ({show, onClose}) => {
     const [activeTab, setActiveTab] = useState(1);
@@ -11,7 +12,13 @@ const PayListModal = ({show, onClose}) => {
             className="modal show"
             style={{ display: 'block', position: 'initial' }}
         >
-            <Modal show={show} onHide={onClose}>
+            <Modal 
+                size="lg"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+                show={show}
+                onHide={onClose}
+            >
                 <Modal.Header closeButton>
                     {/* <Modal.Title>Setting</Modal.Title> */}
                     <Nav
@@ -37,12 +44,21 @@ const PayListModal = ({show, onClose}) => {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onClose}>
-                        닫기
-                    </Button>
-                    <Button variant="primary" onClick={onClose}>
-                        저장하기
-                    </Button>
+                    <div className="modal-summary-group">
+                        <div className="modal-button-group">
+                            <Button variant="outline-dark" size="sm" className="cursor_pointer">선택삭제</Button>
+                        </div>
+                        <div className="modal-summary-item item1">
+                            <div>월 고정금액 합계</div>
+                            <div className="font-bold">123</div>
+                        </div>
+                        <Button variant="primary" onClick={onClose}>
+                            저장하기
+                        </Button>
+                        <Button variant="secondary" onClick={onClose}>
+                            닫기
+                        </Button>
+                    </div>
                 </Modal.Footer>
             </Modal>
         </div>

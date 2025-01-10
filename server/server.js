@@ -171,7 +171,7 @@ app.post('/logout', (req, res) => {
     res.redirect('/');
 })
 
-app.post('/fixedItemList', authenticateToken, function(req, res) {
+app.get('/fixedItemList', authenticateToken, function(req, res) {
     db.query(`SELECT id
                    , DATE_FORMAT(expense_date,"%Y-%m-%d") as expense_date
                    , expense_desc
@@ -197,14 +197,14 @@ app.post('/fixedItemList/insert', authenticateToken, function(req, res) {
 
     data.forEach(item => {
         if(item.isNew) {
-            db.query('INSERT INTO FIXCED_ITEM_LIST (expense_date, expense_desc, expense_amount, expense_payment, expense_group1, expense_group2, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [item.date.replace(/-/g, ""), item.group1, item.group2, item.price1.replace(/,/g,""), item.price2.replace(/,/g,""), item.payment, item.remark, userId],
+            db.query('INSERT INTO FIXCED_ITEM_LIST (expense_date, expense_desc, expense_amount, expense_payment, expense_group1, expense_group2, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, SYSDATE(), ?)',
+            [item.expense_date.replace(/-/g, ""), item.expense_desc, item.expense_amount.replace(/,/g,""), item.expense_payment, item.expense_group1, item.expense_group2, userId],
             (err, result) => {
                 if(err) throw err;
             });
         } else if(item.isModified) {
-            db.query('UPDATE PAYLIST SET date = ?, group1 = ?, group2 = ?, price1 = ?, price2 = ?, payment = ?, remark = ? WHERE id = ?',
-            [item.date.replace(/-/g,""), item.group1, item.group2, item.price1.replace(/,/g,""), item.price2.replace(/,/g,""), item.payment, item.remark, item.id],
+            db.query('UPDATE FIXCED_ITEM_LIST SET expense_date = ?, expense_desc = ?, expense_amount = ?, expense_payment = ?, expense_group1 = ?, expense_group2 = ?, UPD_DT = SYSDATE() WHERE expense_id = ?',
+            [item.expense_date.replace(/-/g,""), item.expense_desc, item.expense_amount.replace(/,/g,""), item.expense_payment, item.expense_group1, item.expense_group2, item.expense_id],
             (err, result) => {
                 if(err) throw err;
             });
@@ -214,15 +214,15 @@ app.post('/fixedItemList/insert', authenticateToken, function(req, res) {
     res.send({ message: 'Data saved successfully!'});
 });
 
-app.post('/payList/delete', authenticateToken, function(req, res) {
+app.post('/fixedItemList/delete', authenticateToken, function(req, res) {
     const userId = req.user.userId;
     const data = req.body;
 
     data.forEach(item => {
-        db.query(`DELETE FROM PAYLIST
+        db.query(`DELETE FROM FIXCED_ITEM_LIST
                    WHERE user_id = ?
-                     AND id = ?`,
-        [userId, item.id],
+                     AND expense_id = ?`,
+        [userId, item.expense_id],
         (err, result) => {
             if(err) throw err;
         });

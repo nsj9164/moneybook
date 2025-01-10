@@ -2,8 +2,8 @@ import './../App.css';
 import { Form, Button } from 'react-bootstrap'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginData } from '../store/paySlice';
 import { useNavigate } from 'react-router-dom';
+import { loginData } from '../store/loginSlice';
 
 export const Login = () => {
     const dispatch = useDispatch();
@@ -12,9 +12,9 @@ export const Login = () => {
     const [userId, setUserId] = useState('');
     const [userPw, setUserPw] = useState('');
     
-    const loginStatus = useSelector((state) => state.payList.loginStatus);
-    const loginMessage = useSelector((state) => state.payList.loginMessage);
-    const isLoggedIn = useSelector((state) => state.payList.isLoggedIn);
+    const loginStatus = useSelector((state) => state.login.loginStatus);
+    const loginMessage = useSelector((state) => state.login.loginMessage);
+    const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
 
     // 로그인
     const handleLogin = () => {

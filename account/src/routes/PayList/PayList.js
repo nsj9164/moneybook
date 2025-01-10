@@ -17,7 +17,7 @@ const Input = styled.td.attrs({
 
 function PayList() {
     const navigate = useNavigate();
-    const isLoggedIn = useSelector((state) => state.payList.isLoggedIn);
+    const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
 
     useEffect(() => {
         if(!isLoggedIn) {
