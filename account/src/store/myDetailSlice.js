@@ -4,7 +4,7 @@ import axios from 'axios';
 export const createAsyncActions = (endpoint) => {
     return {
         fetchData: createAsyncThunk(`${endpoint}/fetchData`, async () => {
-            const response = await axios.get(`http://localhost:8009/${endpoint}`, data, { withCredentials: true });
+            const response = await axios.get(`http://localhost:8009/${endpoint}`, { withCredentials: true });
             return response.data;
         }),
         saveData: createAsyncThunk(`${endpoint}/saveData`, async (data) => {
