@@ -10,9 +10,10 @@ function MyFixedExpense({ isLoggedIn }) {
   const fixedExpenseListStatus = useSelector(
     (state) => state.myDetailList.status
   );
-
   const [fixedData, setFixedData] = useState([]);
   const [fixedId, setFixedId] = useState(1);
+  const [checkedAll, setCheckedAll] = useState(false);
+  const [checkedItems, setCheckedItems] = useState([]);
 
   // fetchData 호출
   useEffect(() => {
@@ -24,7 +25,13 @@ function MyFixedExpense({ isLoggedIn }) {
   // setting fixedData
   useEffect(() => {
     if (fixedExpenseListStatus === "succeeded" && fixedExpenseList.length > 0) {
-      setFixedData(fixedExpenseList);
+      setFixedData(
+        fixedExpenseList.map((item) => ({
+          ...item,
+          isDisabled: false,
+          isModified: false,
+        }))
+      );
     } else if (fixedData.length === 0) {
       setInitial();
     }
@@ -34,11 +41,9 @@ function MyFixedExpense({ isLoggedIn }) {
   // 한 줄 추가
   const setInitial = () => {
     const newId = `expense-${fixedId}`;
-    setFixedData([{ expense_id: newId }]);
+    setFixedData([{ expense_id: newId, isDisabled: true, isNew: true }]);
     setFixedId((id) => id + 1);
   };
-  const [checkedAll, setCheckedAll] = useState(false);
-  const [checkedItems, setCheckedItems] = useState([]);
 
   useEffect(() => {
     console.log("fixedData:::", fixedData);
@@ -56,7 +61,9 @@ function MyFixedExpense({ isLoggedIn }) {
     if (checkedAll) {
       setCheckedItems([]);
     } else {
-      // const allIds = tempData.filter(item => !item.isDisabled).map(item => item.id);
+      const allIds = fixedData
+        .filter((item) => !item.isDisabled)
+        .map((item) => item.id);
       setCheckedItems(allIds);
     }
     setCheckedAll(!checkedAll);
@@ -64,8 +71,12 @@ function MyFixedExpense({ isLoggedIn }) {
 
   // 전체선택/해제
   useEffect(() => {
-    // (checkedItems.length === tempData.filter(item => !item.isDisabled).length && tempData.length > 1) ? setCheckedAll(true) : setCheckedAll(false)
-    // console.log("checkedItems:::", checkedItems);
+    checkedItems.length ===
+      fixedData.filter((item) => !item.isDisabled).length &&
+    fixedData.length > 1
+      ? setCheckedAll(true)
+      : setCheckedAll(false);
+    console.log("checkedItems:::", checkedItems);
   }, [checkedItems]);
 
   const fields = [
