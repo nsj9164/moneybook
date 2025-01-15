@@ -283,15 +283,15 @@ app.post("/fixedItemList/delete", authenticateToken, function (req, res) {
 app.get("/cardList", authenticateToken, function (req, res) {
   db.query(
     `SELECT card_id
-                   , card_company
-                   , card_name
-                   , card_type
-                   , payment_due_date
-                   , usage_period
-                   , active_status
-                FROM CARD_INFO
-               WHERE USER_ID = ?
-               ORDER BY card_id`,
+        , card_company
+        , card_name
+        , card_type
+        , payment_due_date
+        , usage_period
+        , active_status
+    FROM CARD_INFO
+    WHERE USER_ID = ?
+    ORDER BY card_id`,
     [req.user.userId],
     function (err, results, fields) {
       if (err) throw err;

@@ -152,9 +152,11 @@ function PayList() {
 
   // 추가 입력란 클릭시 초기값 세팅
   const setInitial = (item, index) => {
+    console.log("item:::", item);
+    console.log("item.id:::", item.express_id);
     if (item.isDisabled) {
       const newData = tempData.map((i) => {
-        if (item.id === i.id) {
+        if (item.express_id === i.express_id) {
           setTempId((tempId) => tempId + 1);
           console.log("tempId:::", date, tempId);
           return {
