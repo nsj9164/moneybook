@@ -360,6 +360,65 @@ app.post("/cardList/delete", authenticateToken, function (req, res) {
   });
 });
 
+app.get("/categoryList", authenticateToken, function (req, res) {
+  db.query(
+    `SELECT cat_id
+          , category_nm
+    FROM CARD_INFO
+    WHERE USER_ID = ?
+    ORDER BY card_id`,
+    [req.user.userId],
+    function (err, results, fields) {
+      if (err) throw err;
+      res.send(results);
+    }
+  );
+});
+
+app.post("/categoryList/insert", authenticateToken, function (req, res) {
+  const userId = req.user.userId;
+  const data = req.body;
+
+  data.forEach((item) => {
+    if (item.isNew) {
+      db.query(
+        "INSERT INTO category (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
+        [item.category_nm, userId],
+        (err, result) => {
+          if (err) throw err;
+        }
+      );
+    } else if (item.isModified) {
+      db.query(
+        "UPDATE category SET category_nm = ?, UPD_DT = SYSDATE() WHERE cat_id = ?",
+        [item.category_nm, item.cat_id],
+        (err, result) => {
+          if (err) throw err;
+        }
+      );
+    }
+  });
+
+  res.send({ message: "Data saved successfully!" });
+});
+
+app.post("/categoryList/delete", authenticateToken, function (req, res) {
+  const userId = req.user.userId;
+  const data = req.body;
+
+  data.forEach((item) => {
+    db.query(
+      `DELETE FROM category
+        WHERE user_id = ?
+          AND cat_id = ?`,
+      [userId, item.card_id],
+      (err, result) => {
+        if (err) throw err;
+      }
+    );
+  });
+});
+
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "../account/build", "index.html"));
 });

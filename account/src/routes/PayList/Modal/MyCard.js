@@ -189,15 +189,13 @@ function MyCard({ isLoggedIn }) {
                     );
                   } else {
                     return (
-                      <td key={idx}>
-                        <Input
-                          ref={(el) => (inputRefs.current[i * 7 + idx] = el)}
-                          onBlur={(e) => handleUpdate(e, item.id, col)}
-                          onFocus={(e) => setInitial(item, i * 7 + idx)}
-                        >
-                          {item[col]}
-                        </Input>
-                      </td>
+                      <Input
+                        ref={(el) => (inputRefs.current[i * 7 + idx] = el)}
+                        onBlur={(e) => handleUpdate(e, item.id, col)}
+                        onFocus={(e) => setInitial(item, i * 7 + idx)}
+                      >
+                        {item[col]}
+                      </Input>
                     );
                   }
                 })}
