@@ -18,12 +18,11 @@ function MyCategory({ isLoggedIn }) {
     if (isLoggedIn && catListStatus === "idle") {
       dispatch(categoryListActions.fetchData());
     }
-    console.log("catList:::", catList);
   }, [catListStatus, dispatch]);
 
   useEffect(() => {
     if (catListStatus === "succeeded" && catList.length > 0) {
-      setCardData(
+      setCatData(
         catList.map((item) => ({
           ...item,
           isDisabled: false,
@@ -31,15 +30,9 @@ function MyCategory({ isLoggedIn }) {
         }))
       );
     }
-    console.log("Fixed catList current state:", catList);
   }, [catListStatus, catList]);
 
   useEffect(() => {
-    console.log(
-      catData,
-      catData.length,
-      catData.map((item) => console.log(item.categoryNm))
-    );
     if (
       catData.length === 0 ||
       catData.every((item) => item.categoryNm && item.categoryNm !== undefined)
@@ -63,26 +56,6 @@ function MyCategory({ isLoggedIn }) {
     );
   };
 
-  // const setInitial = (item, index) => {
-  //   if (item.isDisabled) {
-  //     setCatData(
-  //       catData.map((data) =>
-  //         item.id === data.id
-  //           ? {
-  //               ...data,
-  //               payment_due_date: 1,
-  //               usage_period_start: 17,
-  //               usage_period_end: 16,
-  //               active_status: 1,
-  //             }
-  //           : data
-  //       )
-  //     );
-  //   } else {
-  //     setFocusedItemId(index);
-  //   }
-  // };
-
   useEffect(() => {
     if (focusedItemId !== null) {
       const focusedElement = inputRefs.current[focusedItemId];
@@ -92,14 +65,7 @@ function MyCategory({ isLoggedIn }) {
     }
   }, [focusedItemId]);
 
-  const fields = [
-    "card_company",
-    "card_name",
-    "card_type",
-    "payment_due_date",
-    "usage_period",
-    "active_status",
-  ];
+  const fields = ["categoryNm"];
 
   return (
     <div className="modal-body">
@@ -120,7 +86,7 @@ function MyCategory({ isLoggedIn }) {
             catData.map((item, i) => (
               <tr key={i}>
                 <Input
-                  ref={(el) => (inputRefs.current[i * 2 + i] = el)}
+                  ref={(el) => (inputRefs.current[i] = el)}
                   onBlur={(e) => handleUpdate(e, item.id)}
                 >
                   {item.categoryNm}
@@ -128,10 +94,9 @@ function MyCategory({ isLoggedIn }) {
                 <td>X</td>
               </tr>
             ))}
-
           {catListStatus === "failed" && (
             <tr>
-              <td colspan="2">Error</td>
+              <td colSpan="2">Error</td>
             </tr>
           )}
         </tbody>
