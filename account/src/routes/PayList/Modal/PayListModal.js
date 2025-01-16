@@ -9,7 +9,7 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
   const [activeTab, setActiveTab] = useState(1);
   return (
     <div
-      className="modal show"
+      className="modal show modal-container"
       style={{ display: "block", position: "initial" }}
     >
       <Modal
@@ -26,13 +26,19 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
             onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}
           >
             <Nav.Item>
-              <Nav.Link onClick={() => setActiveTab(1)}>고정금액관리</Nav.Link>
+              <Nav.Link onClick={() => setActiveTab(1)} className="nav-link">
+                고정금액관리
+              </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link onClick={() => setActiveTab(2)}>분류관리</Nav.Link>
+              <Nav.Link onClick={() => setActiveTab(2)} className="nav-link">
+                분류관리
+              </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link onClick={() => setActiveTab(3)}>카드관리</Nav.Link>
+              <Nav.Link onClick={() => setActiveTab(3)} className="nav-link">
+                카드관리
+              </Nav.Link>
             </Nav.Item>
           </Nav>
         </Modal.Header>
@@ -43,22 +49,26 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
             {activeTab === 3 && <MyCard isLoggedIn />}
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          {activeTab === 1 && (
-            <div className="modal-summary-group">
-              <div className="modal-button-group">
-                <Button
-                  variant="outline-dark"
-                  size="sm"
-                  className="cursor_pointer"
-                >
-                  선택삭제
-                </Button>
-              </div>
-              <div className="modal-summary-item item1">
-                <div>월 고정금액 합계</div>
-                <div className="font-bold">123</div>
-              </div>
+        <Modal.Footer className="modal-footer-custom">
+          <div className="modal-summary-group">
+            {activeTab === 1 && (
+              <>
+                <div className="modal-button-group-left">
+                  <Button
+                    variant="outline-dark"
+                    size="sm"
+                    className="cursor_pointer"
+                  >
+                    선택삭제
+                  </Button>
+                </div>
+                <div className="modal-summary-item item1">
+                  <div>월 고정금액 합계</div>
+                  <div className="font-bold">123</div>
+                </div>
+              </>
+            )}
+            <div className="modal-button-group-right">
               <Button variant="primary" onClick={onClose}>
                 저장하기
               </Button>
@@ -66,7 +76,7 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
                 닫기
               </Button>
             </div>
-          )}
+          </div>
         </Modal.Footer>
       </Modal>
     </div>

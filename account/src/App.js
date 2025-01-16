@@ -1,10 +1,10 @@
-import { Container, Navbar } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
-import { Route, Routes, useLocation } from 'react-router-dom';
-import './App.css';
-import { Login } from './routes/Login';
-import PayList from './routes/PayList/PayList';
-import { logout } from './store/loginSlice';
+import { Container, Navbar } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { Route, Routes, useLocation } from "react-router-dom";
+import "./App.css";
+import { Login } from "./routes/Login";
+import PayList from "./routes/PayList/PayList";
+import { logout } from "./store/loginSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -26,13 +26,15 @@ function App() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav" className="log_out_nav">
-            {location.pathname !== '/login' && (
-              <p className="log_out" onClick={()=>dispatch(logout())}>로그아웃</p>
+            {location.pathname !== "/login" && (
+              <p className="log_out" onClick={() => dispatch(logout())}>
+                로그아웃
+              </p>
             )}
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      
+
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<PayList />} />
