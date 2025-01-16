@@ -35,24 +35,30 @@ function MyCategory({ isLoggedIn }) {
   }, [catListStatus, catList]);
 
   useEffect(() => {
-    if (catData.length >= 0) {
-      const empty = catData.filter((item) => item.categoryNm === "");
-      console.log("empty:::", empty.length);
-      if (empty.length === catData.length) {
-        setCatData((prevCatData) => [
-          ...prevCatData,
-          { cat_id: `cat-${catId}`, isDisabled: true, isModified: true },
-        ]);
-        setCatId((id) => id + 1);
-      }
+    console.log(
+      catData,
+      catData.length,
+      catData.map((item) => console.log(item.categoryNm))
+    );
+    if (
+      catData.length === 0 ||
+      catData.every((item) => item.categoryNm && item.categoryNm !== undefined)
+    ) {
+      setCatData((prevCatData) => [
+        ...prevCatData,
+        { cat_id: `cat-${catId}`, isDisabled: true, isModified: true },
+      ]);
+      setCatId((id) => id + 1);
     }
   }, [catData, catId]);
 
-  const handleUpdate = (e, id, key) => {
+  const handleUpdate = (e, id) => {
     const newItem = e.target.innerText;
     setCatData((prevData) =>
       prevData.map((item) =>
-        item.id === id ? { ...item, [key]: newItem, isModified: true } : item
+        item.id === id
+          ? { ...item, categoryNm: newItem, isModified: true }
+          : item
       )
     );
   };
@@ -112,16 +118,15 @@ function MyCategory({ isLoggedIn }) {
         <tbody>
           {catListStatus === "succeeded" &&
             catData.map((item, i) => (
-              <>
+              <tr key={i}>
                 <Input
-                  key={i}
                   ref={(el) => (inputRefs.current[i * 2 + i] = el)}
                   onBlur={(e) => handleUpdate(e, item.id)}
                 >
                   {item.categoryNm}
                 </Input>
                 <td>X</td>
-              </>
+              </tr>
             ))}
 
           {catListStatus === "failed" && (
