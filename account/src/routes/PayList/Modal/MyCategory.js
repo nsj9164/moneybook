@@ -5,7 +5,7 @@ import { selectText } from "../../../util/util";
 import { Table, Form } from "react-bootstrap";
 import { Input } from "../PayList";
 
-function MyCategory({ isLoggedIn }) {
+function MyCategory({ isLoggedIn, setCatDataList }) {
   const dispatch = useDispatch();
   const catList = useSelector((state) => state.myDetailList.items);
   const catListStatus = useSelector((state) => state.myDetailList.status);
@@ -39,10 +39,15 @@ function MyCategory({ isLoggedIn }) {
     ) {
       setCatData((prevCatData) => [
         ...prevCatData,
-        { cat_id: `cat-${catId}`, isDisabled: true, isModified: true },
+        { cat_id: `cat-${catId}`, isDisabled: true, isNew: true },
       ]);
       setCatId((id) => id + 1);
     }
+
+    const modifiedData = catData.filter(
+      (item) => item.isModified || item.isNew
+    );
+    setCatDataList(modifiedData);
   }, [catData, catId]);
 
   const handleUpdate = (e, id) => {
@@ -72,12 +77,14 @@ function MyCategory({ isLoggedIn }) {
       <h2 className="modal-title">분류 관리하기</h2>
       <Table className="custom-table" bordered hover>
         <colgroup>
-          <col width={"10%"} />
+          <col />
+          <col width={"15%"} />
           <col width={"15%"} />
         </colgroup>
         <thead>
           <tr>
             <th>분류명</th>
+            <th>순서</th>
             <th>삭제</th>
           </tr>
         </thead>
@@ -92,6 +99,7 @@ function MyCategory({ isLoggedIn }) {
                   {item.categoryNm}
                 </Input>
                 <td>X</td>
+                <td>≡</td>
               </tr>
             ))}
           {catListStatus === "failed" && (

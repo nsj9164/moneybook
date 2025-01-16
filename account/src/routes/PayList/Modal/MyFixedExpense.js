@@ -5,7 +5,7 @@ import { fixedItemListActions } from "../../../store/myDetailSlice";
 import { nowCursor, restoreCursor, selectText } from "../../../util/util";
 import { Input } from "../PayList";
 
-function MyFixedExpense({ isLoggedIn }) {
+function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
   const dispatch = useDispatch();
   const fixedExpenseList = useSelector((state) => state.myDetailList.items);
   const fixedExpenseListStatus = useSelector(
@@ -37,7 +37,6 @@ function MyFixedExpense({ isLoggedIn }) {
         }))
       );
     }
-    console.log("Fixed data current state:", fixedData);
   }, [fixedExpenseListStatus, fixedExpenseList]);
 
   useEffect(() => {
@@ -49,20 +48,22 @@ function MyFixedExpense({ isLoggedIn }) {
           {
             expense_id: `expense_${fixedId}`,
             isDisabled: true,
-            isModified: true,
+            isNew: true,
           },
         ]);
         setFixedId((id) => id + 1);
       }
     }
 
-    console.log("fixedData:::", fixedData);
+    const modifiedData = fixedData.filter(
+      (item) => item.isModified || item.isNew
+    );
+    setFixedDataList(modifiedData);
   }, [fixedData]);
 
   // 데이터 수정
   const handleUpdate = (e, id, key) => {
     const newItem = e.target.innerText;
-    console.log("handleUpdate:::", id, key, newItem);
     setFixedData((prevData) =>
       prevData.map((item) =>
         item.id === id ? { ...item, [key]: newItem, isModified: true } : item
@@ -72,8 +73,6 @@ function MyFixedExpense({ isLoggedIn }) {
 
   // 추가 입력란 클릭시 초기값 세팅
   const setInitial = (item, index) => {
-    console.log("item:::", item);
-    console.log("item.id:::", item.id);
     if (item.isDisabled) {
       setFixedData(
         fixedData.map((data) =>
@@ -114,7 +113,6 @@ function MyFixedExpense({ isLoggedIn }) {
     fixedData.length > 1
       ? setCheckedAll(true)
       : setCheckedAll(false);
-    console.log("checkedItems:::", checkedItems);
   }, [checkedItems]);
 
   useEffect(() => {
@@ -137,7 +135,6 @@ function MyFixedExpense({ isLoggedIn }) {
     }
 
     if (col === "expense_amount") {
-      console.log("innerText:::", e.target.innerText, e.key === "Process");
       setPrice(e.target.innerText);
       const blockedRegex = /^[a-zA-Z~!@#$%^&*()_\-+=\[\]{}|\\;:'",.<>?/가-힣]$/;
       if (
@@ -225,15 +222,15 @@ function MyFixedExpense({ isLoggedIn }) {
                   col === "expense_date" ||
                   col === "expense_payment" ||
                   col === "expense_cat_nm" ? (
-                    <td>
+                    <td key={idx}>
                       <Form.Select aria-label="Default select example">
                         {col === "expense_date" &&
-                          Array.from({ length: 31 }, (_, i) => (
+                          Array.from({ length: 31 }, (_, j) => (
                             <option
-                              key={i}
-                              value={String(i + 1).padStart(2, "0") + "일"}
+                              key={j}
+                              value={String(j + 1).padStart(2, "0") + "일"}
                             >
-                              {String(i + 1).padStart(2, "0")}
+                              {String(j + 1).padStart(2, "0")}
                             </option>
                           ))}
                         {col === "expense_date" && (
@@ -255,12 +252,12 @@ function MyFixedExpense({ isLoggedIn }) {
                   ) : (
                     <Input
                       key={idx}
-                      ref={(el) => (inputRefs.current[i * 5 + idx] = el)}
-                      onBlur={(e) => handleUpdate(e, item.id, col)}
+                      ref={(el) => (inputRefs.current[i * 2 + idx] = el)}
+                      onBlur={(e) => handleUpdate(e, item.expense_id, col)}
                       onKeyDown={(e) =>
-                        handleKeyDown(e, (i + 1) * 5 + idx, col)
+                        handleKeyDown(e, (i + 1) * 2 + idx, col)
                       }
-                      onFocus={(e) => setInitial(item, i * 5 + idx)}
+                      onFocus={(e) => setInitial(item, i * 2 + idx)}
                       onInput={(e) => handleInput(e, col)}
                     >
                       {item[col]}

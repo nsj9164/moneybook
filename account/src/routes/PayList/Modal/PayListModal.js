@@ -4,9 +4,28 @@ import MyCard from "./MyCard";
 import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
 import "../../../App.modal.css";
+import { useDispatch } from "react-redux";
+import { fixedItemListActions } from "../../../store/myDetailSlice";
 
 const PayListModal = ({ show, onClose, isLoggedIn }) => {
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState(1);
+  const [fixedDataList, setFixedDataList] = useState([]);
+  const [catDataList, setCatDataList] = useState([]);
+  const [cardDataList, setCardDataList] = useState([]);
+
+  const handleSave = () => {
+    if (activeTab === 1) {
+      console.log("저장하기 버튼 클릭1", fixedDataList);
+      dispatch(fixedItemListActions.saveData(fixedDataList));
+    } else if (activeTab === 2) {
+      console.log("저장하기 버튼 클릭2", catDataList);
+      dispatch(fixedItemListActions.saveData(catDataList));
+    } else {
+      console.log("저장하기 버튼 클릭3", cardDataList);
+      dispatch(fixedItemListActions.saveData(cardDataList));
+    }
+  };
   return (
     <div
       className="modal show modal-container"
@@ -44,9 +63,15 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
         </Modal.Header>
         <Modal.Body>
           <div>
-            {activeTab === 1 && <MyFixedExpense isLoggedIn />}
-            {activeTab === 2 && <MyCategory isLoggedIn />}
-            {activeTab === 3 && <MyCard isLoggedIn />}
+            {activeTab === 1 && (
+              <MyFixedExpense isLoggedIn setFixedDataList={setFixedDataList} />
+            )}
+            {activeTab === 2 && (
+              <MyCategory isLoggedIn setCatDataList={setCatDataList} />
+            )}
+            {activeTab === 3 && (
+              <MyCard isLoggedIn setCardDataList={setCardDataList} />
+            )}
           </div>
         </Modal.Body>
         <Modal.Footer className="modal-footer-custom">
@@ -69,7 +94,7 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
               </>
             )}
             <div className="modal-button-group-right">
-              <Button variant="primary" onClick={onClose}>
+              <Button variant="primary" onClick={handleSave}>
                 저장하기
               </Button>
               <Button variant="secondary" onClick={onClose}>

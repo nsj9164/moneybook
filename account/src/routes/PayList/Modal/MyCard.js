@@ -5,7 +5,7 @@ import { selectText } from "../../../util/util";
 import { Table, Form } from "react-bootstrap";
 import { Input } from "../PayList";
 
-function MyCard({ isLoggedIn }) {
+function MyCard({ isLoggedIn, setCardDataList }) {
   const dispatch = useDispatch();
   const cardList = useSelector((state) => state.myDetailList.items);
   const cardListStatus = useSelector((state) => state.myDetailList.status);
@@ -43,10 +43,15 @@ function MyCard({ isLoggedIn }) {
     ) {
       setCardData((prevCardData) => [
         ...prevCardData,
-        { card_id: `card-${cardId}`, isDisabled: true, isModified: true },
+        { card_id: `card-${cardId}`, isDisabled: true, isNew: true },
       ]);
       setCardId((id) => id + 1);
     }
+
+    const modifiedData = cardData.filter(
+      (item) => item.isModified || item.isNew
+    );
+    setCardDataList(modifiedData);
   }, [cardData, cardId]);
 
   const handleUpdate = (e, id) => {
