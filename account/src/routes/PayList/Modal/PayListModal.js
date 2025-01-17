@@ -5,7 +5,7 @@ import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
 import "../../../App.modal.css";
 import { useDispatch } from "react-redux";
-import { fixedItemListActions, saveData } from "../../../store/myDetailSlice";
+import { fixedItemListActions } from "../../../store/myDetailSlice";
 
 const PayListModal = ({ show, onClose, isLoggedIn }) => {
   const dispatch = useDispatch();
@@ -20,16 +20,17 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
       dispatch(fixedItemListActions.saveData(fixedDataList));
     } else if (activeTab === 2) {
       console.log("저장하기 버튼 클릭2", catDataList);
-      dispatch(cardListActions.saveData(catDataList));
+      // 여기에 저장 처리 추가
     } else {
       console.log("저장하기 버튼 클릭3", cardDataList);
-      dispatch(categoryListActions.saveData(cardDataList));
+      // 여기에 저장 처리 추가
     }
   };
+
   return (
     <div
       className="modal show modal-container"
-      style={{ display: "block", position: "initial" }}
+      style={{ display: show ? "block" : "none", position: "initial" }}
     >
       <Modal
         size="lg"
@@ -39,59 +40,48 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
         onHide={onClose}
       >
         <Modal.Header closeButton>
-          {/* <Modal.Title>Setting</Modal.Title> */}
           <Nav
-            activeKey="/home"
-            onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}
+            variant="tabs"
+            activeKey={activeTab}
+            className="nav-tabs"
+            onSelect={(selectedKey) => setActiveTab(parseInt(selectedKey))}
           >
             <Nav.Item>
-              <Nav.Link onClick={() => setActiveTab(1)} className="nav-link">
+              <Nav.Link eventKey={1} className="nav-link">
                 고정금액관리
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link onClick={() => setActiveTab(2)} className="nav-link">
+              <Nav.Link eventKey={2} className="nav-link">
                 분류관리
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link onClick={() => setActiveTab(3)} className="nav-link">
+              <Nav.Link eventKey={3} className="nav-link">
                 카드관리
               </Nav.Link>
             </Nav.Item>
           </Nav>
         </Modal.Header>
         <Modal.Body>
-          <div>
-            {activeTab === 1 && (
-              <MyFixedExpense isLoggedIn setFixedDataList={setFixedDataList} />
-            )}
-            {activeTab === 2 && (
-              <MyCategory isLoggedIn setCatDataList={setCatDataList} />
-            )}
-            {activeTab === 3 && (
-              <MyCard isLoggedIn setCardDataList={setCardDataList} />
-            )}
-          </div>
+          {activeTab === 1 && (
+            <MyFixedExpense isLoggedIn setFixedDataList={setFixedDataList} />
+          )}
+          {activeTab === 2 && (
+            <MyCategory isLoggedIn setCatDataList={setCatDataList} />
+          )}
+          {activeTab === 3 && (
+            <MyCard isLoggedIn setCardDataList={setCardDataList} />
+          )}
         </Modal.Body>
         <Modal.Footer className="modal-footer-custom">
           <div className="modal-summary-group">
             {activeTab === 1 && (
-              <>
-                <div className="modal-button-group-left">
-                  <Button
-                    variant="outline-dark"
-                    size="sm"
-                    className="cursor_pointer"
-                  >
-                    선택삭제
-                  </Button>
-                </div>
-                <div className="modal-summary-item item1">
-                  <div>월 고정금액 합계</div>
-                  <div className="font-bold">123</div>
-                </div>
-              </>
+              <div className="modal-button-group-left">
+                <Button variant="outline-dark" size="sm">
+                  선택삭제
+                </Button>
+              </div>
             )}
             <div className="modal-button-group-right">
               <Button variant="primary" onClick={handleSave}>

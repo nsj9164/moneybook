@@ -42,7 +42,8 @@ body,
 
 .summary-group {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
   width: 100%;
   align-items: center;
   border: 1px solid #dee2e6;
@@ -50,10 +51,12 @@ body,
   background: #ffffff;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 15px;
 }
 
 .summary-item {
-  width: 20%;
+  flex: 1;
+  min-width: 150px;
   padding-left: 10px;
   border-left: 1px solid #dee2e6;
   text-align: center;
@@ -92,7 +95,7 @@ body,
   font-weight: 700;
   padding: 0.7rem 1.5rem;
   letter-spacing: 0.5px;
-  background: #007bff;
+  background: #03c75a;
   color: white;
   border: none;
   border-radius: 4px;
@@ -100,7 +103,7 @@ body,
 }
 
 .item3 button:hover {
-  background: #0056b3;
+  background: #43a047;
 }
 
 .font-bold {
@@ -125,6 +128,66 @@ body,
   margin: 0 10px;
 }
 
+.hyphen {
+  margin: 0 5px;
+  font-size: 1.2rem;
+}
+
+.square_button {
+  border: 1px solid #6c757d;
+  background: #f8f9fa;
+  color: #495057;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 4px; /* 네모난 모양 */
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.square_button:hover {
+  background: #e9ecef;
+  border-color: #5a6268;
+  color: #343a40;
+}
+
+.square_button span {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.btn_month {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: #f8f9fa;
+  color: #495057;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.btn_month:hover {
+  background: #e9ecef;
+  color: #007bff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn_month:active {
+  background: #dee2e6;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn_prev span,
+.btn_next span {
+  font-weight: bold;
+}
+
 .payList_contents {
   width: 80%;
   height: 100%;
@@ -139,6 +202,9 @@ body,
   border-collapse: collapse;
   width: 100%;
   margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .table th,
@@ -149,12 +215,15 @@ body,
 }
 
 .table th {
-  background-color: #e9ecef;
+  background-color: #35dc86;
   font-weight: bold;
+  font-size: 16px;
+  color: #fff;
+  border: none;
 }
 
 .table-hover tbody tr:hover {
-  background-color: #f1f3f5;
+  background-color: #e9ecef;
 }
 
 input[type="checkbox"] {
@@ -272,6 +341,52 @@ p {
   margin-top: 15px;
 }
 
+/* 추가: 팝오버 스타일링 */
+.popover-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.popover-content {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.popover-header {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.popover-body {
+  font-size: 12px;
+}
+
+/* 추가: DatePicker 스타일링 보강 */
+.input_date {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+  width: 150px;
+}
+
+/* 추가: Disabled 버튼 스타일 */
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 추가: 커서 포인터 스타일 */
 .cursor_pointer {
   cursor: pointer;
 }

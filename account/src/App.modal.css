@@ -173,17 +173,15 @@
 
 .nav-tabs {
   display: flex;
-  justify-content: space-between;
-  width: 100%;
+  justify-content: flex-start; /* 시작 위치 정렬 */
+  gap: 4px; /* 탭 간의 간격 조정 */
+  padding: 0;
+  margin: 0;
 }
 
 .nav-link {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333333; /* Dark gray color for text */
-  padding: 8px 16px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  padding: 6px 12px; /* 여백 축소 */
+  font-size: 14px; /* 글꼴 크기 축소 (필요시) */
 }
 
 .nav-link:hover,
@@ -192,9 +190,12 @@
   color: #007bff; /* Blue color for text */
 }
 
+.nav-item {
+  margin: 0; /* 추가적인 외부 여백 제거 */
+}
+
 .nav-link.active {
-  background-color: #007bff;
-  color: #ffffff;
+  border-bottom: 2px solid #007bff; /* 활성화된 링크 강조 */
 }
 
 /* Close button styling */

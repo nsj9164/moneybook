@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
-import { Table, Button, OverlayTrigger, Popover } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData, deleteData, saveData } from "../../store/paySlice";
 import {
@@ -20,6 +19,7 @@ import {
   addMonths,
 } from "date-fns";
 import PayListModal from "./Modal/PayListModal";
+import { OverlayTrigger, Popover } from "react-bootstrap";
 
 export const Input = styled.td.attrs({
   contentEditable: true,
@@ -327,13 +327,9 @@ function PayList() {
   return (
     <div className="payList_contents">
       <div className="date_wrap">
-        <Button
-          variant="outline-dark"
-          className="btn_month_prev"
-          onClick={() => handleDate("prev")}
-        >
-          &lt;
-        </Button>
+        <button className="square_button" onClick={() => handleDate("prev")}>
+          <span>&lt;</span>
+        </button>
 
         <DatePicker
           selected={startDate}
@@ -354,25 +350,21 @@ function PayList() {
           className="date_picker"
           disableTextInput
         />
-        <Button
-          variant="outline-dark"
-          className="btn_month_next"
-          onClick={() => handleDate("next")}
-        >
-          &gt;
-        </Button>
+        <button className="square_button" onClick={() => handleDate("next")}>
+          <span>&gt;</span>
+        </button>
       </div>
 
-      <Table bordered hover>
+      <table className="table table-hover">
         <colgroup>
-          <col width={"5%"} />
-          <col width={"10%"} />
-          <col width={"10%"} />
+          <col style={{ width: "5%" }} />
+          <col style={{ width: "10%" }} />
+          <col style={{ width: "10%" }} />
           <col />
-          <col width={"12%"} />
-          <col width={"12%"} />
-          <col width={"15%"} />
-          <col width={"15%"} />
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "15%" }} />
+          <col style={{ width: "15%" }} />
         </colgroup>
         <thead>
           <tr>
@@ -393,7 +385,11 @@ function PayList() {
           </tr>
         </thead>
         <tbody>
-          {payListStatus === "loading" && <div>Loading...</div>}
+          {payListStatus === "loading" && (
+            <tr>
+              <td colSpan="8">Loading...</td>
+            </tr>
+          )}
 
           {payListStatus === "succeeded" &&
             tempData.map((item, i) =>
@@ -409,15 +405,12 @@ function PayList() {
                   </td>
                   {columns.map((col, idx) =>
                     col === "date" ? (
-                      <td>
+                      <td key={col}>
                         <DatePicker
-                          key={col}
                           selected={
                             item[col] ? new Date(item[col]) : new Date()
                           }
-                          onKeyDown={(e) => {
-                            e.preventDefault();
-                          }}
+                          onKeyDown={(e) => e.preventDefault()}
                           onChange={(date) => handleUpdate(date, item.id, col)}
                           onFocus={(e) => setInitial(item, i * 7 + idx)}
                           dateFormat="yyyy-MM-dd"
@@ -445,32 +438,28 @@ function PayList() {
 
           {payListStatus === "failed" && (
             <tr>
-              <td colspan="8">Error</td>
+              <td colSpan="8">Error</td>
             </tr>
           )}
         </tbody>
-      </Table>
+      </table>
 
       <div className="summary-group">
         <div className="button-group">
-          <Button
-            variant="outline-dark"
-            size="sm"
+          <button
             disabled={checkedItems.length === 0}
             onClick={handleDelete}
             className="cursor_pointer"
           >
             선택삭제
-          </Button>
-          <Button
-            variant="outline-dark"
-            size="sm"
+          </button>
+          <button
             disabled={checkedItems.length === 0}
             onClick={handleCopy}
             className="cursor_pointer"
           >
             선택복사
-          </Button>
+          </button>
           <OverlayTrigger
             trigger="click"
             key="top"
@@ -484,23 +473,31 @@ function PayList() {
               </Popover>
             }
           >
-            <Button
-              variant="outline-dark"
-              size="sm"
+            <button
+              onClick={handleModal}
               disabled={checkedItems.length === 0}
               className="cursor_pointer"
             >
               카드선택
-            </Button>
+            </button>
           </OverlayTrigger>
-          <Button
-            variant="outline-dark"
-            size="sm"
-            onClick={handleModal}
-            className="cursor_pointer"
-          >
+          {/* <div className="popover-wrapper">
+            <button
+              disabled={checkedItems.length === 0}
+              className="cursor_pointer"
+            >
+              카드선택
+            </button>
+             {isPopoverVisible && (
+              <div className="popover-content">
+                <div className="popover-header">카드분류선택</div>
+                <div className="popover-body">내용을 확인하세요!</div>
+              </div>
+            )} 
+          </div> */}
+          <button onClick={handleModal} className="cursor_pointer">
             고정금액
-          </Button>
+          </button>
           <PayListModal
             show={isModalOpen}
             onClose={handleModal}
@@ -517,9 +514,7 @@ function PayList() {
           <div className="font-bold">{realExpense}</div>
         </div>
         <div className="summary-item item3">
-          <Button variant="primary" size="lg" onClick={handleSave}>
-            저장하기
-          </Button>
+          <button onClick={handleSave}>저장하기</button>
         </div>
       </div>
     </div>

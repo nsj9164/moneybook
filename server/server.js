@@ -229,11 +229,11 @@ app.post("/fixedItemList/insert", authenticateToken, function (req, res) {
   data.forEach((item) => {
     if (item.isNew) {
       db.query(
-        "INSERT INTO FIXCED_ITEM_LIST (expense_date, expense_desc, expense_amount, expense_payment, expense_cat_nm, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, SYSDATE(), ?)",
+        "INSERT INTO FIXCED_ITEM_LIST (expense_date, expense_desc, expense_amount, expense_payment, expense_cat_nm, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, SYSDATE(), ?)",
         [
           item.expense_date,
           item.expense_desc,
-          item.expense_amount.replace(/,/g, ""),
+          item.expense_amount,
           item.expense_payment,
           item.expense_cat_nm,
           userId,
@@ -248,7 +248,7 @@ app.post("/fixedItemList/insert", authenticateToken, function (req, res) {
         [
           item.expense_date,
           item.expense_desc,
-          item.expense_amount.replace(/,/g, ""),
+          item.expense_amount,
           item.expense_payment,
           item.expense_cat_nm,
           item.expense_id,

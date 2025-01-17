@@ -19,14 +19,12 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
   const [focusedItemId, setFocusedItemId] = useState(null);
   const [price, setPrice] = useState("");
 
-  // fetchData 호출
   useEffect(() => {
     if (isLoggedIn && fixedExpenseListStatus === "idle") {
       dispatch(fixedItemListActions.fetchData());
     }
-  }, [fixedExpenseListStatus, dispatch]);
+  }, [isLoggedIn, fixedExpenseListStatus, dispatch]);
 
-  // setting fixedData
   useEffect(() => {
     if (fixedExpenseListStatus === "succeeded" && fixedExpenseList.length > 0) {
       setFixedData(
@@ -40,30 +38,21 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
   }, [fixedExpenseListStatus, fixedExpenseList]);
 
   useEffect(() => {
-    if (fixedData.length >= 0) {
-      const empty = fixedData.filter((item) => !item.isDisabled);
-      if (empty.length === fixedData.length) {
-        setFixedData([
-          ...fixedData,
-          {
-            expense_id: `expense_${fixedId}`,
-            isDisabled: true,
-            isNew: true,
-          },
-        ]);
-        setFixedId((id) => id + 1);
-      }
+    if (fixedData.every((item) => !item.isDisabled)) {
+      setFixedData([
+        ...fixedData,
+        { expense_id: `expense_${fixedId}`, isDisabled: true, isNew: true },
+      ]);
+      setFixedId((prevId) => prevId + 1);
     }
-
     const modifiedData = fixedData.filter(
       (item) =>
         (item.isModified || item.isNew) &&
         fields.some((field) => item[field] !== "" && item[field] !== undefined)
     );
     setFixedDataList(modifiedData);
-  }, [fixedData]);
+  }, [fixedData, setFixedDataList]);
 
-  // 데이터 수정
   const handleUpdate = (e, id, key) => {
     const newItem = e.target.innerText;
     setFixedData((prevData) =>
@@ -75,12 +64,11 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
     );
   };
 
-  // 추가 입력란 클릭시 초기값 세팅
   const setInitial = (item, index) => {
     if (item.isDisabled) {
       setFixedData(
         fixedData.map((data) =>
-          item.id === data.id
+          data.id === item.id
             ? { ...data, expense_amount: 0, isDisabled: false }
             : data
         )
@@ -90,14 +78,12 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
     }
   };
 
-  // 체크항목
   const handleCheck = (id) => {
     setCheckedItems((prev) =>
       prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
     );
   };
 
-  // 전체선택/해제
   const handleCheckedAll = () => {
     if (checkedAll) {
       setCheckedItems([]);
@@ -110,14 +96,13 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
     setCheckedAll(!checkedAll);
   };
 
-  // 전체선택/해제
   useEffect(() => {
-    checkedItems.length ===
-      fixedData.filter((item) => !item.isDisabled).length &&
-    fixedData.length > 1
-      ? setCheckedAll(true)
-      : setCheckedAll(false);
-  }, [checkedItems]);
+    setCheckedAll(
+      checkedItems.length ===
+        fixedData.filter((item) => !item.isDisabled).length &&
+        fixedData.length > 1
+    );
+  }, [checkedItems, fixedData]);
 
   useEffect(() => {
     if (focusedItemId !== null) {
@@ -128,10 +113,8 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
     }
   }, [focusedItemId]);
 
-  // Enter, 숫자 입력
   const handleKeyDown = (e, i, col) => {
     if (e.key === "Enter") {
-      // 엔터로 줄바꿈 방지
       e.preventDefault();
       if (inputRefs.current[i]) {
         inputRefs.current[i].focus();
@@ -139,8 +122,8 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
     }
 
     if (col === "expense_amount") {
-      setPrice(e.target.innerText);
       const blockedRegex = /^[a-zA-Z~!@#$%^&*()_\-+=\[\]{}|\\;:'",.<>?/가-힣]$/;
+      setPrice(e.target.innerText);
       if (
         (/\d/.test(e.key) && e.target.innerText.length > 12) ||
         blockedRegex.test(e.key)
@@ -150,22 +133,20 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
     }
   };
 
-  // 숫자 입력 type(콤마, 커서 위치)
   const handleInput = (e, col) => {
     if (col === "expense_amount") {
       const value = e.target.innerText;
-      if (e.target.innerText !== "\n") {
+      if (value !== "\n") {
         const cursor = nowCursor();
         const onlyNum = value.replace(/[^0-9]/g, "");
         const formattedValue = Number(onlyNum).toLocaleString("ko-KR");
         e.target.innerText = formattedValue;
 
         const diffLength = formattedValue.length - value.length;
-        let adjustedStartOffset =
+        const adjustedStartOffset =
           price === formattedValue && !/[ㄱ-ㅎ가-힣]/.test(value)
             ? cursor.startOffset
             : cursor.startOffset + diffLength;
-
         restoreCursor(
           e.target,
           adjustedStartOffset >= 0 ? adjustedStartOffset : 0
@@ -183,16 +164,16 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
   ];
 
   return (
-    <div class="modal-body">
-      <h2 class="modal-title">고정항목 관리하기</h2>
-      <Table class="custom-table" bordered hover>
+    <div className="modal-body">
+      <h2 className="modal-title">고정항목 관리하기</h2>
+      <Table className="custom-table" bordered hover>
         <colgroup>
-          <col width={"5%"} />
-          <col width={"15%"} />
+          <col width="5%" />
+          <col width="15%" />
           <col />
-          <col width={"15%"} />
-          <col width={"20%"} />
-          <col width={"20%"} />
+          <col width="15%" />
+          <col width="20%" />
+          <col width="20%" />
         </colgroup>
         <thead>
           <tr>
@@ -213,7 +194,7 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
         <tbody>
           {fixedExpenseListStatus === "succeeded" &&
             fixedData.map((item, i) => (
-              <tr key={i}>
+              <tr key={item.expense_id}>
                 <td>
                   <input
                     type="checkbox"
@@ -232,36 +213,24 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
                           Array.from({ length: 31 }, (_, j) => (
                             <option
                               key={j}
-                              value={String(j + 1).padStart(2, "0") + "일"}
+                              value={`${String(j + 1).padStart(2, "0")}일`}
                             >
                               {String(j + 1).padStart(2, "0")}
                             </option>
                           ))}
-                        {col === "expense_date" && (
-                          <>
-                            <option value="1">One{col}</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                          </>
-                        )}
-                        {col === "expense_date" && (
-                          <>
-                            <option value="1">One{col}</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                          </>
-                        )}
                       </Form.Select>
                     </td>
                   ) : (
                     <Input
                       key={idx}
-                      ref={(el) => (inputRefs.current[i * 2 + idx] = el)}
+                      ref={(el) =>
+                        (inputRefs.current[i * fields.length + idx] = el)
+                      }
                       onBlur={(e) => handleUpdate(e, item.expense_id, col)}
                       onKeyDown={(e) =>
-                        handleKeyDown(e, (i + 1) * 2 + idx, col)
+                        handleKeyDown(e, i * fields.length + idx, col)
                       }
-                      onFocus={(e) => setInitial(item, i * 2 + idx)}
+                      onFocus={() => setInitial(item, i * fields.length + idx)}
                       onInput={(e) => handleInput(e, col)}
                     >
                       {item[col]}
@@ -273,7 +242,7 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
 
           {fixedExpenseListStatus === "failed" && (
             <tr>
-              <td colspan="6">Error</td>
+              <td colSpan="6">Error loading data</td>
             </tr>
           )}
         </tbody>
