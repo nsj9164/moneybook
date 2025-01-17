@@ -42,6 +42,7 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
         { cat_id: `cat-${catId}`, isDisabled: true, isNew: true },
       ]);
       setCatId((id) => id + 1);
+      console.log("catData:::", catData);
     }
 
     const modifiedData = catData.filter(
@@ -54,7 +55,7 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
     const newItem = e.target.innerText;
     setCatData((prevData) =>
       prevData.map((item) =>
-        item.id === id
+        item.cat_id === id
           ? { ...item, categoryNm: newItem, isModified: true }
           : item
       )
@@ -94,12 +95,12 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
               <tr key={i}>
                 <Input
                   ref={(el) => (inputRefs.current[i] = el)}
-                  onBlur={(e) => handleUpdate(e, item.id)}
+                  onBlur={(e) => handleUpdate(e, item.cat_id)}
                 >
                   {item.categoryNm}
                 </Input>
-                <td>X</td>
                 <td>≡</td>
+                <td>X</td>
               </tr>
             ))}
           {catListStatus === "failed" && (

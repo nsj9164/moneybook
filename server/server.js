@@ -231,7 +231,7 @@ app.post("/fixedItemList/insert", authenticateToken, function (req, res) {
       db.query(
         "INSERT INTO FIXCED_ITEM_LIST (expense_date, expense_desc, expense_amount, expense_payment, expense_cat_nm, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, SYSDATE(), ?)",
         [
-          item.expense_date.replace(/-/g, ""),
+          item.expense_date,
           item.expense_desc,
           item.expense_amount.replace(/,/g, ""),
           item.expense_payment,
@@ -246,7 +246,7 @@ app.post("/fixedItemList/insert", authenticateToken, function (req, res) {
       db.query(
         "UPDATE FIXCED_ITEM_LIST SET expense_date = ?, expense_desc = ?, expense_amount = ?, expense_payment = ?, expense_cat_nm = ?, UPD_DT = SYSDATE() WHERE expense_id = ?",
         [
-          item.expense_date.replace(/-/g, ""),
+          item.expense_date,
           item.expense_desc,
           item.expense_amount.replace(/,/g, ""),
           item.expense_payment,

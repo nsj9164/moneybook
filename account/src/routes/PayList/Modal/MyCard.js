@@ -58,12 +58,41 @@ function MyCard({ isLoggedIn, setCardDataList }) {
     const newItem = e.target.innerText;
     setCardData((prevData) =>
       prevData.map((item) =>
-        item.id === id
+        item.cat_id === id
           ? { ...item, card_name: newItem, isModified: true }
           : item
       )
     );
+    setCardId((id) => id + 1);
   };
+
+  // 체크항목
+  const handleCheck = (id) => {
+    setCheckedItems((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    );
+  };
+
+  // 전체선택/해제
+  const handleCheckedAll = () => {
+    if (checkedAll) {
+      setCheckedItems([]);
+    } else {
+      const allIds = cardData
+        .filter((item) => !item.isDisabled)
+        .map((item) => item.id);
+      setCheckedItems(allIds);
+    }
+    setCheckedAll(!checkedAll);
+  };
+
+  // 전체선택/해제
+  useEffect(() => {
+    checkedItems.length ===
+      cardData.filter((item) => !item.isDisabled).length && cardData.length > 1
+      ? setCheckedAll(true)
+      : setCheckedAll(false);
+  }, [checkedItems]);
 
   useEffect(() => {
     if (focusedItemId !== null) {
@@ -74,7 +103,23 @@ function MyCard({ isLoggedIn, setCardDataList }) {
     }
   }, [focusedItemId]);
 
-  const fields = ["card_company", "card_name", "card_type", "payment_due_date"];
+  useEffect(() => {
+    if (focusedItemId !== null) {
+      const focusedElement = inputRefs.current[focusedItemId];
+      if (focusedElement) {
+        selectText({ target: focusedElement });
+      }
+    }
+  }, [focusedItemId]);
+
+  const fields = [
+    "card_company",
+    "card_name",
+    "card_type",
+    "payment_due_date",
+    "usage_period",
+    "active_status",
+  ];
 
   return (
     <div className="modal-body">
@@ -83,24 +128,83 @@ function MyCard({ isLoggedIn, setCardDataList }) {
         <colgroup>
           <col width={"10%"} />
           <col width={"15%"} />
+          <col width={"15%"} />
+          <col width={"10%"} />
+          <col />
+          <col width={"10%"} />
+          <col width={"10%"} />
         </colgroup>
         <thead>
           <tr>
             <th>카드사</th>
             <th>카드명</th>
+            <th>카드종류</th>
+            <th>결제일</th>
+            <th>이용기간</th>
+            <th>사용중</th>
+            <th>삭제</th>
           </tr>
         </thead>
         <tbody>
           {cardListStatus === "succeeded" &&
             cardData.map((item, i) => (
               <tr key={i}>
-                <Input
-                  ref={(el) => (inputRefs.current[i] = el)}
-                  onBlur={(e) => handleUpdate(e, item.id)}
-                >
-                  {item.card_name}
-                </Input>
-                <td>X</td>
+                {fields.map((col, idx) => {
+                  if (
+                    col === "card_company" ||
+                    col === "card_type" ||
+                    col === "payment_due_date"
+                  ) {
+                    return (
+                      <td key={idx}>
+                        <Form.Select aria-label="Default select example">
+                          {col === "card_company" && (
+                            <>
+                              <option value="1">One</option>
+                              <option value="2">Two</option>
+                              <option value="3">Three</option>
+                            </>
+                          )}
+                          {col === "card_type" && (
+                            <>
+                              <option value="1">신용카드</option>
+                              <option value="2">체크카드</option>
+                            </>
+                          )}
+                          {col === "payment_due_date" &&
+                            Array.from({ length: 28 }, (_, j) => (
+                              <option
+                                key={j}
+                                value={String(j + 1).padStart(2, "0") + "일"}
+                              >
+                                {String(j + 1).padStart(2, "0")}
+                              </option>
+                            ))}
+                        </Form.Select>
+                      </td>
+                    );
+                  } else if (col === "active_status") {
+                    return (
+                      <td key={idx}>
+                        <input
+                          type="checkbox"
+                          checked={checkedAll}
+                          onChange={handleCheckedAll}
+                        />
+                      </td>
+                    );
+                  } else {
+                    return (
+                      <Input
+                        ref={(el) => (inputRefs.current[i * 7 + idx] = el)}
+                        onBlur={(e) => handleUpdate(e, item.card_id)}
+                        onFocus={(e) => setInitial(item, i * 7 + idx)}
+                      >
+                        {item[col]}
+                      </Input>
+                    );
+                  }
+                })}
               </tr>
             ))}
           {cardListStatus === "failed" && (

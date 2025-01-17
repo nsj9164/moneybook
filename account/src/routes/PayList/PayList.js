@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { Table, Button, OverlayTrigger, Popover } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchData, saveData, deleteData } from "../../store/paySlice";
+import { fetchData, deleteData, saveData } from "../../store/paySlice";
 import {
   nowCursor,
   restoreCursor,

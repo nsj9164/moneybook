@@ -56,7 +56,9 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
     }
 
     const modifiedData = fixedData.filter(
-      (item) => item.isModified || item.isNew
+      (item) =>
+        (item.isModified || item.isNew) &&
+        fields.some((field) => item[field] !== "" && item[field] !== undefined)
     );
     setFixedDataList(modifiedData);
   }, [fixedData]);
@@ -66,7 +68,9 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
     const newItem = e.target.innerText;
     setFixedData((prevData) =>
       prevData.map((item) =>
-        item.id === id ? { ...item, [key]: newItem, isModified: true } : item
+        item.expense_id === id
+          ? { ...item, [key]: newItem, isModified: true }
+          : item
       )
     );
   };
