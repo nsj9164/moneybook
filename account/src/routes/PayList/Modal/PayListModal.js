@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Nav, Modal, Button } from "react-bootstrap";
 import MyCard from "./MyCard";
 import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
@@ -27,43 +26,41 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
     }
   };
 
+  if (!show) return null;
+
   return (
     <div
-      className="modal show modal-container"
-      style={{ display: show ? "block" : "none", position: "initial" }}
+      className="modal-container"
+      style={{ display: show ? "flex" : "none" }}
     >
-      <Modal
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-        show={show}
-        onHide={onClose}
-      >
-        <Modal.Header closeButton>
-          <Nav
-            variant="tabs"
-            activeKey={activeTab}
-            className="nav-tabs"
-            onSelect={(selectedKey) => setActiveTab(parseInt(selectedKey))}
-          >
-            <Nav.Item>
-              <Nav.Link eventKey={1} className="nav-link">
-                고정금액관리
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey={2} className="nav-link">
-                분류관리
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey={3} className="nav-link">
-                카드관리
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Modal.Header>
-        <Modal.Body>
+      <div className="modal-overlay" onClick={onClose}></div>
+      <div className="modal-content">
+        <div className="modal-header">
+          <div className="nav-tabs">
+            <button
+              className={`nav-link ${activeTab === 1 ? "active" : ""}`}
+              onClick={() => setActiveTab(1)}
+            >
+              고정금액관리
+            </button>
+            <button
+              className={`nav-link ${activeTab === 2 ? "active" : ""}`}
+              onClick={() => setActiveTab(2)}
+            >
+              분류관리
+            </button>
+            <button
+              className={`nav-link ${activeTab === 3 ? "active" : ""}`}
+              onClick={() => setActiveTab(3)}
+            >
+              카드관리
+            </button>
+          </div>
+          <button className="modal-close" onClick={onClose}>
+            &times;
+          </button>
+        </div>
+        <div className="modal-body">
           {activeTab === 1 && (
             <MyFixedExpense isLoggedIn setFixedDataList={setFixedDataList} />
           )}
@@ -73,27 +70,25 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
           {activeTab === 3 && (
             <MyCard isLoggedIn setCardDataList={setCardDataList} />
           )}
-        </Modal.Body>
-        <Modal.Footer className="modal-footer-custom">
+        </div>
+        <div className="modal-footer">
           <div className="modal-summary-group">
             {activeTab === 1 && (
               <div className="modal-button-group-left">
-                <Button variant="outline-dark" size="sm">
-                  선택삭제
-                </Button>
+                <button className="cursor_pointer">선택삭제</button>
               </div>
             )}
             <div className="modal-button-group-right">
-              <Button variant="primary" onClick={handleSave}>
+              <button className="btn-save" onClick={handleSave}>
                 저장하기
-              </Button>
-              <Button variant="secondary" onClick={onClose}>
+              </button>
+              <button className="btn-close" onClick={onClose}>
                 닫기
-              </Button>
+              </button>
             </div>
           </div>
-        </Modal.Footer>
-      </Modal>
+        </div>
+      </div>
     </div>
   );
 };

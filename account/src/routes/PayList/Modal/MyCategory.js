@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { categoryListActions } from "../../../store/myDetailSlice";
 import { selectText } from "../../../util/util";
-import { Table, Form } from "react-bootstrap";
 import { Input } from "../PayList";
 
 function MyCategory({ isLoggedIn, setCatDataList }) {
@@ -76,7 +75,7 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
   return (
     <div className="modal-body">
       <h2 className="modal-title">분류 관리하기</h2>
-      <Table className="custom-table" bordered hover>
+      <table className="table table-hover">
         <colgroup>
           <col />
           <col width={"15%"} />
@@ -109,7 +108,7 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
             </tr>
           )}
         </tbody>
-      </Table>
+      </table>
     </div>
   );
 }

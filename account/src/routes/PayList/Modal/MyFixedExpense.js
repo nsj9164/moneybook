@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Table, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { fixedItemListActions } from "../../../store/myDetailSlice";
 import { nowCursor, restoreCursor, selectText } from "../../../util/util";
@@ -166,7 +165,7 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
   return (
     <div className="modal-body">
       <h2 className="modal-title">고정항목 관리하기</h2>
-      <Table className="custom-table" bordered hover>
+      <table className="table table-hover" bordered hover>
         <colgroup>
           <col width="5%" />
           <col width="15%" />
@@ -208,7 +207,7 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
                   col === "expense_payment" ||
                   col === "expense_cat_nm" ? (
                     <td key={idx}>
-                      <Form.Select aria-label="Default select example">
+                      <select aria-label="Default select example">
                         {col === "expense_date" &&
                           Array.from({ length: 31 }, (_, j) => (
                             <option
@@ -218,7 +217,7 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
                               {String(j + 1).padStart(2, "0")}
                             </option>
                           ))}
-                      </Form.Select>
+                      </select>
                     </td>
                   ) : (
                     <Input
@@ -246,7 +245,7 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
             </tr>
           )}
         </tbody>
-      </Table>
+      </table>
     </div>
   );
 }

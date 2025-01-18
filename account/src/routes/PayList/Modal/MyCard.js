@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { cardListActions } from "../../../store/myDetailSlice";
 import { selectText } from "../../../util/util";
-import { Table, Form } from "react-bootstrap";
 import { Input } from "../PayList";
 
 function MyCard({ isLoggedIn, setCardDataList }) {
@@ -124,7 +123,7 @@ function MyCard({ isLoggedIn, setCardDataList }) {
   return (
     <div className="modal-body">
       <h2 className="modal-title">카드 관리하기</h2>
-      <Table className="custom-table" bordered hover>
+      <table className="table table-hover">
         <colgroup>
           <col width={"10%"} />
           <col width={"15%"} />
@@ -157,7 +156,7 @@ function MyCard({ isLoggedIn, setCardDataList }) {
                   ) {
                     return (
                       <td key={idx}>
-                        <Form.Select aria-label="Default select example">
+                        <select aria-label="Default select example">
                           {col === "card_company" && (
                             <>
                               <option value="1">One</option>
@@ -180,7 +179,7 @@ function MyCard({ isLoggedIn, setCardDataList }) {
                                 {String(j + 1).padStart(2, "0")}
                               </option>
                             ))}
-                        </Form.Select>
+                        </select>
                       </td>
                     );
                   } else if (col === "active_status") {
@@ -213,7 +212,7 @@ function MyCard({ isLoggedIn, setCardDataList }) {
             </tr>
           )}
         </tbody>
-      </Table>
+      </table>
     </div>
   );
 }

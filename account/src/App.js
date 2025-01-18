@@ -1,4 +1,3 @@
-import { Container, Navbar } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
@@ -18,27 +17,28 @@ function App() {
 
   return (
     <div className="App">
-      <Navbar expand="lg" className="navBar">
-        <Container>
-          <Navbar.Brand href="#home" className="logo_area">
+      <nav className="navBar">
+        <div className="container">
+          <a href="#home" className="logo_area">
             <div className="logo_img" />
             <span className="logo_title">My MoneyBook</span>
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav" className="log_out_nav">
+          </a>
+          <div id="basic-navbar-nav" className="navbar_collapse log_out_nav">
             {location.pathname !== "/login" && (
               <p className="log_out" onClick={() => dispatch(logout())}>
                 로그아웃
               </p>
             )}
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+          </div>
+        </div>
+      </nav>
 
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<PayList />} />
-      </Routes>
+      <div className="routes">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<PayList />} />
+        </Routes>
+      </div>
     </div>
   );
 }

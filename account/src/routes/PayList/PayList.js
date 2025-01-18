@@ -19,7 +19,7 @@ import {
   addMonths,
 } from "date-fns";
 import PayListModal from "./Modal/PayListModal";
-import { OverlayTrigger, Popover } from "react-bootstrap";
+import { Overlay } from "../../components/Overlay";
 
 export const Input = styled.td.attrs({
   contentEditable: true,
@@ -248,8 +248,6 @@ function PayList() {
 
   // modal control
   const handleModal = () => setIsModalOpen(!isModalOpen);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
 
   // Enter - 입력
   const handleKeyDown = (e, i, col) => {
@@ -312,6 +310,24 @@ function PayList() {
         })
       );
     }
+  };
+
+  const CustomOverlay = ({ triggerText, overlayContent, disabled }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const overlayRef = useRef(null);
+
+    useEffect(() => {
+      const handleOutsideClick = (event) => {
+        if (overlayRef.current && !overlayRef.current.contains(event.target)) {
+          setIsVisible(false);
+        }
+      };
+
+      document.addEventListener("mousedown", handleOutsideClick);
+      return () => {
+        document.addEventListener("mousedown", handleOutsideClick);
+      };
+    }, []);
   };
 
   const columns = [
@@ -460,41 +476,11 @@ function PayList() {
           >
             선택복사
           </button>
-          <OverlayTrigger
-            trigger="click"
-            key="top"
-            placement="top"
-            overlay={
-              <Popover id={`popover-positioned-top`}>
-                <Popover.Header as="h3">카드분류선택</Popover.Header>
-                <Popover.Body>
-                  <strong>Holy guacamole!</strong> Check this info.
-                </Popover.Body>
-              </Popover>
-            }
-          >
-            <button
-              onClick={handleModal}
-              disabled={checkedItems.length === 0}
-              className="cursor_pointer"
-            >
-              카드선택
-            </button>
-          </OverlayTrigger>
-          {/* <div className="popover-wrapper">
-            <button
-              disabled={checkedItems.length === 0}
-              className="cursor_pointer"
-            >
-              카드선택
-            </button>
-             {isPopoverVisible && (
-              <div className="popover-content">
-                <div className="popover-header">카드분류선택</div>
-                <div className="popover-body">내용을 확인하세요!</div>
-              </div>
-            )} 
-          </div> */}
+          <Overlay
+            triggerText="카드선택"
+            overlayContent={"Holy guacamole! Check this info."}
+            disabled={checkedItems.length === 0}
+          />
           <button onClick={handleModal} className="cursor_pointer">
             고정금액
           </button>
