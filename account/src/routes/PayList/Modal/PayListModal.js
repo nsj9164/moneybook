@@ -4,7 +4,11 @@ import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
 import "../../../App.modal.css";
 import { useDispatch } from "react-redux";
-import { fixedItemListActions } from "../../../store/myDetailSlice";
+import {
+  cardListActions,
+  categoryListActions,
+  fixedItemListActions,
+} from "../../../store/myDetailSlice";
 
 const PayListModal = ({ show, onClose, isLoggedIn }) => {
   const dispatch = useDispatch();
@@ -19,9 +23,11 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
       dispatch(fixedItemListActions.saveData(fixedDataList));
     } else if (activeTab === 2) {
       console.log("저장하기 버튼 클릭2", catDataList);
+      dispatch(categoryListActions.saveData(catDataList));
       // 여기에 저장 처리 추가
     } else {
       console.log("저장하기 버튼 클릭3", cardDataList);
+      dispatch(cardListActions.saveData(cardDataList));
       // 여기에 저장 처리 추가
     }
   };
