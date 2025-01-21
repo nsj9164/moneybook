@@ -52,6 +52,7 @@ let myDetailList = createSlice({
   initialState: {
     items: [],
     status: "idle",
+    saveStatus: "idle",
     error: null,
   },
   extraReducers: (builder) => {
@@ -75,10 +76,11 @@ let myDetailList = createSlice({
           state.error = action.error.message;
         })
         .addCase(actions.saveData.fulfilled, (state, action) => {
+          state.saveStatus = "succeeded";
           state.items = action.payload;
         })
         .addCase(actions.saveData.rejected, (state, action) => {
-          state.status = "failed";
+          state.saveStatus = "failed";
           state.error = action.error.message;
           console.error("Save Data Error: ", action.error);
         })

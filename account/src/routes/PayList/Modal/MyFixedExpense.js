@@ -44,6 +44,8 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
       ]);
       setFixedId((prevId) => prevId + 1);
     }
+
+    // 저장할 data
     const modifiedData = fixedData.filter(
       (item) =>
         (item.isModified || item.isNew) &&

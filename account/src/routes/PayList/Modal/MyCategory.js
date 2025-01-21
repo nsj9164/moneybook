@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { categoryListActions } from "../../../store/myDetailSlice";
+import { fetchData } from "../../../store/paySlice";
 import { selectText } from "../../../util/util";
 import { Input } from "../PayList";
 
-function MyCategory({ isLoggedIn, setCatDataList }) {
+function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
   const dispatch = useDispatch();
   const catList = useSelector((state) => state.myDetailList.items);
   const catListStatus = useSelector((state) => state.myDetailList.status);
@@ -34,7 +35,9 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
   useEffect(() => {
     if (
       catData.length === 0 ||
-      catData.every((item) => item.categoryNm && item.categoryNm !== undefined)
+      catData.every(
+        (item) => item.category_nm && item.category_nm !== undefined
+      )
     ) {
       setCatData((prevCatData) => [
         ...prevCatData,
@@ -44,8 +47,11 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
       console.log("catData:::", catData);
     }
 
+    // 저장할 data
     const modifiedData = catData.filter(
-      (item) => item.isModified || item.isNew
+      (item) =>
+        (item.isModified || item.isNew) &&
+        fields.some((field) => item[field] !== "" && item[field] !== undefined)
     );
     setCatDataList(modifiedData);
   }, [catData, catId]);
@@ -55,7 +61,7 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
     setCatData((prevData) =>
       prevData.map((item) =>
         item.cat_id === id
-          ? { ...item, categoryNm: newItem, isModified: true }
+          ? { ...item, category_nm: newItem, isModified: true }
           : item
       )
     );
@@ -70,7 +76,13 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
     }
   }, [focusedItemId]);
 
-  const fields = ["categoryNm"];
+  useEffect(() => {
+    if (saveStatus === "succeeded") {
+      dispatch(categoryListActions.fetchData());
+    }
+  }, [saveStatus]);
+
+  const fields = ["category_nm"];
 
   return (
     <div className="modal-body">
@@ -96,7 +108,7 @@ function MyCategory({ isLoggedIn, setCatDataList }) {
                   ref={(el) => (inputRefs.current[i] = el)}
                   onBlur={(e) => handleUpdate(e, item.cat_id)}
                 >
-                  {item.categoryNm}
+                  {item.category_nm}
                 </Input>
                 <td>≡</td>
                 <td>X</td>

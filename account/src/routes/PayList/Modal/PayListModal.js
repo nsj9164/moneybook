@@ -17,6 +17,8 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
   const [catDataList, setCatDataList] = useState([]);
   const [cardDataList, setCardDataList] = useState([]);
 
+  const saveStatus = useSelector((state) => state.myDetailList.saveStatus);
+
   const handleSave = () => {
     if (activeTab === 1) {
       console.log("저장하기 버튼 클릭1", fixedDataList);
@@ -29,6 +31,12 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
       console.log("저장하기 버튼 클릭3", cardDataList);
       dispatch(cardListActions.saveData(cardDataList));
       // 여기에 저장 처리 추가
+    }
+
+    if (saveStatus === "succeeded") {
+      alert("저장되었습니다.");
+    } else {
+      alert("오류가 발생했습니다.");
     }
   };
 
@@ -68,13 +76,17 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
         </div>
         <div className="modal-body">
           {activeTab === 1 && (
-            <MyFixedExpense isLoggedIn setFixedDataList={setFixedDataList} />
+            <MyFixedExpense
+              isLoggedIn
+              setFixedDataList={setFixedDataList}
+              saveStatus
+            />
           )}
           {activeTab === 2 && (
-            <MyCategory isLoggedIn setCatDataList={setCatDataList} />
+            <MyCategory isLoggedIn setCatDataList={setCatDataList} saveStatus />
           )}
           {activeTab === 3 && (
-            <MyCard isLoggedIn setCardDataList={setCardDataList} />
+            <MyCard isLoggedIn setCardDataList={setCardDataList} saveStatus />
           )}
         </div>
         <div className="modal-footer">
