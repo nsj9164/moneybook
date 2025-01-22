@@ -4,9 +4,9 @@ import {
   categoryListActions,
   cardListActions,
 } from "./myDetailListActions";
-import { createAsyncReducers } from "./reducers/asyncReducers";
+import { createAsyncReducers } from "./myDetailListReducer";
 
-let myDetailList = createSlice({
+const myDetailList = createSlice({
   name: "myDetailList",
   initialState: {
     fixedItemList: {
@@ -30,8 +30,8 @@ let myDetailList = createSlice({
   },
   extraReducers: (builder) => {
     createAsyncReducers(builder, fixedItemListActions, "fixedItemList");
-    createAsyncReducers(builder, cardListActions, "cardList");
     createAsyncReducers(builder, categoryListActions, "categoryList");
+    createAsyncReducers(builder, cardListActions, "cardList");
   },
 });
 

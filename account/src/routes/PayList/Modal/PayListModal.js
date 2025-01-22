@@ -8,7 +8,12 @@ import {
   cardListActions,
   categoryListActions,
   fixedItemListActions,
-} from "../../../store/myDetailSlice";
+} from "../../../store/features/myDetailList/myDetailListActions";
+import {
+  selectAllLists,
+  selectAllSaveStatuses,
+  selectAllStatuses,
+} from "../../../store/features/myDetailList/myDetailListSelectors";
 
 const PayListModal = ({ show, onClose, isLoggedIn }) => {
   const dispatch = useDispatch();
@@ -17,15 +22,38 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
   const [catDataList, setCatDataList] = useState([]);
   const [cardDataList, setCardDataList] = useState([]);
 
-  const active1SaveStatus = useSelector(
-    (state) => state.myDetailList["fixedItemList"].saveStatus
-  );
-  const active2SaveStatus = useSelector(
-    (state) => state.myDetailList["categoryList"].saveStatus
-  );
-  const active3SaveStatus = useSelector(
-    (state) => state.myDetailList["cardList"].saveStatus
-  );
+  const { fixedItemList, categoryList, cardList } = useSelector(selectAllLists);
+  const { fixedItemListStatus, categoryListStatus, cardListStatus } =
+    useSelector(selectAllStatuses);
+  const {
+    fixedItemListSaveStatus,
+    categoryListSaveStatus,
+    cardListSaveStatus,
+  } = useSelector(selectAllSaveStatuses);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      if (fixedItemListStatus === "idle") {
+        dispatch(fixedItemListActions.fetchData());
+      }
+      if (categoryListStatus === "idle") {
+        dispatch(categoryListActions.fetchData());
+      }
+      if (cardListStatus === "idle") {
+        dispatch(cardListActions.fetchData());
+      }
+    }
+  }, [
+    isLoggedIn,
+    fixedItemListStatus,
+    categoryListStatus,
+    cardListStatus,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    console.log("categoryList:::////", categoryList);
+  }, [categoryList]);
 
   const handleSave = () => {
     const dataMap = {
@@ -38,26 +66,28 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
 
     console.log(`저장하기 버튼 클릭${activeTab}`, data);
     dispatch(action(data));
-    useSaveStatusAlert(activeTab);
   };
 
-  const useSaveStatusAlert = (activeTab) => {
-    const saveStatusMap = {
-      1: useSelector((state) => state.myDetailList["fixedItemList"].saveStatus),
-      2: useSelector((state) => state.myDetailList["categoryList"].saveStatus),
-      3: useSelector((state) => state.myDetailList["cardList"].saveStatus),
-    };
+  // useEffect(() => {
+  //   const saveStatusMap = {
+  //     1: useSelector((state) => state.myDetailList["fixedItemList"].saveStatus),
+  //     2: useSelector((state) => state.myDetailList["categoryList"].saveStatus),
+  //     3: useSelector((state) => state.myDetailList["cardList"].saveStatus),
+  //   };
 
-    const activeSaveStatus = saveStatusMap[activeTab];
+  //   const activeSaveStatus = saveStatusMap[activeTab];
 
-    useEffect(() => {
-      if (activeSaveStatus === "succeeded") {
-        alert("저장되었습니다.");
-      } else {
-        alert("오류가 발생하였습니다.");
-      }
-    }, [activeSaveStatus]);
-  };
+  //   if (activeSaveStatus === "succeeded") {
+  //     alert("저장되었습니다.");
+  //   } else {
+  //     alert("오류가 발생하였습니다.");
+  //   }
+  // }, [
+  //   fixedItemListSaveStatus,
+  //   categoryListSaveStatus,
+  //   cardListSaveStatus,
+  //   activeTab,
+  // ]);
 
   if (!show) return null;
 
@@ -94,15 +124,38 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
           </button>
         </div>
         <div className="modal-body">
-          {activeTab === 1 && (
-            <MyFixedExpense isLoggedIn setFixedDataList={setFixedDataList} />
-          )}
-          {activeTab === 2 && (
-            <MyCategory isLoggedIn setCatDataList={setCatDataList} />
-          )}
-          {activeTab === 3 && (
-            <MyCard isLoggedIn setCardDataList={setCardDataList} />
-          )}
+          {activeTab === 1 &&
+            (fixedItemListStatus === "succeeded" ? (
+              <MyFixedExpense
+                setFixedDataList={setFixedDataList}
+                fixedItemList={fixedItemList}
+                catList={categoryList}
+                cardList={cardList}
+              />
+            ) : fixedItemListStatus === "failed" ? (
+              <div>Error loading fixed expense list</div>
+            ) : (
+              <div>Loading...</div>
+            ))}
+          {activeTab === 2 &&
+            (categoryListStatus === "succeeded" ? (
+              <MyCategory
+                setCatDataList={setCatDataList}
+                catList={categoryList}
+              />
+            ) : categoryListStatus === "failed" ? (
+              <div>Error loading fixed expense list</div>
+            ) : (
+              <div>Loading...</div>
+            ))}
+          {activeTab === 3 &&
+            (cardListStatus === "succeeded" ? (
+              <MyCard setCardDataList={setCardDataList} cardList={cardList} />
+            ) : cardListStatus === "failed" ? (
+              <div>Error loading fixed expense list</div>
+            ) : (
+              <div>Loading...</div>
+            ))}
         </div>
         <div className="modal-footer">
           <div className="modal-summary-group">

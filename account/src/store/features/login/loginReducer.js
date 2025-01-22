@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { loginData, logout } from "./loginActions";
 
-let login = createSlice({
+const login = createSlice({
   name: "login",
   initialState: {
     loginStatus: "idle",

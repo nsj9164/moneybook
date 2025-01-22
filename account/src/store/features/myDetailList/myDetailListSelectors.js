@@ -16,19 +16,19 @@ export const selectAllLists = createSelector(
   })
 );
 
-const selectSaveStatus = (state) => state.myDetailList;
+const selectStatus = (state) => state.myDetailList;
 
 export const selectAllStatuses = createSelector(
-  selectSaveStatus,
-  (saveStatus) => ({
-    fixedItemListStatus: saveStatus["fixedItemList"].status,
-    categoryListStatus: saveStatus["categoryList"].status,
-    cardListStatus: saveStatus["cardList"].status,
+  selectStatus,
+  (status) => ({
+    fixedItemListStatus: status["fixedItemList"].status,
+    categoryListStatus: status["categoryList"].status,
+    cardListStatus: status["cardList"].status,
   })
 );
 
 export const selectAllSaveStatuses = createSelector(
-  selectSaveStatus,
+  selectStatus,
   (saveStatus) => ({
     fixedItemListSaveStatus: saveStatus["fixedItemList"].saveStatus,
     categoryListSaveStatus: saveStatus["categoryList"].saveStatus,

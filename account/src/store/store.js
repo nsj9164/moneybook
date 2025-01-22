@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import payListReducer from "./paySlice";
-import loginReducer from "./loginSlice";
+import loginReducer from "./features/login/loginReducer";
+import payListReducer from "./features/payList/payListReducer";
 import myDetailListReducer from "./features/myDetailList/myDetailListSlice";
 
 const store = configureStore({
   reducer: {
-    payList: payListReducer,
     login: loginReducer,
+    payList: payListReducer,
     myDetailList: myDetailListReducer,
   },
 });

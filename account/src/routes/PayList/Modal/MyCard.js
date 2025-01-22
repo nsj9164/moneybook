@@ -1,30 +1,28 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { cardListActions } from "../../../store/myDetailSlice";
 import { selectText } from "../../../util/util";
 import { Input } from "../PayList";
 
-function MyCard({ isLoggedIn, setCardDataList }) {
+function MyCard({ setCardDataList, cardList }) {
   const dispatch = useDispatch();
-  const cardList = useSelector((state) => state.myDetailList["cardList"].items);
-  const cardListStatus = useSelector(
-    (state) => state.myDetailList["cardList"].status
-  );
   const inputRefs = useRef([]);
   const [cardData, setCardData] = useState([]);
   const [cardId, setCardId] = useState(1);
   const [checkedAll, setCheckedAll] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [focusedItemId, setFocusedItemId] = useState(null);
+  const fields = [
+    "card_company",
+    "card_name",
+    "card_type",
+    "payment_due_date",
+    "usage_period_start",
+    "usage_period_end",
+    "active_status",
+  ];
 
   useEffect(() => {
-    if (isLoggedIn && cardListStatus === "idle") {
-      dispatch(cardListActions.fetchData());
-    }
-  }, [cardListStatus, dispatch]);
-
-  useEffect(() => {
-    if (cardListStatus === "succeeded" && cardList.length > 0) {
+    if (cardList.length > 0) {
       setCardData(
         cardList.map((item) => ({
           ...item,
@@ -33,7 +31,7 @@ function MyCard({ isLoggedIn, setCardDataList }) {
         }))
       );
     }
-  }, [cardListStatus, cardList]);
+  }, [cardList]);
 
   useEffect(() => {
     if (
@@ -48,12 +46,15 @@ function MyCard({ isLoggedIn, setCardDataList }) {
       ]);
       setCardId((id) => id + 1);
     }
-
-    const modifiedData = cardData.filter(
-      (item) => item.isModified || item.isNew
-    );
-    setCardDataList(modifiedData);
   }, [cardData, cardId]);
+
+  const modifiedData = useMemo(() => {
+    return cardData.filter((item) => item.isModified || item.isNew);
+  }, [cardData]);
+
+  useEffect(() => {
+    setCardDataList(modifiedData);
+  }, [modifiedData]);
 
   const handleUpdate = (e, id) => {
     const newItem = e.target.innerText;
@@ -113,15 +114,6 @@ function MyCard({ isLoggedIn, setCardDataList }) {
     }
   }, [focusedItemId]);
 
-  const fields = [
-    "card_company",
-    "card_name",
-    "card_type",
-    "payment_due_date",
-    "usage_period",
-    "active_status",
-  ];
-
   return (
     <div className="modal-body">
       <h2 className="modal-title">카드 관리하기</h2>
@@ -147,7 +139,7 @@ function MyCard({ isLoggedIn, setCardDataList }) {
           </tr>
         </thead>
         <tbody>
-          {cardListStatus === "succeeded" &&
+          {cardData.length > 0 ? (
             cardData.map((item, i) => (
               <tr key={i}>
                 {fields.map((col, idx) => {
@@ -199,7 +191,6 @@ function MyCard({ isLoggedIn, setCardDataList }) {
                       <Input
                         ref={(el) => (inputRefs.current[i * 7 + idx] = el)}
                         onBlur={(e) => handleUpdate(e, item.card_id)}
-                        onFocus={(e) => setInitial(item, i * 7 + idx)}
                       >
                         {item[col]}
                       </Input>
@@ -207,10 +198,10 @@ function MyCard({ isLoggedIn, setCardDataList }) {
                   }
                 })}
               </tr>
-            ))}
-          {cardListStatus === "failed" && (
+            ))
+          ) : (
             <tr>
-              <td colSpan="2">Error</td>
+              <td colSpan="7">No data available</td>
             </tr>
           )}
         </tbody>

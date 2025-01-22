@@ -1,17 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { categoryListActions } from "../../../store/myDetailSlice";
 import { selectText } from "../../../util/util";
 import { Input } from "../PayList";
 
-function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
+function MyCategory({ setCatDataList, catList }) {
+  console.log("catList!!!!", catList);
   const dispatch = useDispatch();
-  const catList = useSelector(
-    (state) => state.myDetailList["categoryList"].items
-  );
-  const catListStatus = useSelector(
-    (state) => state.myDetailList["categoryList"].status
-  );
   const catListSaveStatus = useSelector(
     (state) => state.myDetailList["categoryList"].saveStatus
   );
@@ -19,19 +13,10 @@ function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
   const [catData, setCatData] = useState([]);
   const [catId, setCatId] = useState(1);
   const [focusedItemId, setFocusedItemId] = useState(null);
+  const fields = ["category_nm"];
 
   useEffect(() => {
-    console.log("isLoggedIn:::", isLoggedIn);
-    console.log("catListStatus:::", catListStatus);
-    if (isLoggedIn && catListStatus === "idle") {
-      console.log("호출?!");
-      dispatch(categoryListActions.fetchData());
-    }
-    console.log("catList:::", catList);
-  }, [catListStatus, dispatch]);
-
-  useEffect(() => {
-    if (catListStatus === "succeeded" && catList.length > 0) {
+    if (catList.length > 0) {
       setCatData(
         catList.map((item) => ({
           ...item,
@@ -42,7 +27,7 @@ function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
     }
 
     console.log("catList:::", catList);
-  }, [catListStatus, catList]);
+  }, [catList]);
 
   useEffect(() => {
     if (
@@ -58,15 +43,20 @@ function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
       setCatId((id) => id + 1);
       console.log("catData:::", catData);
     }
+  }, [catList, catData]);
 
-    // 저장할 data
-    const modifiedData = catData.filter(
+  // 저장할 data
+  const modifiedData = useMemo(() => {
+    return catData.filter(
       (item) =>
         (item.isModified || item.isNew) &&
         fields.some((field) => item[field] !== "" && item[field] !== undefined)
     );
+  }, [catData]);
+
+  useEffect(() => {
     setCatDataList(modifiedData);
-  }, [catData, catId]);
+  }, [modifiedData]);
 
   const handleUpdate = (e, id) => {
     const newItem = e.target.innerText;
@@ -97,15 +87,13 @@ function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
   // 삭제하기
   const handleDelete = (id) => {
     console.log(id);
-    if (catData.some((item) => item.cat_id === id)) {
-      dispatch(categoryListActions.deleteData(id));
+    if (catList.some((item) => item.cat_id === id)) {
+      dispatch(categoryListActions.deleteData([id]));
     }
     console.log("prevData:::", catData);
-    setCatData((prevData) => prevData.filter((item) => item.id !== id));
+    setCatData((prevData) => prevData.filter((item) => item.cat_id !== id));
     console.log("nextData:::", catData);
   };
-
-  const fields = ["category_nm"];
 
   return (
     <div className="modal-body">
@@ -124,7 +112,7 @@ function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
           </tr>
         </thead>
         <tbody>
-          {catListStatus === "succeeded" &&
+          {catData.length > 0 ? (
             catData.map((item, i) => (
               <tr key={i}>
                 <Input
@@ -141,10 +129,10 @@ function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
                   X
                 </td>
               </tr>
-            ))}
-          {catListStatus === "failed" && (
+            ))
+          ) : (
             <tr>
-              <td colSpan="2">Error</td>
+              <td colSpan="3">No data available</td>
             </tr>
           )}
         </tbody>

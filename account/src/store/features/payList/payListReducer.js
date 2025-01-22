@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { logout } from "../login/loginActions";
 import { deleteData, fetchData, saveData } from "./payListActions";
 
 const payList = createSlice({

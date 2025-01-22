@@ -6,13 +6,9 @@ export const createAsyncActions = (endpoint) => {
     // data = {} : data를 전달하지 않으면, 빈 객체 {}
     // withCredentials : 쿠키나 인증 정보를 포함시키기 위한 옵션
     fetchData: createAsyncThunk(`${endpoint}/fetchData`, async (data = {}) => {
-      const response = await axios.post(
-        `http://localhost:8009/${endpoint}`,
-        data,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.get(`http://localhost:8009/${endpoint}`, {
+        withCredentials: true,
+      });
       return response.data;
     }),
     saveData: createAsyncThunk(`${endpoint}/saveData`, async (data) => {
@@ -32,5 +28,5 @@ export const createAsyncActions = (endpoint) => {
 };
 
 export const fixedItemListActions = createAsyncActions("fixedItemList");
-export const cardListActions = createAsyncActions("cardList");
 export const categoryListActions = createAsyncActions("categoryList");
+export const cardListActions = createAsyncActions("cardList");

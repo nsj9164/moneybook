@@ -1,4 +1,4 @@
-const createAsyncReducers = (builder, actions, stateKey) => {
+export const createAsyncReducers = (builder, actions, stateKey) => {
   builder
     .addCase(actions.fetchData.pending, (state) => {
       state[stateKey].status = "loading";

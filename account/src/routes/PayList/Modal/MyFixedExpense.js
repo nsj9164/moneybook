@@ -1,17 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fixedItemListActions } from "../../../store/myDetailSlice";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { nowCursor, restoreCursor, selectText } from "../../../util/util";
 import { Input } from "../PayList";
 
-function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
+function MyFixedExpense({
+  setFixedDataList,
+  fixedItemList,
+  catList,
+  cardList,
+}) {
   const dispatch = useDispatch();
-  const fixedExpenseList = useSelector(
-    (state) => state.myDetailList["fixedItemList"].items
-  );
-  const fixedExpenseListStatus = useSelector(
-    (state) => state.myDetailList["fixedItemList"].status
-  );
   const inputRefs = useRef([]);
   const [fixedData, setFixedData] = useState([]);
   const [fixedId, setFixedId] = useState(1);
@@ -19,43 +17,48 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
   const [checkedItems, setCheckedItems] = useState([]);
   const [focusedItemId, setFocusedItemId] = useState(null);
   const [price, setPrice] = useState("");
+  const fields = [
+    "expense_date",
+    "expense_desc",
+    "expense_amount",
+    "expense_payment",
+    "expense_cat_nm",
+  ];
 
   useEffect(() => {
-    console.log("status???", fixedExpenseListStatus);
-    if (isLoggedIn && fixedExpenseListStatus === "idle") {
-      dispatch(fixedItemListActions.fetchData());
-    }
-  }, [isLoggedIn, fixedExpenseListStatus, dispatch]);
-
-  useEffect(() => {
-    if (fixedExpenseListStatus === "succeeded" && fixedExpenseList.length > 0) {
+    if (fixedItemList.length > 0) {
       setFixedData(
-        fixedExpenseList.map((item) => ({
+        fixedItemList.map((item) => ({
           ...item,
           isDisabled: false,
           isModified: false,
         }))
       );
     }
-  }, [fixedExpenseListStatus, fixedExpenseList]);
+  }, [fixedItemList]);
 
   useEffect(() => {
-    if (fixedData.every((item) => !item.isDisabled)) {
-      setFixedData([
-        ...fixedData,
+    if (fixedData.length === 0 || fixedData.every((item) => !item.isDisabled)) {
+      setFixedData((prevData) => [
+        ...prevData,
         { expense_id: `expense_${fixedId}`, isDisabled: true, isNew: true },
       ]);
       setFixedId((prevId) => prevId + 1);
     }
+  }, [fixedItemList, fixedData]);
 
-    // 저장할 data
-    const modifiedData = fixedData.filter(
+  // 저장할 data
+  const modifiedData = useMemo(() => {
+    return fixedData.filter(
       (item) =>
         (item.isModified || item.isNew) &&
         fields.some((field) => item[field] !== "" && item[field] !== undefined)
     );
+  }, [fixedData]);
+
+  useEffect(() => {
     setFixedDataList(modifiedData);
-  }, [fixedData, setFixedDataList]);
+  }, [modifiedData]);
 
   const handleUpdate = (e, id, key) => {
     const newItem = e.target.innerText;
@@ -159,14 +162,6 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
     }
   };
 
-  const fields = [
-    "expense_date",
-    "expense_desc",
-    "expense_amount",
-    "expense_payment",
-    "expense_cat_nm",
-  ];
-
   return (
     <div className="modal-body">
       <h2 className="modal-title">고정항목 관리하기</h2>
@@ -196,7 +191,7 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
           </tr>
         </thead>
         <tbody>
-          {fixedExpenseListStatus === "succeeded" &&
+          {fixedData.length > 0 ? (
             fixedData.map((item, i) => (
               <tr key={item.expense_id}>
                 <td>
@@ -242,11 +237,10 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
                   )
                 )}
               </tr>
-            ))}
-
-          {fixedExpenseListStatus === "failed" && (
+            ))
+          ) : (
             <tr>
-              <td colSpan="6">Error loading data</td>
+              <td colSpan="6">No data available</td>
             </tr>
           )}
         </tbody>

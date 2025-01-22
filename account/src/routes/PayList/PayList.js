@@ -1,7 +1,11 @@
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchData, deleteData, saveData } from "../../store/paySlice";
+import {
+  fetchData,
+  deleteData,
+  saveData,
+} from "../../store/features/payList/payListActions";
 import {
   nowCursor,
   restoreCursor,
@@ -101,8 +105,6 @@ function PayList() {
       .filter((item) => item.price2 && unformatNumber(item.price2) > 0)
       .reduce((sum, item) => sum + parseInt(unformatNumber(item.price2)), 0);
     setRealExpense(sumPrice2.toLocaleString("ko-KR"));
-
-    console.log("tempData:::", tempData);
   }, [tempData]);
 
   // datepicker - 이전/다음
@@ -129,10 +131,8 @@ function PayList() {
   // 데이터 수정
   const handleUpdate = (e, id, key) => {
     const newItem = key === "date" ? e : e.target.innerText;
-    console.log("handleUpdate:::", id, key, newItem);
     setTempData((prevData) =>
       prevData.map((item) => {
-        console.log(item.id);
         return item.id === id
           ? { ...item, [key]: newItem, isModified: true }
           : item;
@@ -152,13 +152,10 @@ function PayList() {
 
   // 추가 입력란 클릭시 초기값 세팅
   const setInitial = (item, index) => {
-    console.log("item:::", item);
-    console.log("item.id:::", item.express_id);
     if (item.isDisabled) {
       const newData = tempData.map((i) => {
         if (item.express_id === i.express_id) {
           setTempId((tempId) => tempId + 1);
-          console.log("tempId:::", date, tempId);
           return {
             ...i,
             id: `${date}-${tempId}`,
@@ -172,7 +169,6 @@ function PayList() {
           return i;
         }
       });
-      console.log("newData:::", newData);
       setTempData(newData);
       setTimeout(() => setFocusedItemId(index), 0);
     } else {
@@ -206,15 +202,13 @@ function PayList() {
       tempData.filter((item) => !item.isDisabled).length && tempData.length > 1
       ? setCheckedAll(true)
       : setCheckedAll(false);
-    console.log("checkedItems:::", checkedItems);
   }, [checkedItems, tempData]);
 
   // 삭제
   const handleDelete = () => {
     const delCheckedList = checkedItems.filter((id) =>
-      tempData.some((item) => item.id === id)
+      payList.some((item) => item.id === id)
     );
-    console.log("delCheckedList::::", delCheckedList);
     if (delCheckedList.length > 0) {
       dispatch(deleteData(delCheckedList));
     }
@@ -262,7 +256,6 @@ function PayList() {
     }
 
     if (col.includes("price")) {
-      console.log("innerText:::", e.target.innerText, e.key === "Process");
       setPrice(e.target.innerText);
       const blockedRegex = /^[a-zA-Z~!@#$%^&*()_\-+=\[\]{}|\\;:'",.<>?/가-힣]$/;
       if (
