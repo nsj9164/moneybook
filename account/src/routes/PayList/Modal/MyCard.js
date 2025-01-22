@@ -6,8 +6,10 @@ import { Input } from "../PayList";
 
 function MyCard({ isLoggedIn, setCardDataList }) {
   const dispatch = useDispatch();
-  const cardList = useSelector((state) => state.myDetailList.items);
-  const cardListStatus = useSelector((state) => state.myDetailList.status);
+  const cardList = useSelector((state) => state.myDetailList["cardList"].items);
+  const cardListStatus = useSelector(
+    (state) => state.myDetailList["cardList"].status
+  );
   const inputRefs = useRef([]);
   const [cardData, setCardData] = useState([]);
   const [cardId, setCardId] = useState(1);

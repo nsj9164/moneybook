@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MyCard from "./MyCard";
 import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
 import "../../../App.modal.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   cardListActions,
   categoryListActions,
@@ -17,27 +17,46 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
   const [catDataList, setCatDataList] = useState([]);
   const [cardDataList, setCardDataList] = useState([]);
 
-  const saveStatus = useSelector((state) => state.myDetailList.saveStatus);
+  const active1SaveStatus = useSelector(
+    (state) => state.myDetailList["fixedItemList"].saveStatus
+  );
+  const active2SaveStatus = useSelector(
+    (state) => state.myDetailList["categoryList"].saveStatus
+  );
+  const active3SaveStatus = useSelector(
+    (state) => state.myDetailList["cardList"].saveStatus
+  );
 
   const handleSave = () => {
-    if (activeTab === 1) {
-      console.log("저장하기 버튼 클릭1", fixedDataList);
-      dispatch(fixedItemListActions.saveData(fixedDataList));
-    } else if (activeTab === 2) {
-      console.log("저장하기 버튼 클릭2", catDataList);
-      dispatch(categoryListActions.saveData(catDataList));
-      // 여기에 저장 처리 추가
-    } else {
-      console.log("저장하기 버튼 클릭3", cardDataList);
-      dispatch(cardListActions.saveData(cardDataList));
-      // 여기에 저장 처리 추가
-    }
+    const dataMap = {
+      1: { action: fixedItemListActions.saveData, data: fixedDataList },
+      2: { action: categoryListActions.saveData, data: catDataList },
+      3: { action: cardListActions.saveData, data: cardDataList },
+    };
 
-    if (saveStatus === "succeeded") {
-      alert("저장되었습니다.");
-    } else {
-      alert("오류가 발생했습니다.");
-    }
+    const { action, data } = dataMap[activeTab];
+
+    console.log(`저장하기 버튼 클릭${activeTab}`, data);
+    dispatch(action(data));
+    useSaveStatusAlert(activeTab);
+  };
+
+  const useSaveStatusAlert = (activeTab) => {
+    const saveStatusMap = {
+      1: useSelector((state) => state.myDetailList["fixedItemList"].saveStatus),
+      2: useSelector((state) => state.myDetailList["categoryList"].saveStatus),
+      3: useSelector((state) => state.myDetailList["cardList"].saveStatus),
+    };
+
+    const activeSaveStatus = saveStatusMap[activeTab];
+
+    useEffect(() => {
+      if (activeSaveStatus === "succeeded") {
+        alert("저장되었습니다.");
+      } else {
+        alert("오류가 발생하였습니다.");
+      }
+    }, [activeSaveStatus]);
   };
 
   if (!show) return null;
@@ -76,17 +95,13 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
         </div>
         <div className="modal-body">
           {activeTab === 1 && (
-            <MyFixedExpense
-              isLoggedIn
-              setFixedDataList={setFixedDataList}
-              saveStatus
-            />
+            <MyFixedExpense isLoggedIn setFixedDataList={setFixedDataList} />
           )}
           {activeTab === 2 && (
-            <MyCategory isLoggedIn setCatDataList={setCatDataList} saveStatus />
+            <MyCategory isLoggedIn setCatDataList={setCatDataList} />
           )}
           {activeTab === 3 && (
-            <MyCard isLoggedIn setCardDataList={setCardDataList} saveStatus />
+            <MyCard isLoggedIn setCardDataList={setCardDataList} />
           )}
         </div>
         <div className="modal-footer">

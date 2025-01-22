@@ -6,9 +6,11 @@ import { Input } from "../PayList";
 
 function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
   const dispatch = useDispatch();
-  const fixedExpenseList = useSelector((state) => state.myDetailList.items);
+  const fixedExpenseList = useSelector(
+    (state) => state.myDetailList["fixedItemList"].items
+  );
   const fixedExpenseListStatus = useSelector(
-    (state) => state.myDetailList.status
+    (state) => state.myDetailList["fixedItemList"].status
   );
   const inputRefs = useRef([]);
   const [fixedData, setFixedData] = useState([]);
@@ -19,6 +21,7 @@ function MyFixedExpense({ isLoggedIn, setFixedDataList }) {
   const [price, setPrice] = useState("");
 
   useEffect(() => {
+    console.log("status???", fixedExpenseListStatus);
     if (isLoggedIn && fixedExpenseListStatus === "idle") {
       dispatch(fixedItemListActions.fetchData());
     }

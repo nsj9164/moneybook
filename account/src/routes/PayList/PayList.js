@@ -215,7 +215,9 @@ function PayList() {
       tempData.some((item) => item.id === id)
     );
     console.log("delCheckedList::::", delCheckedList);
-    dispatch(deleteData(delCheckedList));
+    if (delCheckedList.length > 0) {
+      dispatch(deleteData(delCheckedList));
+    }
 
     setTempData((prevData) =>
       prevData.map((item) => {

@@ -1,23 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { categoryListActions } from "../../../store/myDetailSlice";
-import { fetchData } from "../../../store/paySlice";
 import { selectText } from "../../../util/util";
 import { Input } from "../PayList";
 
 function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
   const dispatch = useDispatch();
-  const catList = useSelector((state) => state.myDetailList.items);
-  const catListStatus = useSelector((state) => state.myDetailList.status);
+  const catList = useSelector(
+    (state) => state.myDetailList["categoryList"].items
+  );
+  const catListStatus = useSelector(
+    (state) => state.myDetailList["categoryList"].status
+  );
+  const catListSaveStatus = useSelector(
+    (state) => state.myDetailList["categoryList"].saveStatus
+  );
   const inputRefs = useRef([]);
   const [catData, setCatData] = useState([]);
   const [catId, setCatId] = useState(1);
   const [focusedItemId, setFocusedItemId] = useState(null);
 
   useEffect(() => {
+    console.log("isLoggedIn:::", isLoggedIn);
+    console.log("catListStatus:::", catListStatus);
     if (isLoggedIn && catListStatus === "idle") {
+      console.log("호출?!");
       dispatch(categoryListActions.fetchData());
     }
+    console.log("catList:::", catList);
   }, [catListStatus, dispatch]);
 
   useEffect(() => {
@@ -30,6 +40,8 @@ function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
         }))
       );
     }
+
+    console.log("catList:::", catList);
   }, [catListStatus, catList]);
 
   useEffect(() => {
@@ -77,10 +89,21 @@ function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
   }, [focusedItemId]);
 
   useEffect(() => {
-    if (saveStatus === "succeeded") {
+    if (catListSaveStatus === "succeeded") {
       dispatch(categoryListActions.fetchData());
     }
-  }, [saveStatus]);
+  }, [catListSaveStatus]);
+
+  // 삭제하기
+  const handleDelete = (id) => {
+    console.log(id);
+    if (catData.some((item) => item.cat_id === id)) {
+      dispatch(categoryListActions.deleteData(id));
+    }
+    console.log("prevData:::", catData);
+    setCatData((prevData) => prevData.filter((item) => item.id !== id));
+    console.log("nextData:::", catData);
+  };
 
   const fields = ["category_nm"];
 
@@ -111,7 +134,12 @@ function MyCategory({ isLoggedIn, setCatDataList, saveStatus }) {
                   {item.category_nm}
                 </Input>
                 <td>≡</td>
-                <td>X</td>
+                <td
+                  className="cursor_pointer"
+                  onClick={() => handleDelete(item.cat_id)}
+                >
+                  X
+                </td>
               </tr>
             ))}
           {catListStatus === "failed" && (

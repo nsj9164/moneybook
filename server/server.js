@@ -32,7 +32,6 @@ app.use(express.static(path.join(__dirname, "../account/build")));
 const authenticateToken = (req, res, next) => {
   // 쿠키에서 JWT 가져오기
   const token = req.cookies.token;
-  console.log("token : ", token);
   if (!token) {
     return res.status(401).json({ message: "로그인이 필요합니다." });
   }
@@ -287,7 +286,8 @@ app.get("/cardList", authenticateToken, function (req, res) {
         , card_name
         , card_type
         , payment_due_date
-        , usage_period
+        , usage_period_start
+        , usage_period_end
         , active_status
     FROM CARD_INFO
     WHERE USER_ID = ?
@@ -307,13 +307,14 @@ app.post("/cardList/insert", authenticateToken, function (req, res) {
   data.forEach((item) => {
     if (item.isNew) {
       db.query(
-        "INSERT INTO CARD_INFO (card_company, card_name, card_type, payment_due_date, usage_period, active_status, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, SYSDATE(), ?)",
+        "INSERT INTO CARD_INFO (card_company, card_name, card_type, payment_due_date, usage_period_start, usage_period_end, active_status, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, SYSDATE(), ?)",
         [
           item.card_company,
           item.card_name,
           item.card_type,
           item.payment_due_date,
-          item.usage_period,
+          item.usage_period_start,
+          item.usage_period_end,
           item.active_status,
           userId,
         ],
@@ -323,13 +324,14 @@ app.post("/cardList/insert", authenticateToken, function (req, res) {
       );
     } else if (item.isModified) {
       db.query(
-        "UPDATE CARD_INFO SET card_company = ?, card_name = ?, card_type = ?, payment_due_date = ?, usage_period = ?, active_status = ?, UPD_DT = SYSDATE() WHERE card_id = ?",
+        "UPDATE CARD_INFO SET card_company = ?, card_name = ?, card_type = ?, payment_due_date = ?, usage_period_start = ?, usage_period_end = ?, active_status = ?, UPD_DT = SYSDATE() WHERE card_id = ?",
         [
           item.card_company,
           item.card_name,
           item.card_type,
           item.payment_due_date,
-          item.usage_period,
+          item.usage_period_start,
+          item.usage_period_end,
           item.active_status,
           item.card_id,
         ],
@@ -364,9 +366,9 @@ app.get("/categoryList", authenticateToken, function (req, res) {
   db.query(
     `SELECT cat_id
           , category_nm
-    FROM CARD_INFO
+    FROM CATEGORY_INFO
     WHERE USER_ID = ?
-    ORDER BY card_id`,
+    ORDER BY cat_id`,
     [req.user.userId],
     function (err, results, fields) {
       if (err) throw err;
@@ -382,7 +384,7 @@ app.post("/categoryList/insert", authenticateToken, function (req, res) {
   data.forEach((item) => {
     if (item.isNew) {
       db.query(
-        "INSERT INTO category (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
+        "INSERT INTO CATEGORY_INFO (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
         [item.category_nm, userId],
         (err, result) => {
           if (err) throw err;
@@ -390,7 +392,7 @@ app.post("/categoryList/insert", authenticateToken, function (req, res) {
       );
     } else if (item.isModified) {
       db.query(
-        "UPDATE category SET category_nm = ?, UPD_DT = SYSDATE() WHERE cat_id = ?",
+        "UPDATE CATEGORY_INFO SET category_nm = ?, UPD_DT = SYSDATE() WHERE cat_id = ?",
         [item.category_nm, item.cat_id],
         (err, result) => {
           if (err) throw err;
@@ -405,18 +407,22 @@ app.post("/categoryList/insert", authenticateToken, function (req, res) {
 app.post("/categoryList/delete", authenticateToken, function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
-
-  data.forEach((item) => {
-    db.query(
-      `DELETE FROM category
-        WHERE user_id = ?
-          AND cat_id = ?`,
-      [userId, item.card_id],
-      (err, result) => {
-        if (err) throw err;
+  console.log("호출", data);
+  db.query(
+    `DELETE FROM CATEGORY_INFO
+      WHERE user_id = ?
+        AND cat_id = ?`,
+    [userId, data],
+    (err, result) => {
+      if (err) {
+        console.error("쿼리 에러:", err);
+        res.status(500).send("쿼리 실행 실패");
+        return;
       }
-    );
-  });
+      console.log("삭제될 결과:", result);
+      res.status(500).send("삭제 완료");
+    }
+  );
 });
 
 app.get("*", function (req, res) {
