@@ -4,7 +4,6 @@ import { selectText } from "../../../util/util";
 import { Input } from "../PayList";
 
 function MyCategory({ setCatDataList, catList }) {
-  console.log("catList!!!!", catList);
   const dispatch = useDispatch();
   const catListSaveStatus = useSelector(
     (state) => state.myDetailList["categoryList"].saveStatus

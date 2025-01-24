@@ -203,9 +203,17 @@ function MyFixedExpense({
                   />
                 </td>
                 {fields.map((col, idx) =>
-                  col === "expense_date" ||
-                  col === "expense_payment" ||
-                  col === "expense_cat_nm" ? (
+                  {col === "expense_cat_nm" && (
+                    catList.map(list => (
+                      <option
+                        value={list.category_nm}
+                      >
+                        {list.category_nm}
+                      </option>
+                    ))
+                  )}
+                  {(col === "expense_date" ||
+                  col === "expense_payment") && (
                     <td key={idx}>
                       <select aria-label="Default select example">
                         {col === "expense_date" &&
@@ -218,7 +226,7 @@ function MyFixedExpense({
                             </option>
                           ))}
                       </select>
-                    </td>
+                    </td>}
                   ) : (
                     <Input
                       key={idx}
