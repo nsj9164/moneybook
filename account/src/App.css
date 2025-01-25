@@ -34,7 +34,7 @@ body,
 }
 
 .logo_img {
-  background-image: url("./img/moneybook_logo_icon.png");
+  background-image: url("./assets/images/moneybook_logo_icon.png");
   background-repeat: no-repeat;
   width: 3rem;
   height: 3rem;

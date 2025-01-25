@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import CustomSelect from "../../../components/SelectComponent/CustomSelect";
 import { nowCursor, restoreCursor, selectText } from "../../../util/util";
 import { Input } from "../PayList";
 
@@ -203,30 +204,44 @@ function MyFixedExpense({
                   />
                 </td>
                 {fields.map((col, idx) =>
-                  {col === "expense_cat_nm" && (
-                    catList.map(list => (
-                      <option
-                        value={list.category_nm}
-                      >
-                        {list.category_nm}
-                      </option>
-                    ))
-                  )}
-                  {(col === "expense_date" ||
-                  col === "expense_payment") && (
+                  col === "expense_date" ? (
                     <td key={idx}>
-                      <select aria-label="Default select example">
-                        {col === "expense_date" &&
-                          Array.from({ length: 31 }, (_, j) => (
-                            <option
-                              key={j}
-                              value={`${String(j + 1).padStart(2, "0")}일`}
-                            >
-                              {String(j + 1).padStart(2, "0")}
-                            </option>
-                          ))}
-                      </select>
-                    </td>}
+                      <CustomSelect
+                        options={Array.from({ length: 31 }, (_, j) => ({
+                          value: String(j + 1).padStart(2, "0"),
+                          label: String(j + 1).padStart(2, "0"),
+                        }))}
+                        onChange={(value) =>
+                          console.log("Selected date:", value)
+                        }
+                      />
+                    </td>
+                  ) : col === "expense_payment" ? (
+                    <td key={idx}>
+                      <CustomSelect
+                        value={null}
+                        options={cardList.map((list) => ({
+                          value: list.card_id,
+                          label: list.card_name,
+                        }))}
+                        defaultValue="선택없음"
+                        onChange={(value) =>
+                          console.log("Selected payment:", value)
+                        }
+                      />
+                    </td>
+                  ) : col === "expense_cat_nm" ? (
+                    <td key={idx}>
+                      <CustomSelect
+                        options={catList.map((list) => ({
+                          value: list.cat_id,
+                          label: list.category_nm,
+                        }))}
+                        onChange={(value) =>
+                          console.log("Selected category:", value)
+                        }
+                      />
+                    </td>
                   ) : (
                     <Input
                       key={idx}

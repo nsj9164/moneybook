@@ -34,7 +34,7 @@
 
 .modal-body {
   padding: 24px;
-  background-color: #f5f5f5; /* Soft light gray */
+  background-color: #f5f5f5;
   border-radius: 12px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
   font-family: "Helvetica", sans-serif;
@@ -160,8 +160,7 @@
 
 /* Input fields */
 .modal-container input[type="text"],
-.modal-container input[type="number"],
-.modal-container select {
+.modal-container input[type="number"] {
   border-radius: 8px;
   border: 1px solid #e0e0e0;
   padding: 12px;
@@ -173,11 +172,6 @@
 
 .modal-container input[type="text"]:focus,
 .modal-container input[type="number"]:focus,
-.modal-container select:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
 .modal-button-group-right {
   display: flex;
   gap: 16px;
@@ -199,50 +193,46 @@
 }
 
 .btn-close {
-  /* background: #e9ecef; */
   width: inherit;
   height: inherit;
   background: #f0f0f0;
   color: #495057;
 }
 
-.btn-close:hover {
-}
-
 /* Modal Header */
 .modal-header {
-  background-color: #ffffff; /* White background */
+  background-color: #ffffff;
   padding: 20px;
-  border-bottom: 1px solid #e0e0e0; /* Soft border line */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
-  border-radius: 8px 8px 0 0; /* Rounded corners at the top */
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px 8px 0 0;
 }
 
 .nav-tabs {
   display: flex;
-  justify-content: flex-start; /* 시작 위치 정렬 */
-  gap: 4px; /* 탭 간의 간격 조정 */
+  justify-content: flex-start;
+  gap: 4px;
   padding: 0;
   margin: 0;
 }
 
 .nav-link {
-  padding: 6px 12px; /* 여백 축소 */
-  font-size: 14px; /* 글꼴 크기 축소 (필요시) */
+  padding: 6px 12px;
+  font-size: 14px;
 }
 
 .nav-link:hover,
 .nav-link:focus {
-  background-color: #f2f2f2; /* Soft gray background on hover */
-  color: #007bff; /* Blue color for text */
+  background-color: #f2f2f2;
+  color: #007bff;
 }
 
 .nav-item {
-  margin: 0; /* 추가적인 외부 여백 제거 */
+  margin: 0;
 }
 
 .nav-link.active {
-  border-bottom: 2px solid #007bff; /* 활성화된 링크 강조 */
+  border-bottom: 2px solid #007bff;
 }
 
 /* Close button styling */
@@ -268,39 +258,4 @@
 .modal-summary-item.item1 .font-bold {
   font-weight: 700;
   color: #333;
-}
-
-select {
-  width: 100%; /* 필요에 따라 너비 조정 */
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
-  font-size: 16px;
-  color: #333;
-  outline: none;
-  appearance: none; /* 기본 화살표 제거 */
-  cursor: pointer;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-select:focus {
-  border-color: #007bff; /* 포커스 시 테두리 색상 */
-  box-shadow: 0 0 4px rgba(0, 123, 255, 0.5); /* 포커스 시 외곽선 */
-}
-
-option {
-  padding: 8px; /* 옵션에 여백 추가 */
-  background-color: #fff;
-  color: #333;
-}
-
-select::-ms-expand {
-  display: none; /* IE의 기본 화살표 제거 */
-}
-
-select[aria-label="Default select example"] {
-  /* 특정 select 요소에만 적용 */
-  max-width: 300px; /* 최대 너비 지정 */
-  margin: 8px 0; /* 위아래 간격 */
 }
