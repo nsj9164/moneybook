@@ -10,11 +10,17 @@ export const StyledSelect = styled.select`
   outline: none;
   background-color: white;
 
-  max-height: ${(props) => props.maxHeight}; /* 동적으로 계산된 max-height */
+  max-height: ${(props) =>
+    props.maxHeight || "auto"}; /* 동적으로 계산된 max-height */
   overflow-y: auto;
 
   &:focus {
     border-color: #0078ff;
     box-shadow: 0 0 3px rgba(0, 120, 255, 0.5);
   }
+`;
+
+export const StyledWrapper = styled.div`
+  position: relative;
+  width: 100%;
 `;

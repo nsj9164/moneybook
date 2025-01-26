@@ -55,14 +55,15 @@ function MyFixedExpense({
         (item.isModified || item.isNew) &&
         fields.some((field) => item[field] !== "" && item[field] !== undefined)
     );
+    console.log("fixedData:::", fixedData);
   }, [fixedData]);
 
   useEffect(() => {
     setFixedDataList(modifiedData);
   }, [modifiedData]);
 
-  const handleUpdate = (e, id, key) => {
-    const newItem = e.target.innerText;
+  const handleUpdate = (newItem, id, key) => {
+    console.log("newItem:::", newItem);
     setFixedData((prevData) =>
       prevData.map((item) =>
         item.expense_id === id
@@ -205,50 +206,51 @@ function MyFixedExpense({
                 </td>
                 {fields.map((col, idx) =>
                   col === "expense_date" ? (
-                    <td key={idx}>
-                      <CustomSelect
-                        options={Array.from({ length: 31 }, (_, j) => ({
-                          value: String(j + 1).padStart(2, "0"),
-                          label: String(j + 1).padStart(2, "0"),
-                        }))}
-                        onChange={(value) =>
-                          console.log("Selected date:", value)
-                        }
-                      />
-                    </td>
+                    <CustomSelect
+                      key={idx}
+                      value={null}
+                      options={Array.from({ length: 31 }, (_, j) => ({
+                        value: String(j + 1).padStart(2, "0"),
+                        label: String(j + 1).padStart(2, "0"),
+                      }))}
+                      onChange={(value) =>
+                        handleUpdate(value, item.expense_id, col)
+                      }
+                    />
                   ) : col === "expense_payment" ? (
-                    <td key={idx}>
-                      <CustomSelect
-                        value={null}
-                        options={cardList.map((list) => ({
-                          value: list.card_id,
-                          label: list.card_name,
-                        }))}
-                        defaultValue="선택없음"
-                        onChange={(value) =>
-                          console.log("Selected payment:", value)
-                        }
-                      />
-                    </td>
+                    <CustomSelect
+                      key={idx}
+                      value={null}
+                      options={cardList.map((list) => ({
+                        value: list.card_id,
+                        label: list.card_name,
+                      }))}
+                      defaultValue="선택없음"
+                      onChange={(value) =>
+                        handleUpdate(value, item.expense_id, col)
+                      }
+                    />
                   ) : col === "expense_cat_nm" ? (
-                    <td key={idx}>
-                      <CustomSelect
-                        options={catList.map((list) => ({
-                          value: list.cat_id,
-                          label: list.category_nm,
-                        }))}
-                        onChange={(value) =>
-                          console.log("Selected category:", value)
-                        }
-                      />
-                    </td>
+                    <CustomSelect
+                      key={idx}
+                      value={null}
+                      options={catList.map((list) => ({
+                        value: list.cat_id,
+                        label: list.category_nm,
+                      }))}
+                      onChange={(value) =>
+                        handleUpdate(value, item.expense_id, col)
+                      }
+                    />
                   ) : (
                     <Input
                       key={idx}
                       ref={(el) =>
                         (inputRefs.current[i * fields.length + idx] = el)
                       }
-                      onBlur={(e) => handleUpdate(e, item.expense_id, col)}
+                      onBlur={(e) =>
+                        handleUpdate(e.target.innerText, item.expense_id, col)
+                      }
                       onKeyDown={(e) =>
                         handleKeyDown(e, i * fields.length + idx, col)
                       }
