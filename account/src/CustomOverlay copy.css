@@ -1,0 +1,64 @@
+/* 오버레이 버튼과 팝업 컨테이너 */
+.overlay-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.popover {
+  position: absolute;
+  top: 100%; /* 버튼 바로 아래 위치 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  min-width: 150px;
+  max-width: 200px;
+  animation: fadeIn 0.3s forwards;
+  text-align: center;
+  font-size: 14px;
+
+  /* 화살표 */
+  &::after {
+    content: "";
+    position: absolute;
+    top: -10px; /* 화살표가 팝오버의 바로 위에 위치하도록 */
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent; /* 왼쪽 부분 투명 */
+    border-right: 10px solid transparent; /* 오른쪽 부분 투명 */
+    border-bottom: 10px solid #ddd; /* 아래쪽 화살표 색상 */
+  }
+}
+
+/* 팝오버 헤더 */
+.popover-header {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+/* 팝오버 본문 */
+.popover-body {
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* 팝오버 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import CustomSelect from "../../../components/SelectComponent/CustomSelect";
-import { nowCursor, restoreCursor, selectText } from "../../../util/util";
+import { date, nowCursor, restoreCursor, selectText } from "../../../util/util";
 import { Input } from "../PayList";
 
 function MyFixedExpense({
@@ -42,7 +42,13 @@ function MyFixedExpense({
     if (fixedData.length === 0 || fixedData.every((item) => !item.isDisabled)) {
       setFixedData((prevData) => [
         ...prevData,
-        { expense_id: `expense_${fixedId}`, isDisabled: true, isNew: true },
+        {
+          expense_id: `expense_${fixedId}`,
+          expense_date: `${date.slice(-2)}`,
+          expense_amount: 0,
+          isDisabled: true,
+          isNew: true,
+        },
       ]);
       setFixedId((prevId) => prevId + 1);
     }
@@ -55,7 +61,6 @@ function MyFixedExpense({
         (item.isModified || item.isNew) &&
         fields.some((field) => item[field] !== "" && item[field] !== undefined)
     );
-    console.log("fixedData:::", fixedData);
   }, [fixedData]);
 
   useEffect(() => {
@@ -63,11 +68,11 @@ function MyFixedExpense({
   }, [modifiedData]);
 
   const handleUpdate = (newItem, id, key) => {
-    console.log("newItem:::", newItem);
+    console.log("newItem:::", newItem, id, key);
     setFixedData((prevData) =>
       prevData.map((item) =>
         item.expense_id === id
-          ? { ...item, [key]: newItem, isModified: true }
+          ? { ...item, [key]: newItem, isModified: true, isDisabled: false }
           : item
       )
     );
@@ -163,7 +168,7 @@ function MyFixedExpense({
       }
     }
   };
-
+  console.log(date.slice(-2));
   return (
     <div className="modal-body">
       <h2 className="modal-title">고정항목 관리하기</h2>
@@ -208,11 +213,12 @@ function MyFixedExpense({
                   col === "expense_date" ? (
                     <CustomSelect
                       key={idx}
-                      value={null}
+                      value={item[col]}
                       options={Array.from({ length: 31 }, (_, j) => ({
                         value: String(j + 1).padStart(2, "0"),
                         label: String(j + 1).padStart(2, "0"),
                       }))}
+                      defaultValue={date.slice(-2)}
                       onChange={(value) =>
                         handleUpdate(value, item.expense_id, col)
                       }
@@ -220,12 +226,13 @@ function MyFixedExpense({
                   ) : col === "expense_payment" ? (
                     <CustomSelect
                       key={idx}
-                      value={null}
+                      value={item[col]}
                       options={cardList.map((list) => ({
                         value: list.card_id,
                         label: list.card_name,
                       }))}
-                      defaultValue="선택없음"
+                      defaultValue="0"
+                      noSelectValue="선택없음"
                       onChange={(value) =>
                         handleUpdate(value, item.expense_id, col)
                       }
@@ -233,11 +240,13 @@ function MyFixedExpense({
                   ) : col === "expense_cat_nm" ? (
                     <CustomSelect
                       key={idx}
-                      value={null}
+                      value={item[col]}
                       options={catList.map((list) => ({
                         value: list.cat_id,
                         label: list.category_nm,
                       }))}
+                      defaultValue="0"
+                      noSelectValue="미분류"
                       onChange={(value) =>
                         handleUpdate(value, item.expense_id, col)
                       }

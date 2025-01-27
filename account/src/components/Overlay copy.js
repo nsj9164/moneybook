@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import "../CustomOverlay.css";
 
 export const Overlay = ({
   triggerText,
@@ -8,6 +7,7 @@ export const Overlay = ({
   disabled,
   onClick,
 }) => {
+  const [isVisible, setIsVisible] = useState(false);
   const overlayRef = useRef(null);
 
   // 외부 클릭 시 오버레이 닫기
@@ -21,14 +21,31 @@ export const Overlay = ({
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [onClick]);
+  }, []);
+
+  const handleClick = () => {
+    setIsVisible(!isVisible);
+    if (onClick) {
+      onClick();
+    }
+  };
 
   return (
     <div className="overlay-trigger">
-      <div ref={overlayRef} className="popover">
-        {overlayHeader && <h3 className="popover-header">{overlayHeader}</h3>}
-        <p className="popover-body">{overlayContent}</p>
-      </div>
+      <button
+        onClick={handleClick}
+        disabled={disabled}
+        className="button-group-btns"
+      >
+        {triggerText}
+      </button>
+
+      {isVisible && (
+        <div ref={overlayRef} className="popover">
+          {overlayHeader && <h3 className="popover-header">{overlayHeader}</h3>}
+          <p className="popover-body">{overlayContent}</p>
+        </div>
+      )}
     </div>
   );
 };

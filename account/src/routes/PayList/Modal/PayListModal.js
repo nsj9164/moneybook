@@ -14,6 +14,7 @@ import {
   selectAllSaveStatuses,
   selectAllStatuses,
 } from "../../../store/features/myDetailList/myDetailListSelectors";
+import { Overlay } from "../../../components/Overlay";
 
 const PayListModal = ({ show, onClose, isLoggedIn }) => {
   const dispatch = useDispatch();
@@ -165,6 +166,10 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
               </div>
             )}
             <div className="modal-button-group-right">
+              <Overlay
+                triggerText="저장하기"
+                overlayContent={"Holy guacamole! Check this info."}
+              />
               <button className="btn-save" onClick={handleSave}>
                 저장하기
               </button>

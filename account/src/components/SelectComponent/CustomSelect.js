@@ -8,33 +8,38 @@ const CustomSelect = ({
   options,
   maxHeight,
   defaultValue,
+  noSelectValue,
 }) => {
-  const [selectedValue, setSelectedValue] = useState("");
+  const [selectedValue, setSelectedValue] = useState(value ?? "");
 
   useEffect(() => {
-    // value가 바뀌었을 때, select box도 강제로 리렌더링됩니다.
-    console.log("Selected value changed:", value);
+    setSelectedValue(value ?? "");
   }, [value]);
 
   const handleSelectClick = () => {
-    console.log("너 때문이니???", value, defaultValue);
-    // if (!value && defaultValue) {
-    //   onChange("");
-    // }
+    if (!selectedValue) {
+      let setValue = defaultValue ? defaultValue : "noData";
+      setSelectedValue(setValue);
+      onChange(setValue);
+    }
   };
 
   const handleSelectChange = (e) => {
-    console.log("customSelect1:::", e.target.value);
-    console.log("customSelect2:::", e.target);
+    console.log("customSelect:::", e.target.value);
+    setSelectedValue(e.target.value);
     onChange(e.target.value);
   };
 
   return (
     <td key={key}>
       <StyledWrapper>
-        <StyledSelect onChange={handleSelectChange}>
+        <StyledSelect
+          value={selectedValue}
+          onFocus={handleSelectClick}
+          onChange={handleSelectChange}
+        >
           <option value="" disabled hidden></option>
-          {defaultValue && <option value="">{defaultValue}</option>}
+          {noSelectValue && <option value="noData">{noSelectValue}</option>}
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

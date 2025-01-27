@@ -7,6 +7,7 @@ import {
   saveData,
 } from "../../store/features/payList/payListActions";
 import {
+  date,
   nowCursor,
   restoreCursor,
   selectText,
@@ -55,12 +56,8 @@ function PayList() {
   const [tempId, setTempId] = useState(1);
   const [startDate, setStartDate] = useState(startOfMonth(new Date()));
   const [endDate, setEndDate] = useState(endOfMonth(new Date()));
-
-  const today = new Date();
-  const date = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}-${String(today.getDate()).padStart(2, "0")}`;
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
 
   // payList 호출
   useEffect(() => {
@@ -304,26 +301,22 @@ function PayList() {
           end: format(endDate, "yyyyMMdd"),
         })
       );
+    } else {
+      setIsOverlayVisible(true);
     }
   };
 
-  const CustomOverlay = ({ triggerText, overlayContent, disabled }) => {
-    const [isVisible, setIsVisible] = useState(false);
-    const overlayRef = useRef(null);
-
-    useEffect(() => {
-      const handleOutsideClick = (event) => {
-        if (overlayRef.current && !overlayRef.current.contains(event.target)) {
-          setIsVisible(false);
-        }
-      };
-
-      document.addEventListener("mousedown", handleOutsideClick);
-      return () => {
-        document.addEventListener("mousedown", handleOutsideClick);
-      };
-    }, []);
+  const handleButtonMouseEnter = () => {
+    setIsButtonHovered(true);
   };
+
+  const handleButtonMouseLeave = () => {
+    setIsButtonHovered(false);
+  };
+
+  if (isOverlayVisible && !isButtonHovered) {
+    setIsOverlayVisible(false);
+  }
 
   const columns = [
     "date",
@@ -473,6 +466,7 @@ function PayList() {
           </button>
           <Overlay
             triggerText="카드선택"
+            overlayHeader="카드분류선택"
             overlayContent={"Holy guacamole! Check this info."}
             disabled={checkedItems.length === 0}
           />
@@ -494,8 +488,24 @@ function PayList() {
           <div>실지출합계</div>
           <div className="font-bold">{realExpense}</div>
         </div>
+
         <div className="summary-item item3">
-          <button onClick={handleSave}>저장하기</button>
+          <button
+            onClick={handleSave}
+            onMouseEnter={handleButtonMouseEnter}
+            onMouseLeave={handleButtonMouseLeave}
+          >
+            저장하기
+          </button>
+
+          {isOverlayVisible && (
+            <Overlay
+              triggerText="저장하기"
+              overlayContent={"저장할 내용이 없습니다."}
+              disabled={false}
+              onClick={() => setIsOverlayVisible(false)}
+            />
+          )}
         </div>
       </div>
     </div>

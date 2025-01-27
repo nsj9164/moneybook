@@ -210,7 +210,7 @@ app.get("/fixedItemList", authenticateToken, function (req, res) {
                    , FORMAT(expense_amount,0) as expense_amount
                    , expense_payment
                    , expense_cat_nm
-                FROM FIXCED_ITEM_LIST
+                FROM FIXED_ITEM_LIST
                WHERE USER_ID = ?
                ORDER BY expense_date, expense_id`,
     [req.user.userId],
@@ -228,7 +228,7 @@ app.post("/fixedItemList/insert", authenticateToken, function (req, res) {
   data.forEach((item) => {
     if (item.isNew) {
       db.query(
-        "INSERT INTO FIXCED_ITEM_LIST (expense_date, expense_desc, expense_amount, expense_payment, expense_cat_nm, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, SYSDATE(), ?)",
+        "INSERT INTO FIXED_ITEM_LIST (expense_date, expense_desc, expense_amount, expense_payment, expense_cat_nm, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, SYSDATE(), ?)",
         [
           item.expense_date,
           item.expense_desc,
@@ -243,7 +243,7 @@ app.post("/fixedItemList/insert", authenticateToken, function (req, res) {
       );
     } else if (item.isModified) {
       db.query(
-        "UPDATE FIXCED_ITEM_LIST SET expense_date = ?, expense_desc = ?, expense_amount = ?, expense_payment = ?, expense_cat_nm = ?, UPD_DT = SYSDATE() WHERE expense_id = ?",
+        "UPDATE FIXED_ITEM_LIST SET expense_date = ?, expense_desc = ?, expense_amount = ?, expense_payment = ?, expense_cat_nm = ?, UPD_DT = SYSDATE() WHERE expense_id = ?",
         [
           item.expense_date,
           item.expense_desc,
@@ -268,7 +268,7 @@ app.post("/fixedItemList/delete", authenticateToken, function (req, res) {
 
   data.forEach((item) => {
     db.query(
-      `DELETE FROM FIXCED_ITEM_LIST
+      `DELETE FROM FIXED_ITEM_LIST
                    WHERE user_id = ?
                      AND expense_id = ?`,
       [userId, item.expense_id],
