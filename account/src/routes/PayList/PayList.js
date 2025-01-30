@@ -56,7 +56,7 @@ function PayList() {
   const [tempId, setTempId] = useState(1);
   const [startDate, setStartDate] = useState(startOfMonth(new Date()));
   const [endDate, setEndDate] = useState(endOfMonth(new Date()));
-  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+  const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
 
   // payList 호출
@@ -302,21 +302,27 @@ function PayList() {
         })
       );
     } else {
-      setIsOverlayVisible(true);
+      if (visibleOverlay !== "save-overlay") {
+        setVisibleOverlay("save-overlay");
+      }
     }
   };
 
-  const handleButtonMouseEnter = () => {
-    setIsButtonHovered(true);
+  useEffect(() => {
+    if (!isButtonHovered && visibleOverlay === "save-overlay") {
+      setVisibleOverlay(null);
+    }
+  }, [isButtonHovered]);
+
+  const handleOverlay = (overlay) => {
+    visibleOverlay === null
+      ? setVisibleOverlay(overlay)
+      : setVisibleOverlay(null);
   };
 
-  const handleButtonMouseLeave = () => {
-    setIsButtonHovered(false);
+  const handleClose = () => {
+    setVisibleOverlay(null);
   };
-
-  if (isOverlayVisible && !isButtonHovered) {
-    setIsOverlayVisible(false);
-  }
 
   const columns = [
     "date",
@@ -464,12 +470,20 @@ function PayList() {
           >
             선택복사
           </button>
-          <Overlay
-            triggerText="카드선택"
-            overlayHeader="카드분류선택"
-            overlayContent={"Holy guacamole! Check this info."}
+          <button
             disabled={checkedItems.length === 0}
-          />
+            className="cursor_pointer"
+            onClick={() => handleOverlay("card-overlay")}
+          >
+            카드선택
+          </button>
+
+          {visibleOverlay === "card-overlay" && (
+            <Overlay
+              overlayHeader="카드분류선택"
+              overlayContent={"Holy guacamole! Check this info."}
+            />
+          )}
           <button onClick={handleModal} className="cursor_pointer">
             고정금액
           </button>
@@ -492,18 +506,17 @@ function PayList() {
         <div className="summary-item item3">
           <button
             onClick={handleSave}
-            onMouseEnter={handleButtonMouseEnter}
-            onMouseLeave={handleButtonMouseLeave}
+            onMouseEnter={() => setIsButtonHovered(true)}
+            onMouseLeave={() => setIsButtonHovered(false)}
           >
             저장하기
           </button>
 
-          {isOverlayVisible && (
+          {visibleOverlay === "save-overlay" && (
             <Overlay
               triggerText="저장하기"
               overlayContent={"저장할 내용이 없습니다."}
-              disabled={false}
-              onClick={() => setIsOverlayVisible(false)}
+              onClick={() => setVisibleOverlay("save-overlay")}
             />
           )}
         </div>

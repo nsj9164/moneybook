@@ -1,27 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import "../CustomOverlay.css";
 
-export const Overlay = ({
-  triggerText,
-  overlayHeader,
-  overlayContent,
-  disabled,
-  onClick,
-}) => {
+export const Overlay = ({ overlayHeader, overlayContent }) => {
   const overlayRef = useRef(null);
-
-  // 외부 클릭 시 오버레이 닫기
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (overlayRef.current && !overlayRef.current.contains(event.target)) {
-        setIsVisible(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, [onClick]);
 
   return (
     <div className="overlay-trigger">
