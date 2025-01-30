@@ -1,35 +1,80 @@
+/* CustomOverlay.css */
+/* 추가: 팝오버 스타일링 */
+.popover-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.popover-content {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 10;
+  white-space: nowrap;
+}
+
 /* 오버레이 트리거 컨테이너 */
 .overlay-trigger {
-  position: relative; /* 부모 요소에 상대적 위치 지정 */
+  position: relative;
   display: inline-block;
+}
+
+.overlay-button:hover {
+  background-color: #0056b3;
+}
+
+.overlay-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 /* 팝오버 스타일 */
 .popover {
   position: absolute;
-  top: calc(100% + 8px); /* 버튼 바로 아래 */
+  top: 100%;
   left: 50%;
-  transform: translateX(-50%); /* 좌우 중앙 정렬 */
+  transform: translateX(-50%);
   z-index: 1000;
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  padding: 8px 12px; /* 여백 조정 */
+  padding: 10px;
   width: 200px;
   animation: fadeIn 0.3s forwards;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -10px; /* 화살표 위치 */
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #ddd; /* 화살표 색상 */
+  }
 }
 
-/* 팝오버 화살표 */
-.popover::after {
-  content: "";
-  position: absolute;
-  top: -8px; /* 화살표가 팝오버의 바로 위에 위치하도록 */
-  left: 50%;
-  transform: translateX(-50%);
-  border-left: 8px solid transparent; /* 왼쪽 부분 투명 */
-  border-right: 8px solid transparent; /* 오른쪽 부분 투명 */
-  border-bottom: 8px solid #ddd; /* 아래쪽 화살표 색상 */
+/* 팝오버 헤더 */
+.popover-header {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+
+/* 팝오버 본문 */
+.popover-body {
+  font-size: 14px;
+  color: #333;
 }
 
 /* 팝오버 애니메이션 */

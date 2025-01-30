@@ -58,6 +58,8 @@ function PayList() {
   const [endDate, setEndDate] = useState(endOfMonth(new Date()));
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const cardButtonRef = useRef(null);
+  const saveButtonRef = useRef(null);
 
   // payList 호출
   useEffect(() => {
@@ -470,20 +472,23 @@ function PayList() {
           >
             선택복사
           </button>
-          <button
-            disabled={checkedItems.length === 0}
-            className="cursor_pointer"
-            onClick={() => handleOverlay("card-overlay")}
-          >
-            카드선택
-          </button>
+          <div className="overlay-trigger">
+            <button
+              ref={cardButtonRef}
+              className="cursor_pointer"
+              disabled={checkedItems.length === 0}
+              onClick={() => handleOverlay("card-overlay")}
+            >
+              카드선택
+            </button>
 
-          {visibleOverlay === "card-overlay" && (
-            <Overlay
-              overlayHeader="카드분류선택"
-              overlayContent={"Holy guacamole! Check this info."}
-            />
-          )}
+            {visibleOverlay === "card-overlay" && (
+              <Overlay
+                overlayHeader="카드분류선택"
+                overlayContent={"Holy guacamole! Check this info."}
+              />
+            )}
+          </div>
           <button onClick={handleModal} className="cursor_pointer">
             고정금액
           </button>
@@ -504,21 +509,24 @@ function PayList() {
         </div>
 
         <div className="summary-item item3">
-          <button
-            onClick={handleSave}
-            onMouseEnter={() => setIsButtonHovered(true)}
-            onMouseLeave={() => setIsButtonHovered(false)}
-          >
-            저장하기
-          </button>
+          <div className="overlay-trigger">
+            <button
+              ref={saveButtonRef}
+              onClick={handleSave}
+              onMouseEnter={() => setIsButtonHovered(true)}
+              onMouseLeave={() => setIsButtonHovered(false)}
+            >
+              저장하기
+            </button>
 
-          {visibleOverlay === "save-overlay" && (
-            <Overlay
-              triggerText="저장하기"
-              overlayContent={"저장할 내용이 없습니다."}
-              onClick={() => setVisibleOverlay("save-overlay")}
-            />
-          )}
+            {visibleOverlay === "save-overlay" && (
+              <Overlay
+                triggerText="저장하기"
+                overlayContent={"저장할 내용이 없습니다."}
+                onClick={() => setVisibleOverlay("save-overlay")}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
