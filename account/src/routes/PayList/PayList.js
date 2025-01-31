@@ -58,8 +58,6 @@ function PayList() {
   const [endDate, setEndDate] = useState(endOfMonth(new Date()));
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
-  const cardButtonRef = useRef(null);
-  const saveButtonRef = useRef(null);
 
   // payList 호출
   useEffect(() => {
@@ -104,6 +102,8 @@ function PayList() {
       .filter((item) => item.price2 && unformatNumber(item.price2) > 0)
       .reduce((sum, item) => sum + parseInt(unformatNumber(item.price2)), 0);
     setRealExpense(sumPrice2.toLocaleString("ko-KR"));
+
+    console.log("tempData:::", tempData);
   }, [tempData]);
 
   // datepicker - 이전/다음
@@ -153,7 +153,8 @@ function PayList() {
   const setInitial = (item, index) => {
     if (item.isDisabled) {
       const newData = tempData.map((i) => {
-        if (item.express_id === i.express_id) {
+        console.log("!!!!!!!!!!!!!", item, i, item.id, i.id);
+        if (item.id === i.id) {
           setTempId((tempId) => tempId + 1);
           return {
             ...i,
@@ -205,19 +206,19 @@ function PayList() {
 
   // 삭제
   const handleDelete = () => {
-    const delCheckedList = checkedItems.filter((id) =>
-      payList.some((item) => item.id === id)
+    const delCheckedIds = new Set(checkedItems);
+    const payListIds = new Set(
+      payList.filter((item) => delCheckedIds.has(item.id))
     );
-    if (delCheckedList.length > 0) {
-      dispatch(deleteData(delCheckedList));
+    console.log("delCheckedIds:::", delCheckedIds);
+    console.log("payListIds:::", payListIds);
+
+    if (delCheckedIds.size > 0) {
+      dispatch(deleteData([...delCheckedIds]));
     }
 
     setTempData((prevData) =>
-      prevData.map((item) => {
-        return delCheckedList.includes(item.id)
-          ? { ...item, isDeleted: true }
-          : item;
-      })
+      prevData.filter((item) => !delCheckedIds.has(item.id))
     );
     setCheckedItems([]);
   };
@@ -226,7 +227,7 @@ function PayList() {
   const handleCopy = () => {
     const copyCheckedList = tempData
       .filter((item) => checkedItems.includes(item.id))
-      .map((item) => ({ ...item }));
+      .map((item) => ({ ...item, isNew: true }));
     copyCheckedList.map((item) => {
       setTempId((prevTempId) => {
         item.id = `${date}-${prevTempId}`;
@@ -295,6 +296,7 @@ function PayList() {
     const modifiedData = tempData.filter(
       (item) => item.isModified || item.isNew
     );
+    console.log("modifiedData:::", modifiedData);
     if (modifiedData.length > 0) {
       dispatch(saveData(tempData));
       dispatch(
@@ -423,7 +425,13 @@ function PayList() {
                             item[col] ? new Date(item[col]) : new Date()
                           }
                           onKeyDown={(e) => e.preventDefault()}
-                          onChange={(date) => handleUpdate(date, item.id, col)}
+                          onChange={(date) =>
+                            handleUpdate(
+                              format(date, "yyyy-MM-dd"),
+                              item.id,
+                              col
+                            )
+                          }
                           onFocus={(e) => setInitial(item, i * 7 + idx)}
                           dateFormat="yyyy-MM-dd"
                           className="input_date"
@@ -458,24 +466,14 @@ function PayList() {
 
       <div className="summary-group">
         <div className="button-group">
-          <button
-            disabled={checkedItems.length === 0}
-            onClick={handleDelete}
-            className="cursor_pointer"
-          >
+          <button disabled={checkedItems.length === 0} onClick={handleDelete}>
             선택삭제
           </button>
-          <button
-            disabled={checkedItems.length === 0}
-            onClick={handleCopy}
-            className="cursor_pointer"
-          >
+          <button disabled={checkedItems.length === 0} onClick={handleCopy}>
             선택복사
           </button>
-          <div className="overlay-trigger">
+          <div className="popover-wrapper">
             <button
-              ref={cardButtonRef}
-              className="cursor_pointer"
               disabled={checkedItems.length === 0}
               onClick={() => handleOverlay("card-overlay")}
             >
@@ -486,12 +484,12 @@ function PayList() {
               <Overlay
                 overlayHeader="카드분류선택"
                 overlayContent={"Holy guacamole! Check this info."}
+                setVisibleOverlay={setVisibleOverlay}
+                onClose={() => setVisibleOverlay(null)}
               />
             )}
           </div>
-          <button onClick={handleModal} className="cursor_pointer">
-            고정금액
-          </button>
+          <button onClick={handleModal}>고정금액</button>
           <PayListModal
             show={isModalOpen}
             onClose={handleModal}
@@ -509,9 +507,8 @@ function PayList() {
         </div>
 
         <div className="summary-item item3">
-          <div className="overlay-trigger">
+          <div className="popover-wrapper">
             <button
-              ref={saveButtonRef}
               onClick={handleSave}
               onMouseEnter={() => setIsButtonHovered(true)}
               onMouseLeave={() => setIsButtonHovered(false)}
@@ -524,6 +521,8 @@ function PayList() {
                 triggerText="저장하기"
                 overlayContent={"저장할 내용이 없습니다."}
                 onClick={() => setVisibleOverlay("save-overlay")}
+                setVisibleOverlay={setVisibleOverlay}
+                onClose={() => setVisibleOverlay(null)}
               />
             )}
           </div>

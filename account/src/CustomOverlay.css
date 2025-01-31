@@ -1,88 +1,64 @@
-/* CustomOverlay.css */
-/* 추가: 팝오버 스타일링 */
+/* 팝오버 스타일 */
 .popover-wrapper {
   position: relative;
   display: inline-block;
 }
 
-.popover-content {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  z-index: 10;
-  white-space: nowrap;
-}
-
-/* 오버레이 트리거 컨테이너 */
-.overlay-trigger {
-  position: relative;
-  display: inline-block;
-}
-
-.overlay-button:hover {
-  background-color: #0056b3;
-}
-
-.overlay-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-/* 팝오버 스타일 */
 .popover {
   position: absolute;
-  top: 100%;
+  top: 110%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  padding: 10px;
-  width: 200px;
-  animation: fadeIn 0.3s forwards;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1px;
+  width: 220px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-out;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
 
-  &::after {
-    content: "";
-    position: absolute;
-    top: -10px; /* 화살표 위치 */
-    left: 50%;
-    transform: translateX(-50%);
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #ddd; /* 화살표 색상 */
-  }
+/* 화살표 스타일 */
+.popover::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid rgba(0, 0, 0, 0.6);
 }
 
 /* 팝오버 헤더 */
 .popover-header {
   margin: 0;
   font-size: 16px;
-  font-weight: bold;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-  margin-bottom: 10px;
+  font-weight: 600;
+  color: #222; /* 글자색 */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  padding-bottom: 4px;
 }
 
 /* 팝오버 본문 */
 .popover-body {
   font-size: 14px;
-  color: #333;
+  color: #333; /* 글자색 */
+  padding: 10px; /* 여백 제거 */
+  margin-top: 0;
+  margin-bottom: 0;
+  text-align: center;
 }
 
-/* 팝오버 애니메이션 */
 @keyframes fadeIn {
   from {
     opacity: 0;
+    transform: translateX(-50%) translateY(-5px);
   }
   to {
     opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 }
