@@ -276,6 +276,10 @@ body,
   background-color: #e9ecef;
 }
 
+/* tr:has(td[data-placeholder]:empty) td {
+  background-color: #fcfcfc;
+} */
+
 input[type="checkbox"] {
   width: 15px;
   height: 15px;

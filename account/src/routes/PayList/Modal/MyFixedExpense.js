@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { Input } from "../../../components/EditableCell";
 import CustomSelect from "../../../components/SelectComponent/CustomSelect";
 import { date, nowCursor, restoreCursor, selectText } from "../../../util/util";
-import { Input } from "../PayList";
 
 function MyFixedExpense({
   setFixedDataList,

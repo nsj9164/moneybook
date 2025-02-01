@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectText } from "../../../util/util";
-import { Input } from "../PayList";
+import { Input } from "../../../components/EditableCell";
+import CustomSelect from "../../../components/SelectComponent/CustomSelect";
+import { useAuth } from "../../../hooks/useAuth";
+import { cardCompanyListActions } from "../../../store/features/myDetailList/myDetailListActions";
+import {
+  selectAllLists,
+  selectAllStatuses,
+} from "../../../store/features/myDetailList/myDetailListSelectors";
+import { date, selectText } from "../../../util/util";
 
 function MyCard({ setCardDataList, cardList }) {
   const dispatch = useDispatch();
@@ -11,6 +18,9 @@ function MyCard({ setCardDataList, cardList }) {
   const [checkedAll, setCheckedAll] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [focusedItemId, setFocusedItemId] = useState(null);
+  const { cardCompanyList } = useSelector(selectAllLists);
+  const { cardCompanyListStatus } = useSelector(selectAllStatuses);
+  const { isLoggedIn } = useAuth();
   const fields = [
     "card_company",
     "card_name",
@@ -56,6 +66,17 @@ function MyCard({ setCardDataList, cardList }) {
     setCardDataList(modifiedData);
   }, [modifiedData]);
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      if (cardCompanyListStatus === "idle") {
+        dispatch(cardCompanyListActions.fetchData());
+      }
+    }
+  }, [isLoggedIn, cardCompanyListStatus, dispatch]);
+
+  useEffect(() => {
+    console.log("cardCompanyList:::", cardCompanyList);
+  }, [cardCompanyList]);
   const handleUpdate = (e, id) => {
     const newItem = e.target.innerText;
     setCardData((prevData) =>
@@ -151,28 +172,59 @@ function MyCard({ setCardDataList, cardList }) {
                     return (
                       <td key={idx}>
                         <select aria-label="Default select example">
-                          {col === "card_company" && (
-                            <>
-                              <option value="1">One</option>
-                              <option value="2">Two</option>
-                              <option value="3">Three</option>
-                            </>
-                          )}
+                          {
+                            col === "card_company" &&
+                              (cardCompanyListStatus === "succeeded" ? (
+                                <CustomSelect
+                                  key={idx}
+                                  value={item[col] || "선택"}
+                                  options={cardCompanyList.map((list) => ({
+                                    value: list.value,
+                                    label: list.name,
+                                  }))}
+                                  defaultValue="0"
+                                  onChange={(value) =>
+                                    handleUpdate(value, item.expense_id, col)
+                                  }
+                                />
+                              ) : (
+                                <CustomSelect
+                                  key={idx}
+                                  value={item[col]}
+                                  options={cardCompanyList.map((list) => ({
+                                    value: list.value,
+                                    label: list.name,
+                                  }))}
+                                  defaultValue="0"
+                                  noSelectValue="미분류"
+                                />
+                              ))
+
+                            // <option value="1">One</option>
+                            // <option value="2">Two</option>
+                            // <option value="3">Three</option>
+                          }
                           {col === "card_type" && (
-                            <>
-                              <option value="1">신용카드</option>
-                              <option value="2">체크카드</option>
-                            </>
+                            <CustomSelect
+                              key={idx}
+                              value={item[col]}
+                              options={[
+                                { value: "1", label: "신용카드" },
+                                { value: "2", label: "체크카드" },
+                              ]}
+                            />
                           )}
-                          {col === "payment_due_date" &&
-                            Array.from({ length: 28 }, (_, j) => (
-                              <option
-                                key={j}
-                                value={String(j + 1).padStart(2, "0") + "일"}
-                              >
-                                {String(j + 1).padStart(2, "0")}
-                              </option>
-                            ))}
+                          {col === "payment_due_date" && (
+                            <CustomSelect
+                              key={idx}
+                              value={item[col]}
+                              options={Array.from({ length: 28 }, (_, j) => ({
+                                value: String(j + 1).padStart(2, "0"),
+                                label: String(j + 1).padStart(2, "0"),
+                              }))}
+                              defaultValue={date.slice(-2)}
+                            />
+                          )}
                         </select>
                       </td>
                     );

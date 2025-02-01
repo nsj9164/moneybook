@@ -425,6 +425,19 @@ app.post("/categoryList/delete", authenticateToken, function (req, res) {
   );
 });
 
+app.get("/cardCompanyList", authenticateToken, function (req, res) {
+  db.query(
+    `SELECT id, value, name 
+       FROM card_companies
+      WHERE use_yn = 'Y'
+      ORDER BY id`,
+    function (err, results, fields) {
+      if (err) throw err;
+      res.send(results);
+    }
+  );
+});
+
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "../account/build", "index.html"));
 });

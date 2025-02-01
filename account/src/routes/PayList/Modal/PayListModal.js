@@ -15,8 +15,9 @@ import {
   selectAllStatuses,
 } from "../../../store/features/myDetailList/myDetailListSelectors";
 import { Overlay } from "../../../components/Overlay";
+import { useAuth } from "../../../hooks/useAuth";
 
-const PayListModal = ({ show, onClose, isLoggedIn }) => {
+const PayListModal = ({ show, onClose }) => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState(1);
   const [fixedDataList, setFixedDataList] = useState([]);
@@ -31,6 +32,9 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
     categoryListSaveStatus,
     cardListSaveStatus,
   } = useSelector(selectAllSaveStatuses);
+
+  const [visibleOverlay, setVisibleOverlay] = useState(false);
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -66,8 +70,16 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
     const { action, data } = dataMap[activeTab];
 
     console.log(`저장하기 버튼 클릭${activeTab}`, data);
-    dispatch(action(data));
+    if (data.length > 0) {
+      dispatch(action(data));
+    } else {
+      setVisibleOverlay(true);
+    }
   };
+
+  useEffect(() => {
+    console.log("overlay::", visibleOverlay);
+  }, [visibleOverlay]);
 
   // useEffect(() => {
   //   const saveStatusMap = {
@@ -160,19 +172,25 @@ const PayListModal = ({ show, onClose, isLoggedIn }) => {
         </div>
         <div className="modal-footer">
           <div className="modal-summary-group">
-            {activeTab === 1 && (
-              <div className="modal-button-group-left">
+            <div className="modal-button-group-left">
+              {activeTab === 1 && (
                 <button className="cursor_pointer">선택삭제</button>
-              </div>
-            )}
+              )}
+            </div>
             <div className="modal-button-group-right">
-              <Overlay
-                triggerText="저장하기"
-                overlayContent={"Holy guacamole! Check this info."}
-              />
-              <button className="btn-save" onClick={handleSave}>
-                저장하기
-              </button>
+              <div className="overlay-trigger">
+                <button className="btn-save" onClick={handleSave}>
+                  저장하기
+                </button>
+
+                {visibleOverlay && (
+                  <Overlay
+                    overlayContent={"저장할 내용이 없습니다."}
+                    setVisibleOverlay={setVisibleOverlay}
+                  />
+                )}
+              </div>
+
               <button className="btn-close" onClick={onClose}>
                 닫기
               </button>

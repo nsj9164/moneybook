@@ -25,16 +25,12 @@ import {
 } from "date-fns";
 import PayListModal from "./Modal/PayListModal";
 import { Overlay } from "../../components/Overlay";
-
-export const Input = styled.td.attrs({
-  contentEditable: true,
-  suppressContentEditableWarning: true,
-})``;
+import { Input } from "../../components/EditableCell";
+import { useAuth } from "../../hooks/useAuth";
 
 function PayList() {
   const navigate = useNavigate();
-  const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
-
+  const { isLoggedIn } = useAuth();
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/login");
@@ -485,17 +481,11 @@ function PayList() {
                 overlayHeader="카드분류선택"
                 overlayContent={"Holy guacamole! Check this info."}
                 setVisibleOverlay={setVisibleOverlay}
-                onClose={() => setVisibleOverlay(null)}
               />
             )}
           </div>
           <button onClick={handleModal}>고정금액</button>
-          <PayListModal
-            show={isModalOpen}
-            onClose={handleModal}
-            isLoggedIn
-            Input
-          />
+          <PayListModal show={isModalOpen} onClose={handleModal} />
         </div>
         <div className="summary-item item1">
           <div>지출합계</div>
@@ -518,11 +508,8 @@ function PayList() {
 
             {visibleOverlay === "save-overlay" && (
               <Overlay
-                triggerText="저장하기"
                 overlayContent={"저장할 내용이 없습니다."}
-                onClick={() => setVisibleOverlay("save-overlay")}
                 setVisibleOverlay={setVisibleOverlay}
-                onClose={() => setVisibleOverlay(null)}
               />
             )}
           </div>

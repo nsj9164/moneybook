@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginData } from "../store/features/login/loginActions";
+import { useAuth } from "../hooks/useAuth";
 
 export const Login = () => {
   const dispatch = useDispatch();
@@ -13,7 +14,7 @@ export const Login = () => {
 
   const loginStatus = useSelector((state) => state.login.loginStatus);
   const loginMessage = useSelector((state) => state.login.loginMessage);
-  const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
+  const isLoggedIn = useAuth();
 
   // 로그인
   const handleLogin = () => {

@@ -3,6 +3,7 @@ import {
   fixedItemListActions,
   categoryListActions,
   cardListActions,
+  cardCompanyListActions,
 } from "./myDetailListActions";
 import { createAsyncReducers } from "./myDetailListReducer";
 
@@ -27,11 +28,17 @@ const myDetailList = createSlice({
       saveStatus: "idle",
       error: null,
     },
+    cardCompanyList: {
+      items: [],
+      status: "idle",
+      error: null,
+    },
   },
   extraReducers: (builder) => {
     createAsyncReducers(builder, fixedItemListActions, "fixedItemList");
     createAsyncReducers(builder, categoryListActions, "categoryList");
     createAsyncReducers(builder, cardListActions, "cardList");
+    createAsyncReducers(builder, cardCompanyListActions, "cardCompanyList");
   },
 });
 

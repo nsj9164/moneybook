@@ -30,3 +30,4 @@ export const createAsyncActions = (endpoint) => {
 export const fixedItemListActions = createAsyncActions("fixedItemList");
 export const categoryListActions = createAsyncActions("categoryList");
 export const cardListActions = createAsyncActions("cardList");
+export const cardCompanyListActions = createAsyncActions("cardCompanyList");

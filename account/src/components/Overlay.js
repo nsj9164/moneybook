@@ -9,14 +9,12 @@ export const Overlay = ({
   const overlayRef = useRef(null);
 
   useEffect(() => {
-    console.log("클릭클릭");
     const handleClickOutside = (event) => {
       if (
         overlayRef.current &&
         !overlayRef.current.contains(event.target) &&
         !event.target.closest(".popover-wrapper")
       ) {
-        console.log("외부 클릭 감지됨", event.target);
         setVisibleOverlay(null);
       }
     };

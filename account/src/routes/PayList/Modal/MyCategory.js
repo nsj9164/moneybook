@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Input } from "../../../components/EditableCell";
 import { selectText } from "../../../util/util";
-import { Input } from "../PayList";
 
 function MyCategory({ setCatDataList, catList }) {
   const dispatch = useDispatch();
@@ -94,6 +94,10 @@ function MyCategory({ setCatDataList, catList }) {
     console.log("nextData:::", catData);
   };
 
+  const removePlaceholder = (e) => {
+    e.target.dataset.placeholder = "";
+  };
+
   return (
     <div className="modal-body">
       <h2 className="modal-title">분류 관리하기</h2>
@@ -115,7 +119,9 @@ function MyCategory({ setCatDataList, catList }) {
             catData.map((item, i) => (
               <tr key={i}>
                 <Input
+                  data-placeholder="클릭해서 추가"
                   ref={(el) => (inputRefs.current[i] = el)}
+                  onInput={removePlaceholder}
                   onBlur={(e) => handleUpdate(e, item.cat_id)}
                 >
                   {item.category_nm}
