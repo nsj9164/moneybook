@@ -172,10 +172,10 @@ function MyFixedExpense({
   return (
     <div className="modal-body">
       <h2 className="modal-title">고정항목 관리하기</h2>
-      <table className="table table-hover" bordered hover>
+      <table className="table table-hover table-sm" bordered hover>
         <colgroup>
-          <col width="5%" />
-          <col width="15%" />
+          <col width="8%" />
+          <col width="12%" />
           <col />
           <col width="15%" />
           <col width="20%" />
@@ -231,7 +231,6 @@ function MyFixedExpense({
                         value: list.card_id,
                         label: list.card_name,
                       }))}
-                      defaultValue="0"
                       noSelectValue="선택없음"
                       onChange={(value) =>
                         handleUpdate(value, item.expense_id, col)
@@ -245,7 +244,6 @@ function MyFixedExpense({
                         value: list.cat_id,
                         label: list.category_nm,
                       }))}
-                      defaultValue="0"
                       noSelectValue="미분류"
                       onChange={(value) =>
                         handleUpdate(value, item.expense_id, col)

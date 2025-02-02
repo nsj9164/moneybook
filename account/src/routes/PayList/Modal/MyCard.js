@@ -1,26 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Input } from "../../../components/EditableCell";
-import CustomSelect from "../../../components/SelectComponent/CustomSelect";
+import MyCardTable from "../../../components/Modal/MyCardTable";
 import { useAuth } from "../../../hooks/useAuth";
-import { cardCompanyListActions } from "../../../store/features/myDetailList/myDetailListActions";
+import {
+  cardCompanyListActions,
+  cardListActions,
+} from "../../../store/features/myDetailList/myDetailListActions";
 import {
   selectAllLists,
   selectAllStatuses,
 } from "../../../store/features/myDetailList/myDetailListSelectors";
+import { getCardBillingPeriod } from "../../../util/payDateutils";
 import { date, selectText } from "../../../util/util";
 
 function MyCard({ setCardDataList, cardList }) {
   const dispatch = useDispatch();
-  const inputRefs = useRef([]);
+  const { isLoggedIn } = useAuth();
   const [cardData, setCardData] = useState([]);
   const [cardId, setCardId] = useState(1);
-  const [checkedAll, setCheckedAll] = useState(false);
-  const [checkedItems, setCheckedItems] = useState([]);
   const [focusedItemId, setFocusedItemId] = useState(null);
   const { cardCompanyList } = useSelector(selectAllLists);
   const { cardCompanyListStatus } = useSelector(selectAllStatuses);
-  const { isLoggedIn } = useAuth();
+  const [visibleOverlay, setVisibleOverlay] = useState(null);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+
   const fields = [
     "card_company",
     "card_name",
@@ -46,13 +49,20 @@ function MyCard({ setCardDataList, cardList }) {
   useEffect(() => {
     if (
       cardData.length === 0 ||
-      cardData.every(
-        (item) => item.card_company && item.card_company !== undefined
-      )
+      cardData.every((item) => item.card_name && item.card_name !== undefined)
     ) {
+      console.log("cardData::::::", cardData);
       setCardData((prevCardData) => [
         ...prevCardData,
-        { card_id: `card-${cardId}`, isDisabled: true, isNew: true },
+        {
+          card_id: `card-${cardId}`,
+          card_type: "1",
+          payment_due_date: "01",
+          usage_period_start: "17",
+          usage_period_end: "16",
+          isDisabled: true,
+          isNew: true,
+        },
       ]);
       setCardId((id) => id + 1);
     }
@@ -74,77 +84,73 @@ function MyCard({ setCardDataList, cardList }) {
     }
   }, [isLoggedIn, cardCompanyListStatus, dispatch]);
 
-  useEffect(() => {
-    console.log("cardCompanyList:::", cardCompanyList);
-  }, [cardCompanyList]);
   const handleUpdate = (e, id) => {
     const newItem = e.target.innerText;
+    console.log("newItem:::", newItem);
     setCardData((prevData) =>
       prevData.map((item) =>
-        item.cat_id === id
-          ? { ...item, card_name: newItem, isModified: true }
+        item.card_id === id
+          ? { ...item, card_name: newItem, isDisabled: false, isModified: true }
           : item
       )
     );
     setCardId((id) => id + 1);
   };
 
-  // 체크항목
-  const handleCheck = (id) => {
-    setCheckedItems((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+  useEffect(() => {
+    if (focusedItemId !== null) {
+      const focusedElement = inputRefs.current[focusedItemId];
+      if (focusedElement) {
+        selectText({ target: focusedElement });
+      }
+    }
+  }, [focusedItemId]);
+
+  useEffect(() => {
+    console.log("isButtonHovered:::", isButtonHovered);
+    if (!isButtonHovered && visibleOverlay) {
+      setVisibleOverlay(null);
+    }
+  }, [isButtonHovered]);
+
+  const handlePaymentPeriod = (value, id) => {
+    const period = getCardBillingPeriod(Number(value));
+    setCardData((prevData) =>
+      prevData.map((item) =>
+        item.card_id === id
+          ? {
+              ...item,
+              payment_due_date: value,
+              usage_period_start: `${period.start}`,
+              usage_period_end: `${period.end}`,
+            }
+          : item
+      )
     );
   };
 
-  // 전체선택/해제
-  const handleCheckedAll = () => {
-    if (checkedAll) {
-      setCheckedItems([]);
+  // 삭제
+  const handleDelete = (id, isDisabled) => {
+    if (isDisabled) {
+      setVisibleOverlay(true);
     } else {
-      const allIds = cardData
-        .filter((item) => !item.isDisabled)
-        .map((item) => item.id);
-      setCheckedItems(allIds);
+      if (cardList.some((item) => item.card_id === id)) {
+        dispatch(cardListActions.deleteData([id]));
+      }
+      setCardData((prevData) => prevData.filter((item) => item.card_id !== id));
     }
-    setCheckedAll(!checkedAll);
   };
-
-  // 전체선택/해제
-  useEffect(() => {
-    checkedItems.length ===
-      cardData.filter((item) => !item.isDisabled).length && cardData.length > 1
-      ? setCheckedAll(true)
-      : setCheckedAll(false);
-  }, [checkedItems]);
-
-  useEffect(() => {
-    if (focusedItemId !== null) {
-      const focusedElement = inputRefs.current[focusedItemId];
-      if (focusedElement) {
-        selectText({ target: focusedElement });
-      }
-    }
-  }, [focusedItemId]);
-
-  useEffect(() => {
-    if (focusedItemId !== null) {
-      const focusedElement = inputRefs.current[focusedItemId];
-      if (focusedElement) {
-        selectText({ target: focusedElement });
-      }
-    }
-  }, [focusedItemId]);
 
   return (
     <div className="modal-body">
       <h2 className="modal-title">카드 관리하기</h2>
       <table className="table table-hover">
         <colgroup>
-          <col width={"10%"} />
-          <col width={"15%"} />
-          <col width={"15%"} />
-          <col width={"10%"} />
+          <col width={"12%"} />
           <col />
+          <col width={"13%"} />
+          <col width={"10%"} />
+          <col width={"25%"} />
           <col width={"10%"} />
           <col width={"10%"} />
         </colgroup>
@@ -161,96 +167,23 @@ function MyCard({ setCardDataList, cardList }) {
         </thead>
         <tbody>
           {cardData.length > 0 ? (
-            cardData.map((item, i) => (
-              <tr key={i}>
-                {fields.map((col, idx) => {
-                  if (
-                    col === "card_company" ||
-                    col === "card_type" ||
-                    col === "payment_due_date"
-                  ) {
-                    return (
-                      <td key={idx}>
-                        <select aria-label="Default select example">
-                          {
-                            col === "card_company" &&
-                              (cardCompanyListStatus === "succeeded" ? (
-                                <CustomSelect
-                                  key={idx}
-                                  value={item[col] || "선택"}
-                                  options={cardCompanyList.map((list) => ({
-                                    value: list.value,
-                                    label: list.name,
-                                  }))}
-                                  defaultValue="0"
-                                  onChange={(value) =>
-                                    handleUpdate(value, item.expense_id, col)
-                                  }
-                                />
-                              ) : (
-                                <CustomSelect
-                                  key={idx}
-                                  value={item[col]}
-                                  options={cardCompanyList.map((list) => ({
-                                    value: list.value,
-                                    label: list.name,
-                                  }))}
-                                  defaultValue="0"
-                                  noSelectValue="미분류"
-                                />
-                              ))
-
-                            // <option value="1">One</option>
-                            // <option value="2">Two</option>
-                            // <option value="3">Three</option>
-                          }
-                          {col === "card_type" && (
-                            <CustomSelect
-                              key={idx}
-                              value={item[col]}
-                              options={[
-                                { value: "1", label: "신용카드" },
-                                { value: "2", label: "체크카드" },
-                              ]}
-                            />
-                          )}
-                          {col === "payment_due_date" && (
-                            <CustomSelect
-                              key={idx}
-                              value={item[col]}
-                              options={Array.from({ length: 28 }, (_, j) => ({
-                                value: String(j + 1).padStart(2, "0"),
-                                label: String(j + 1).padStart(2, "0"),
-                              }))}
-                              defaultValue={date.slice(-2)}
-                            />
-                          )}
-                        </select>
-                      </td>
-                    );
-                  } else if (col === "active_status") {
-                    return (
-                      <td key={idx}>
-                        <input
-                          type="checkbox"
-                          checked={checkedAll}
-                          onChange={handleCheckedAll}
-                        />
-                      </td>
-                    );
-                  } else {
-                    return (
-                      <Input
-                        ref={(el) => (inputRefs.current[i * 7 + idx] = el)}
-                        onBlur={(e) => handleUpdate(e, item.card_id)}
-                      >
-                        {item[col]}
-                      </Input>
-                    );
-                  }
-                })}
-              </tr>
-            ))
+            cardData.map((item, i) => {
+              return item ? (
+                <tr key={item.card_id}>
+                  <MyCardTable
+                    fields={fields}
+                    item={item}
+                    handleUpdate={handleUpdate}
+                    handlePaymentPeriod={handlePaymentPeriod}
+                    cardCompanyList={cardCompanyList}
+                    visibleOverlay={visibleOverlay}
+                    setVisibleOverlay={setVisibleOverlay}
+                    handleDelete={handleDelete}
+                    setIsButtonHovered={setIsButtonHovered}
+                  />
+                </tr>
+              ) : null;
+            })
           ) : (
             <tr>
               <td colSpan="7">No data available</td>

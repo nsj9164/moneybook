@@ -4,16 +4,19 @@ export const StyledSelect = styled.select`
   width: 100%;
   height: 40px;
   border: none;
-  /* border: 1px solid #ddd; */
   border-radius: 4px;
   padding: 0 8px;
   font-size: 14px;
   outline: none;
   background-color: white;
+  text-align: center;
 
-  max-height: ${(props) =>
-    props.maxHeight || "auto"}; /* 동적으로 계산된 max-height */
+  max-height: ${(props) => props.maxHeight || "auto"};
   overflow-y: auto;
+
+  -webkit-appearance: none; /* 크롬, 사파리 */
+  -moz-appearance: none; /* 파이어폭스 */
+  appearance: none; /* 표준 브라우저 */
 
   &:focus {
     border-color: #0078ff;

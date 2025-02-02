@@ -286,8 +286,7 @@ app.get("/cardList", authenticateToken, function (req, res) {
         , card_name
         , card_type
         , payment_due_date
-        , usage_period_start
-        , usage_period_end
+        , usage_period_start + "-" + usage_period_end as usage_period
         , active_status
     FROM CARD_INFO
     WHERE USER_ID = ?
@@ -362,6 +361,19 @@ app.post("/cardList/delete", authenticateToken, function (req, res) {
   });
 });
 
+app.get("/cardCompanyList", authenticateToken, function (req, res) {
+  db.query(
+    `SELECT id, value, name 
+       FROM card_companies
+      WHERE use_yn = 'Y'
+      ORDER BY id`,
+    function (err, results, fields) {
+      if (err) throw err;
+      res.send(results);
+    }
+  );
+});
+
 app.get("/categoryList", authenticateToken, function (req, res) {
   db.query(
     `SELECT cat_id
@@ -421,19 +433,6 @@ app.post("/categoryList/delete", authenticateToken, function (req, res) {
       }
       console.log("삭제될 결과:", result);
       res.status(500).send("삭제 완료");
-    }
-  );
-});
-
-app.get("/cardCompanyList", authenticateToken, function (req, res) {
-  db.query(
-    `SELECT id, value, name 
-       FROM card_companies
-      WHERE use_yn = 'Y'
-      ORDER BY id`,
-    function (err, results, fields) {
-      if (err) throw err;
-      res.send(results);
     }
   );
 });

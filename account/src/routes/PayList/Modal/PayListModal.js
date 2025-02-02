@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MyCard from "./MyCard";
 import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
-import "../../../App.modal.css";
+import "../../../styles/App.modal.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
   cardListActions,
@@ -178,7 +178,7 @@ const PayListModal = ({ show, onClose }) => {
               )}
             </div>
             <div className="modal-button-group-right">
-              <div className="overlay-trigger">
+              <div className="popover-wrapper">
                 <button className="btn-save" onClick={handleSave}>
                   저장하기
                 </button>

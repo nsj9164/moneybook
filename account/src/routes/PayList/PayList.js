@@ -320,10 +320,6 @@ function PayList() {
       : setVisibleOverlay(null);
   };
 
-  const handleClose = () => {
-    setVisibleOverlay(null);
-  };
-
   const columns = [
     "date",
     "cat_nm",
@@ -470,6 +466,7 @@ function PayList() {
           </button>
           <div className="popover-wrapper">
             <button
+              className="button-group-btns"
               disabled={checkedItems.length === 0}
               onClick={() => handleOverlay("card-overlay")}
             >

@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Input } from "../../../components/EditableCell";
+import { categoryListActions } from "../../../store/features/myDetailList/myDetailListActions";
 import { selectText } from "../../../util/util";
+import classNames from "classnames";
+import { Overlay } from "../../../components/Overlay";
 
 function MyCategory({ setCatDataList, catList }) {
   const dispatch = useDispatch();
@@ -12,6 +15,8 @@ function MyCategory({ setCatDataList, catList }) {
   const [catData, setCatData] = useState([]);
   const [catId, setCatId] = useState(1);
   const [focusedItemId, setFocusedItemId] = useState(null);
+  const [visibleOverlay, setVisibleOverlay] = useState(null);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
   const fields = ["category_nm"];
 
   useEffect(() => {
@@ -57,15 +62,25 @@ function MyCategory({ setCatDataList, catList }) {
     setCatDataList(modifiedData);
   }, [modifiedData]);
 
+  useEffect(() => {
+    console.log("catData::::::::::", catData);
+  }, [catData]);
+
   const handleUpdate = (e, id) => {
     const newItem = e.target.innerText;
     setCatData((prevData) =>
       prevData.map((item) =>
         item.cat_id === id
-          ? { ...item, category_nm: newItem, isModified: true }
+          ? {
+              ...item,
+              category_nm: newItem,
+              isDisabled: false,
+              isModified: true,
+            }
           : item
       )
     );
+    console.log("catData/////", catData);
   };
 
   useEffect(() => {
@@ -84,16 +99,32 @@ function MyCategory({ setCatDataList, catList }) {
   }, [catListSaveStatus]);
 
   // 삭제하기
-  const handleDelete = (id) => {
-    console.log(id);
-    if (catList.some((item) => item.cat_id === id)) {
-      dispatch(categoryListActions.deleteData([id]));
+  const handleDelete = (id, isDisabled) => {
+    console.log(id, isDisabled);
+    if (isDisabled) {
+      setVisibleOverlay(true);
+    } else {
+      if (catList.some((item) => item.cat_id === id)) {
+        dispatch(categoryListActions.deleteData([id]));
+      }
+      console.log("prevData:::", catData);
+      setCatData((prevData) => prevData.filter((item) => item.cat_id !== id));
+      console.log("nextData:::", catData);
     }
-    console.log("prevData:::", catData);
-    setCatData((prevData) => prevData.filter((item) => item.cat_id !== id));
-    console.log("nextData:::", catData);
   };
 
+  useEffect(() => {
+    console.log("isButtonHovered:::", isButtonHovered);
+    if (!isButtonHovered && visibleOverlay) {
+      setVisibleOverlay(null);
+    }
+  }, [isButtonHovered]);
+
+  useEffect(() => {
+    console.log("Overlay/////", visibleOverlay);
+  }, [visibleOverlay]);
+
+  // 분류명 placeholder 없애기
   const removePlaceholder = (e) => {
     e.target.dataset.placeholder = "";
   };
@@ -127,11 +158,36 @@ function MyCategory({ setCatDataList, catList }) {
                   {item.category_nm}
                 </Input>
                 <td>≡</td>
-                <td
-                  className="cursor_pointer"
-                  onClick={() => handleDelete(item.cat_id)}
-                >
-                  X
+
+                <td key={i}>
+                  <div className="popover-wrapper w-100">
+                    <button
+                      className={classNames("btn-delete", {
+                        "btn-disabled": item.isDisabled,
+                      })}
+                      onClick={() => handleDelete(item.cat_id, item.isDisabled)}
+                      onMouseEnter={
+                        item.isDisabled
+                          ? () => setIsButtonHovered(true)
+                          : undefined
+                      }
+                      onMouseLeave={
+                        item.isDisabled
+                          ? () => setIsButtonHovered(false)
+                          : undefined
+                      }
+                    >
+                      X
+                    </button>
+                    {item.isDisabled && visibleOverlay && (
+                      <Overlay
+                        overlayContent={
+                          "분류명을 입력하기 전에는\n삭제할 수 없습니다."
+                        }
+                        setVisibleOverlay={setVisibleOverlay}
+                      />
+                    )}
+                  </div>
                 </td>
               </tr>
             ))

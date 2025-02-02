@@ -18,7 +18,7 @@ const CustomSelect = ({
 
   const handleSelectClick = () => {
     if (!selectedValue) {
-      let setValue = defaultValue ? defaultValue : "noData";
+      let setValue = defaultValue ? defaultValue : "none";
       setSelectedValue(setValue);
       onChange(setValue);
     }
@@ -39,7 +39,7 @@ const CustomSelect = ({
           onChange={handleSelectChange}
         >
           <option value="" disabled hidden></option>
-          {noSelectValue && <option value="noData">{noSelectValue}</option>}
+          {noSelectValue && <option value="none">{noSelectValue}</option>}
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
