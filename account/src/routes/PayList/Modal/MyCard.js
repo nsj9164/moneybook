@@ -84,8 +84,7 @@ function MyCard({ setCardDataList, cardList }) {
     }
   }, [isLoggedIn, cardCompanyListStatus, dispatch]);
 
-  const handleUpdate = (e, id) => {
-    const newItem = e.target.innerText;
+  const handleUpdate = (newItem, id, col) => {
     console.log("newItem:::", newItem);
     setCardData((prevData) =>
       prevData.map((item) =>

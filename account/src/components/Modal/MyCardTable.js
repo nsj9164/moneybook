@@ -32,6 +32,15 @@ const MyCardTable = ({
             onChange={(value) => handleUpdate(value, item.card_id, col)}
           />
         );
+      case "card_name":
+        return (
+          <Input
+            key={col}
+            onBlur={(e) => handleUpdate(e.target.innerText, item.card_id, col)}
+          >
+            {item[col]}
+          </Input>
+        );
       case "card_type":
         return (
           <CustomSelect
@@ -41,6 +50,7 @@ const MyCardTable = ({
               { value: "1", label: "신용카드" },
               { value: "2", label: "체크카드" },
             ]}
+            onChange={(value) => handleUpdate(value, item.card_id, col)}
           />
         );
       case "payment_due_date":
@@ -53,8 +63,8 @@ const MyCardTable = ({
               label: String(j + 1).padStart(2, "0"),
             }))}
             defaultValue="01"
-            onChange={(value) => handlePaymentPeriod(value, item.card_id)}
-            setDisabled={item.card_type === "2"}
+            onChange={(value) => handlePaymentPeriod(value, item.card_id, col)}
+            disabled={item.card_type === "2"}
           />
         );
       case "active_status":
@@ -104,14 +114,8 @@ const MyCardTable = ({
             전전월 {periodStart}일 ~ 전월 {periodEnd}일
           </td>
         );
-      case "usage_period_end":
-        return null;
       default:
-        return (
-          <Input key={col} onBlur={(e) => handleUpdate(e, item.card_id, col)}>
-            {item[col]}
-          </Input>
-        );
+        null;
     }
   };
 

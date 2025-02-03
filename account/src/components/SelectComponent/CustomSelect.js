@@ -9,7 +9,9 @@ const CustomSelect = ({
   maxHeight,
   defaultValue,
   noSelectValue,
+  disabled,
 }) => {
+  console.log("disabled", disabled);
   const [selectedValue, setSelectedValue] = useState(value ?? "");
 
   useEffect(() => {
@@ -37,6 +39,7 @@ const CustomSelect = ({
           value={selectedValue}
           onFocus={handleSelectClick}
           onChange={handleSelectChange}
+          disabled={disabled}
         >
           <option value="" disabled hidden></option>
           {noSelectValue && <option value="none">{noSelectValue}</option>}

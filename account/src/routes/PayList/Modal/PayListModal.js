@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MyCard from "./MyCard";
 import MyCategory from "./MyCategory";
 import MyFixedExpense from "./MyFixedExpense";
@@ -16,9 +16,17 @@ import {
 } from "../../../store/features/myDetailList/myDetailListSelectors";
 import { Overlay } from "../../../components/Overlay";
 import { useAuth } from "../../../hooks/useAuth";
+import tabConfigs from "../../../config/tabConfigs";
+import TabContent from "../../../components/Modal/TabContent";
+import AlertModal from "../../../components/AlertModal";
 
 const PayListModal = ({ show, onClose }) => {
+  // Modal hide일때 렌더링 방지
+  if (!show) return null;
+
   const dispatch = useDispatch();
+  const { isLoggedIn } = useAuth();
+
   const [activeTab, setActiveTab] = useState(1);
   const [fixedDataList, setFixedDataList] = useState([]);
   const [catDataList, setCatDataList] = useState([]);
@@ -34,8 +42,10 @@ const PayListModal = ({ show, onClose }) => {
   } = useSelector(selectAllSaveStatuses);
 
   const [visibleOverlay, setVisibleOverlay] = useState(false);
-  const { isLoggedIn } = useAuth();
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
 
+  // 데이터 초기 로드
   useEffect(() => {
     if (isLoggedIn) {
       if (fixedItemListStatus === "idle") {
@@ -56,10 +66,7 @@ const PayListModal = ({ show, onClose }) => {
     dispatch,
   ]);
 
-  useEffect(() => {
-    console.log("categoryList:::////", categoryList);
-  }, [categoryList]);
-
+  // [저장 버튼 클릭 시] 데이터 저장
   const handleSave = () => {
     const dataMap = {
       1: { action: fixedItemListActions.saveData, data: fixedDataList },
@@ -77,32 +84,46 @@ const PayListModal = ({ show, onClose }) => {
     }
   };
 
+  // 버튼 hover 상태에 따른 Overlay hide 처리
   useEffect(() => {
-    console.log("overlay::", visibleOverlay);
-  }, [visibleOverlay]);
+    if (!isButtonHovered && visibleOverlay) {
+      setVisibleOverlay(null);
+    }
+  }, [isButtonHovered]);
 
-  // useEffect(() => {
-  //   const saveStatusMap = {
-  //     1: useSelector((state) => state.myDetailList["fixedItemList"].saveStatus),
-  //     2: useSelector((state) => state.myDetailList["categoryList"].saveStatus),
-  //     3: useSelector((state) => state.myDetailList["cardList"].saveStatus),
-  //   };
+  // 현재 활성화된 탭의 설정 가져오기
+  const currentTabConfigs = useMemo(() => {
+    const result = tabConfigs({
+      fixedItemListStatus,
+      categoryListStatus,
+      cardListStatus,
+      fixedItemListSaveStatus,
+      categoryListSaveStatus,
+      cardListSaveStatus,
+      fixedItemList,
+      categoryList,
+      cardList,
+      setFixedDataList,
+      setCatDataList,
+      setCardDataList,
+    });
+    console.log("Memoized tabConfigs result:", result);
+    return result; // 반드시 값을 리턴
+  }, [
+    activeTab,
+    fixedItemListStatus,
+    categoryListStatus,
+    cardListStatus,
+    fixedItemListSaveStatus,
+    categoryListSaveStatus,
+    cardListSaveStatus,
+    fixedItemList,
+    categoryList,
+    cardList,
+  ]);
 
-  //   const activeSaveStatus = saveStatusMap[activeTab];
-
-  //   if (activeSaveStatus === "succeeded") {
-  //     alert("저장되었습니다.");
-  //   } else {
-  //     alert("오류가 발생하였습니다.");
-  //   }
-  // }, [
-  //   fixedItemListSaveStatus,
-  //   categoryListSaveStatus,
-  //   cardListSaveStatus,
-  //   activeTab,
-  // ]);
-
-  if (!show) return null;
+  const activeTabConfig = currentTabConfigs?.[activeTab] || {};
+  console.log("Active Tab Config:", activeTabConfig);
 
   return (
     <div
@@ -137,38 +158,7 @@ const PayListModal = ({ show, onClose }) => {
           </button>
         </div>
         <div className="modal-body">
-          {activeTab === 1 &&
-            (fixedItemListStatus === "succeeded" ? (
-              <MyFixedExpense
-                setFixedDataList={setFixedDataList}
-                fixedItemList={fixedItemList}
-                catList={categoryList}
-                cardList={cardList}
-              />
-            ) : fixedItemListStatus === "failed" ? (
-              <div>Error loading fixed expense list</div>
-            ) : (
-              <div>Loading...</div>
-            ))}
-          {activeTab === 2 &&
-            (categoryListStatus === "succeeded" ? (
-              <MyCategory
-                setCatDataList={setCatDataList}
-                catList={categoryList}
-              />
-            ) : categoryListStatus === "failed" ? (
-              <div>Error loading fixed expense list</div>
-            ) : (
-              <div>Loading...</div>
-            ))}
-          {activeTab === 3 &&
-            (cardListStatus === "succeeded" ? (
-              <MyCard setCardDataList={setCardDataList} cardList={cardList} />
-            ) : cardListStatus === "failed" ? (
-              <div>Error loading fixed expense list</div>
-            ) : (
-              <div>Loading...</div>
-            ))}
+          <TabContent {...currentTabConfigs[activeTab]} />
         </div>
         <div className="modal-footer">
           <div className="modal-summary-group">
@@ -179,7 +169,12 @@ const PayListModal = ({ show, onClose }) => {
             </div>
             <div className="modal-button-group-right">
               <div className="popover-wrapper">
-                <button className="btn-save" onClick={handleSave}>
+                <button
+                  className="btn-save"
+                  onClick={handleSave}
+                  onMouseEnter={() => setIsButtonHovered(true)}
+                  onMouseLeave={() => setIsButtonHovered(false)}
+                >
                   저장하기
                 </button>
 
@@ -198,6 +193,12 @@ const PayListModal = ({ show, onClose }) => {
           </div>
         </div>
       </div>
+      {showAlertModal && (
+        <AlertModal
+          message="저장 되었습니다."
+          onClose={() => setShowAlertModal(false)}
+        />
+      )}
     </div>
   );
 };
