@@ -48,23 +48,13 @@ const PayListModal = ({ show, onClose }) => {
   // 데이터 초기 로드
   useEffect(() => {
     if (isLoggedIn) {
-      if (fixedItemListStatus === "idle") {
+      fixedItemListStatus === "idle" &&
         dispatch(fixedItemListActions.fetchData());
-      }
-      if (categoryListStatus === "idle") {
+      categoryListStatus === "idle" &&
         dispatch(categoryListActions.fetchData());
-      }
-      if (cardListStatus === "idle") {
-        dispatch(cardListActions.fetchData());
-      }
+      cardListStatus === "idle" && dispatch(cardListActions.fetchData());
     }
-  }, [
-    isLoggedIn,
-    fixedItemListStatus,
-    categoryListStatus,
-    cardListStatus,
-    dispatch,
-  ]);
+  }, [isLoggedIn, dispatch]);
 
   // [저장 버튼 클릭 시] 데이터 저장
   const handleSave = () => {
@@ -78,7 +68,10 @@ const PayListModal = ({ show, onClose }) => {
 
     console.log(`저장하기 버튼 클릭${activeTab}`, data);
     if (data.length > 0) {
-      dispatch(action(data));
+      // 저장 처리 후 AlertModal 띄우기
+      dispatch(action(data)).then(() => {
+        setShowAlertModal(true);
+      });
     } else {
       setVisibleOverlay(true);
     }
@@ -93,7 +86,7 @@ const PayListModal = ({ show, onClose }) => {
 
   // 현재 활성화된 탭의 설정 가져오기
   const currentTabConfigs = useMemo(() => {
-    const result = tabConfigs({
+    return tabConfigs({
       fixedItemListStatus,
       categoryListStatus,
       cardListStatus,
@@ -107,23 +100,11 @@ const PayListModal = ({ show, onClose }) => {
       setCatDataList,
       setCardDataList,
     });
-    console.log("Memoized tabConfigs result:", result);
-    return result; // 반드시 값을 리턴
-  }, [
-    activeTab,
-    fixedItemListStatus,
-    categoryListStatus,
-    cardListStatus,
-    fixedItemListSaveStatus,
-    categoryListSaveStatus,
-    cardListSaveStatus,
-    fixedItemList,
-    categoryList,
-    cardList,
-  ]);
+  }, [fixedItemListStatus, categoryListStatus, cardListStatus]);
 
-  const activeTabConfig = currentTabConfigs?.[activeTab] || {};
-  console.log("Active Tab Config:", activeTabConfig);
+  const MemoizedComponent = useMemo(() => {
+    return currentTabConfigs[activeTab]?.component || null;
+  }, [currentTabConfigs, activeTab]);
 
   return (
     <div
@@ -158,7 +139,14 @@ const PayListModal = ({ show, onClose }) => {
           </button>
         </div>
         <div className="modal-body">
-          <TabContent {...currentTabConfigs[activeTab]} />
+          {MemoizedComponent ? (
+            <TabContent
+              {...currentTabConfigs[activeTab]}
+              setShowAlertModal={setShowAlertModal}
+            />
+          ) : (
+            <div>로딩중...</div>
+          )}
         </div>
         <div className="modal-footer">
           <div className="modal-summary-group">
@@ -195,7 +183,7 @@ const PayListModal = ({ show, onClose }) => {
       </div>
       {showAlertModal && (
         <AlertModal
-          message="저장 되었습니다."
+          message="저장에 성공했습니다!"
           onClose={() => setShowAlertModal(false)}
         />
       )}

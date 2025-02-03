@@ -1,13 +1,19 @@
 import PropTypes from "prop-types";
+import { createPortal } from "react-dom";
 import "../styles/AlertModal.css";
 const AlertModal = ({ message, onClose }) => {
-  return (
+  return createPortal(
     <div className="alert-modal-overlay" onClick={onClose}>
       <div className="alert-modal-content" onClick={(e) => e.stopPropagation()}>
-        <p>{message}</p>
-        <button onClick={onClose}>확인</button>
+        <p className="alert-message">{message}</p>
+        <div className="alert-modal-actions">
+          <button className="alert-modal-btn" onClick={onClose}>
+            확인
+          </button>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
