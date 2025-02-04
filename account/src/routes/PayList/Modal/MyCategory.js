@@ -29,8 +29,6 @@ function MyCategory({ setCatDataList, catList }) {
         }))
       );
     }
-
-    console.log("catList:::", catList);
   }, [catList]);
 
   useEffect(() => {
@@ -45,7 +43,6 @@ function MyCategory({ setCatDataList, catList }) {
         { cat_id: `cat-${catId}`, isDisabled: true, isNew: true },
       ]);
       setCatId((id) => id + 1);
-      console.log("catData:::", catData);
     }
   }, [catList, catData]);
 
@@ -62,9 +59,7 @@ function MyCategory({ setCatDataList, catList }) {
     setCatDataList(modifiedData);
   }, [modifiedData]);
 
-  useEffect(() => {
-    console.log("catData::::::::::", catData);
-  }, [catData]);
+  useEffect(() => {}, [catData]);
 
   const handleUpdate = (e, id) => {
     const newItem = e.target.innerText;
@@ -80,7 +75,6 @@ function MyCategory({ setCatDataList, catList }) {
           : item
       )
     );
-    console.log("catData/////", catData);
   };
 
   useEffect(() => {
@@ -100,29 +94,21 @@ function MyCategory({ setCatDataList, catList }) {
 
   // 삭제하기
   const handleDelete = (id, isDisabled) => {
-    console.log(id, isDisabled);
     if (isDisabled) {
       setVisibleOverlay(true);
     } else {
       if (catList.some((item) => item.cat_id === id)) {
         dispatch(categoryListActions.deleteData([id]));
       }
-      console.log("prevData:::", catData);
       setCatData((prevData) => prevData.filter((item) => item.cat_id !== id));
-      console.log("nextData:::", catData);
     }
   };
 
   useEffect(() => {
-    console.log("isButtonHovered:::", isButtonHovered);
     if (!isButtonHovered && visibleOverlay) {
       setVisibleOverlay(null);
     }
   }, [isButtonHovered]);
-
-  useEffect(() => {
-    console.log("Overlay/////", visibleOverlay);
-  }, [visibleOverlay]);
 
   // 분류명 placeholder 없애기
   const removePlaceholder = (e) => {

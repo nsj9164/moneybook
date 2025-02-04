@@ -47,17 +47,29 @@ const PayListModal = ({ show, onClose }) => {
 
   // 데이터 초기 로드
   useEffect(() => {
+    console.log("11111111111111111111111");
     if (isLoggedIn) {
-      fixedItemListStatus === "idle" &&
+      if (fixedItemListStatus === "idle") {
         dispatch(fixedItemListActions.fetchData());
-      categoryListStatus === "idle" &&
+      }
+      if (categoryListStatus === "idle") {
         dispatch(categoryListActions.fetchData());
-      cardListStatus === "idle" && dispatch(cardListActions.fetchData());
+      }
+      if (cardListStatus === "idle") {
+        dispatch(cardListActions.fetchData());
+      }
     }
-  }, [isLoggedIn, dispatch]);
+  }, [
+    isLoggedIn,
+    fixedItemListStatus,
+    categoryListStatus,
+    cardListStatus,
+    dispatch,
+  ]);
 
   // [저장 버튼 클릭 시] 데이터 저장
   const handleSave = () => {
+    console.log("22222222222222222");
     const dataMap = {
       1: { action: fixedItemListActions.saveData, data: fixedDataList },
       2: { action: categoryListActions.saveData, data: catDataList },
@@ -70,15 +82,18 @@ const PayListModal = ({ show, onClose }) => {
     if (data.length > 0) {
       // 저장 처리 후 AlertModal 띄우기
       dispatch(action(data)).then(() => {
+        console.log("저장 성공");
         setShowAlertModal(true);
       });
     } else {
+      console.log("저장할 데이터 없음");
       setVisibleOverlay(true);
     }
   };
 
   // 버튼 hover 상태에 따른 Overlay hide 처리
   useEffect(() => {
+    console.log("3333333333333333333333333");
     if (!isButtonHovered && visibleOverlay) {
       setVisibleOverlay(null);
     }
@@ -86,6 +101,12 @@ const PayListModal = ({ show, onClose }) => {
 
   // 현재 활성화된 탭의 설정 가져오기
   const currentTabConfigs = useMemo(() => {
+    console.log(
+      "여기서 값이 바뀌나???",
+      fixedItemListStatus,
+      categoryListStatus,
+      cardListStatus
+    );
     return tabConfigs({
       fixedItemListStatus,
       categoryListStatus,
@@ -100,11 +121,19 @@ const PayListModal = ({ show, onClose }) => {
       setCatDataList,
       setCardDataList,
     });
-  }, [fixedItemListStatus, categoryListStatus, cardListStatus]);
+  }, [
+    fixedItemListStatus,
+    categoryListStatus,
+    cardListStatus,
+    fixedItemListSaveStatus,
+    categoryListSaveStatus,
+    cardListSaveStatus,
+  ]);
 
-  const MemoizedComponent = useMemo(() => {
-    return currentTabConfigs[activeTab]?.component || null;
-  }, [currentTabConfigs, activeTab]);
+  // const MemoizedComponent = useMemo(() => {
+  //   console.log("444444444444444444444444");
+  //   return currentTabConfigs[activeTab]?.component || null;
+  // }, [currentTabConfigs, activeTab]);
 
   return (
     <div
@@ -139,14 +168,10 @@ const PayListModal = ({ show, onClose }) => {
           </button>
         </div>
         <div className="modal-body">
-          {MemoizedComponent ? (
-            <TabContent
-              {...currentTabConfigs[activeTab]}
-              setShowAlertModal={setShowAlertModal}
-            />
-          ) : (
-            <div>로딩중...</div>
-          )}
+          <TabContent
+            {...currentTabConfigs[activeTab]}
+            setShowAlertModal={setShowAlertModal}
+          />
         </div>
         <div className="modal-footer">
           <div className="modal-summary-group">
