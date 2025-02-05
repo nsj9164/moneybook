@@ -39,7 +39,7 @@
 }
 
 .alert-modal-btn {
-  background-color: #43a047;
+  background-color: #03c75a;
   color: #fff;
   padding: 12px 30px;
   border-radius: 30px;
@@ -51,7 +51,7 @@
 }
 
 .alert-modal-btn:hover {
-  background-color: #1479c0;
+  background-color: #43a047;
 }
 
 .alert-modal-btn:focus {

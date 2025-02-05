@@ -1,6 +1,11 @@
 import MyCard from "../routes/PayList/Modal/MyCard";
 import MyCategory from "../routes/PayList/Modal/MyCategory";
 import MyFixedExpense from "../routes/PayList/Modal/MyFixedExpense";
+import {
+  cardListActions,
+  categoryListActions,
+  fixedItemListActions,
+} from "../store/features/myDetailList/myDetailListActions";
 
 const tabConfigs = ({
   fixedItemListStatus,
@@ -30,6 +35,8 @@ const tabConfigs = ({
       />
     ),
     errorMessage: "Error loading fixed expense list",
+    idField: "expense_id",
+    listType: "fixedItemList",
   },
   2: {
     status: categoryListStatus,
@@ -40,6 +47,8 @@ const tabConfigs = ({
       <MyCategory setCatDataList={setCatDataList} catList={categoryList} />
     ),
     errorMessage: "Error loading category list",
+    idField: "cat_id",
+    listType: "categoryList",
   },
   3: {
     status: cardListStatus,
@@ -48,6 +57,9 @@ const tabConfigs = ({
     setData: setCardDataList,
     component: <MyCard setCardDataList={setCardDataList} cardList={cardList} />,
     errorMessage: "Error loading card list",
+    updateAction: cardListActions.updateItem,
+    idField: "card_id",
+    listType: "cardList",
   },
 });
 

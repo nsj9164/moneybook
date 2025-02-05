@@ -426,13 +426,7 @@ app.post("/categoryList/delete", authenticateToken, function (req, res) {
         AND cat_id = ?`,
     [userId, data],
     (err, result) => {
-      if (err) {
-        console.error("쿼리 에러:", err);
-        res.status(500).send("쿼리 실행 실패");
-        return;
-      }
-      console.log("삭제될 결과:", result);
-      res.status(500).send("삭제 완료");
+      if (err) throw err;
     }
   );
 });

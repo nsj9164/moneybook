@@ -42,7 +42,7 @@ const CustomSelect = ({
           disabled={disabled}
         >
           <option value="" disabled hidden></option>
-          {noSelectValue && <option value="none">{noSelectValue}</option>}
+          {noSelectValue && <option value="0">{noSelectValue}</option>}
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

@@ -81,15 +81,35 @@ const PayListModal = ({ show, onClose }) => {
     console.log(`저장하기 버튼 클릭${activeTab}`, data);
     if (data.length > 0) {
       // 저장 처리 후 AlertModal 띄우기
-      dispatch(action(data)).then(() => {
-        console.log("저장 성공");
-        setShowAlertModal(true);
-      });
+      dispatch(action(data))
+        .then((resultAction) => {
+          if (resultAction.meta.requestStatus === "fulfilled") {
+            setShowAlertModal(true);
+
+            data.forEach((item) => {
+              dispatch(updateItem({ ...item, idField }));
+            });
+          }
+        })
+        .catch((error) => {
+          console.log("저장 실패:", error);
+        });
     } else {
       console.log("저장할 데이터 없음");
       setVisibleOverlay(true);
     }
   };
+
+  const handleDelete = () => {
+    const dataMap = {
+      1: { action: fixedItemListActions.saveData, data: fixedDataList },
+      2: { action: categoryListActions.saveData, data: catDataList },
+      3: { action: cardListActions.saveData, data: cardDataList },
+    };
+
+    const { action, data } = dataMap[activeTab];
+    if(data)
+  }
 
   // 버튼 hover 상태에 따른 Overlay hide 처리
   useEffect(() => {
@@ -129,11 +149,6 @@ const PayListModal = ({ show, onClose }) => {
     categoryListSaveStatus,
     cardListSaveStatus,
   ]);
-
-  // const MemoizedComponent = useMemo(() => {
-  //   console.log("444444444444444444444444");
-  //   return currentTabConfigs[activeTab]?.component || null;
-  // }, [currentTabConfigs, activeTab]);
 
   return (
     <div
@@ -177,7 +192,7 @@ const PayListModal = ({ show, onClose }) => {
           <div className="modal-summary-group">
             <div className="modal-button-group-left">
               {activeTab === 1 && (
-                <button className="cursor_pointer">선택삭제</button>
+                <button className="cursor_pointer" onClick={handleDelete}>선택삭제</button>
               )}
             </div>
             <div className="modal-button-group-right">

@@ -8,9 +8,6 @@ import { Overlay } from "../../../components/Overlay";
 
 function MyCategory({ setCatDataList, catList }) {
   const dispatch = useDispatch();
-  const catListSaveStatus = useSelector(
-    (state) => state.myDetailList["categoryList"].saveStatus
-  );
   const inputRefs = useRef([]);
   const [catData, setCatData] = useState([]);
   const [catId, setCatId] = useState(1);
@@ -85,12 +82,6 @@ function MyCategory({ setCatDataList, catList }) {
       }
     }
   }, [focusedItemId]);
-
-  useEffect(() => {
-    if (catListSaveStatus === "succeeded") {
-      dispatch(categoryListActions.fetchData());
-    }
-  }, [catListSaveStatus]);
 
   // 삭제하기
   const handleDelete = (id, isDisabled) => {

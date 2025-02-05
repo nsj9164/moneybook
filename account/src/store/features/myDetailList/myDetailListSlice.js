@@ -34,6 +34,21 @@ const myDetailList = createSlice({
       error: null,
     },
   },
+  reducers: {
+    updateItem: (state, action) => {
+      const { idField, ...updatedItem } = action.payload;
+      const stateKey = updatedItem.listType; // 리스트 타입을 구분하는 키
+
+      if (state[stateKey]) {
+        const index = state[stateKey].items.findIndex(
+          (item) => item[idField] === updatedItem[idField]
+        );
+        if (index !== -1) {
+          state[stateKey].items[index] = updatedItem;
+        }
+      }
+    },
+  },
   extraReducers: (builder) => {
     createAsyncReducers(builder, fixedItemListActions, "fixedItemList");
     createAsyncReducers(builder, categoryListActions, "categoryList");
@@ -42,4 +57,5 @@ const myDetailList = createSlice({
   },
 });
 
+export const { updateItem } = myDetailList.actions;
 export default myDetailList.reducer;

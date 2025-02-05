@@ -52,18 +52,25 @@ function MyFixedExpense({
       ]);
       setFixedId((prevId) => prevId + 1);
     }
+    console.log("fixedData::::", fixedData);
   }, [fixedItemList, fixedData]);
 
   // 저장할 data
   const modifiedData = useMemo(() => {
+    const hasValidFields =
+      item.expense_amount !== 0 ||
+      item.expense_cat_nm !== "" ||
+      item.expense_payment !== "" ||
+      item.expense_desc !== "";
     return fixedData.filter(
       (item) =>
         (item.isModified || item.isNew) &&
-        fields.some((field) => item[field] !== "" && item[field] !== undefined)
+        fields.some((field) => item.expense_amount !== "")
     );
   }, [fixedData]);
 
   useEffect(() => {
+    console.log("modifiedData::::", modifiedData);
     setFixedDataList(modifiedData);
   }, [modifiedData]);
 
