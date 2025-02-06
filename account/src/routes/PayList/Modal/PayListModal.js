@@ -108,8 +108,7 @@ const PayListModal = ({ show, onClose }) => {
     };
 
     const { action, data } = dataMap[activeTab];
-    if(data)
-  }
+  };
 
   // 버튼 hover 상태에 따른 Overlay hide 처리
   useEffect(() => {
@@ -192,7 +191,9 @@ const PayListModal = ({ show, onClose }) => {
           <div className="modal-summary-group">
             <div className="modal-button-group-left">
               {activeTab === 1 && (
-                <button className="cursor_pointer" onClick={handleDelete}>선택삭제</button>
+                <button className="cursor_pointer" onClick={handleDelete}>
+                  선택삭제
+                </button>
               )}
             </div>
             <div className="modal-button-group-right">
