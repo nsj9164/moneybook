@@ -10,7 +10,7 @@ import {
   selectAllLists,
   selectAllStatuses,
 } from "../../../store/features/myDetailList/myDetailListSelectors";
-import { getCardBillingPeriod } from "../../../util/payDateutils";
+import { getCardBillingPeriod } from "../../../util/payDateUtils";
 import { date, selectText } from "../../../util/util";
 
 function MyCard({ setCardDataList, cardList }) {
