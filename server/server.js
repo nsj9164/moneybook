@@ -1,18 +1,17 @@
 const express = require("express");
 const db = require("./database/db");
 const app = express();
-const port = "8009";
+require("dotenv").config();
+const PORT = process.env.PORT || 3000;
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 
-// app.get('/config', (req, res) => {
-//     res.json({ host: process.env.HOST, port: process.env.PORT });
-// })
-
-app.listen(port, (req, res) => {
-  //console.log(`Server running on http://${process.env.HOST}:${process.env.PORT}`);
+app.listen(PORT, (req, res) => {
+  console.log(
+    `Server running on http://${process.env.HOST}:${process.env.PORT}`
+  );
 });
 
 app.use(express.json());
@@ -266,17 +265,19 @@ app.post("/fixedItemList/delete", authenticateToken, function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
 
-  data.forEach((item) => {
+  if (data.length > 0) {
+    const placeholders = data.map(() => "?").join(", ");
+
     db.query(
       `DELETE FROM FIXED_ITEM_LIST
-                   WHERE user_id = ?
-                     AND expense_id = ?`,
-      [userId, item.expense_id],
+        WHERE user_id = ?
+          AND expense_id IN (${placeholders})`,
+      [userId, ...data],
       (err, result) => {
         if (err) throw err;
       }
     );
-  });
+  }
 });
 
 app.get("/cardList", authenticateToken, function (req, res) {

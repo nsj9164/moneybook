@@ -20,6 +20,8 @@ const tabConfigs = ({
   setFixedDataList,
   setCatDataList,
   setCardDataList,
+  checkedItems,
+  setCheckedItems,
 }) => ({
   1: {
     status: fixedItemListStatus,
@@ -32,6 +34,8 @@ const tabConfigs = ({
         fixedItemList={fixedItemList}
         catList={categoryList}
         cardList={cardList}
+        checkedItems={checkedItems}
+        setCheckedItems={setCheckedItems}
       />
     ),
     errorMessage: "Error loading fixed expense list",

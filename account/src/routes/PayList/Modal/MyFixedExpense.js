@@ -9,13 +9,14 @@ function MyFixedExpense({
   fixedItemList,
   catList,
   cardList,
+  checkedItems,
+  setCheckedItems,
 }) {
   const dispatch = useDispatch();
   const inputRefs = useRef([]);
   const [fixedData, setFixedData] = useState([]);
   const [fixedId, setFixedId] = useState(1);
   const [checkedAll, setCheckedAll] = useState(false);
-  const [checkedItems, setCheckedItems] = useState([]);
   const [focusedItemId, setFocusedItemId] = useState(null);
   const [price, setPrice] = useState("");
   const fields = [
@@ -57,16 +58,15 @@ function MyFixedExpense({
 
   // 저장할 data
   const modifiedData = useMemo(() => {
-    const hasValidFields =
-      item.expense_amount !== 0 ||
-      item.expense_cat_nm !== "" ||
-      item.expense_payment !== "" ||
-      item.expense_desc !== "";
-    return fixedData.filter(
-      (item) =>
-        (item.isModified || item.isNew) &&
-        fields.some((field) => item.expense_amount !== "")
-    );
+    return fixedData.filter((item) => {
+      const hasValidFields =
+        item.expense_amount !== 0 ||
+        item.expense_cat_nm !== "" ||
+        item.expense_payment !== "" ||
+        item.expense_desc !== "";
+
+      return (item.isModified || item.isNew) && hasValidFields;
+    });
   }, [fixedData]);
 
   useEffect(() => {
@@ -100,9 +100,13 @@ function MyFixedExpense({
   };
 
   const handleCheck = (id) => {
+    console.log("id.//////////////", id);
     setCheckedItems((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((item_Id) => item_Id !== id)
+        : [...prev, id]
     );
+    console.log("checkedItems:::", checkedItems);
   };
 
   const handleCheckedAll = () => {
@@ -123,6 +127,7 @@ function MyFixedExpense({
         fixedData.filter((item) => !item.isDisabled).length &&
         fixedData.length > 1
     );
+    console.log("checkedItems:::", checkedItems);
   }, [checkedItems, fixedData]);
 
   useEffect(() => {
@@ -211,8 +216,8 @@ function MyFixedExpense({
                 <td>
                   <input
                     type="checkbox"
-                    checked={checkedItems.includes(item.id)}
-                    onChange={() => handleCheck(item.id)}
+                    checked={checkedItems.includes(item.expense_id)}
+                    onChange={() => handleCheck(item.expense_id)}
                     disabled={item.isDisabled}
                   />
                 </td>

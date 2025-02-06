@@ -44,10 +44,10 @@ const PayListModal = ({ show, onClose }) => {
   const [visibleOverlay, setVisibleOverlay] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
+  const [checkedItems, setCheckedItems] = useState([]);
 
   // 데이터 초기 로드
   useEffect(() => {
-    console.log("11111111111111111111111");
     if (isLoggedIn) {
       if (fixedItemListStatus === "idle") {
         dispatch(fixedItemListActions.fetchData());
@@ -69,7 +69,6 @@ const PayListModal = ({ show, onClose }) => {
 
   // [저장 버튼 클릭 시] 데이터 저장
   const handleSave = () => {
-    console.log("22222222222222222");
     const dataMap = {
       1: { action: fixedItemListActions.saveData, data: fixedDataList },
       2: { action: categoryListActions.saveData, data: catDataList },
@@ -101,18 +100,33 @@ const PayListModal = ({ show, onClose }) => {
   };
 
   const handleDelete = () => {
-    const dataMap = {
-      1: { action: fixedItemListActions.saveData, data: fixedDataList },
-      2: { action: categoryListActions.saveData, data: catDataList },
-      3: { action: cardListActions.saveData, data: cardDataList },
-    };
+    if (checkedItems.length > 0) {
+      dispatch(fixedItemListActions.deleteData(checkedItems))
+        .then((resultAction) => {
+          if (resultAction.meta.requestStatus === "fulfilled") {
+            console.log("여기 타는거니?");
+            setShowAlertModal(true);
 
-    const { action, data } = dataMap[activeTab];
+            setFixedDataList((prevList) => {
+              prevList.filter(
+                (item) => !checkedItems.includes(item.expense_id)
+              );
+            });
+
+            setCheckedItems([]);
+          }
+        })
+        .catch((error) => {
+          console.log("삭제 실패:", error);
+        });
+    } else {
+      console.log("삭제할 데이터 없음");
+      setVisibleOverlay(true);
+    }
   };
 
   // 버튼 hover 상태에 따른 Overlay hide 처리
   useEffect(() => {
-    console.log("3333333333333333333333333");
     if (!isButtonHovered && visibleOverlay) {
       setVisibleOverlay(null);
     }
@@ -120,12 +134,6 @@ const PayListModal = ({ show, onClose }) => {
 
   // 현재 활성화된 탭의 설정 가져오기
   const currentTabConfigs = useMemo(() => {
-    console.log(
-      "여기서 값이 바뀌나???",
-      fixedItemListStatus,
-      categoryListStatus,
-      cardListStatus
-    );
     return tabConfigs({
       fixedItemListStatus,
       categoryListStatus,
@@ -139,6 +147,8 @@ const PayListModal = ({ show, onClose }) => {
       setFixedDataList,
       setCatDataList,
       setCardDataList,
+      checkedItems,
+      setCheckedItems,
     });
   }, [
     fixedItemListStatus,
@@ -147,6 +157,7 @@ const PayListModal = ({ show, onClose }) => {
     fixedItemListSaveStatus,
     categoryListSaveStatus,
     cardListSaveStatus,
+    checkedItems,
   ]);
 
   return (
