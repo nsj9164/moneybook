@@ -264,7 +264,7 @@ app.post("/fixedItemList/insert", authenticateToken, function (req, res) {
 app.post("/fixedItemList/delete", authenticateToken, function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
-
+  console.log("data///////", data);
   if (data.length > 0) {
     const placeholders = data.map(() => "?").join(", ");
 
@@ -275,6 +275,7 @@ app.post("/fixedItemList/delete", authenticateToken, function (req, res) {
       [userId, ...data],
       (err, result) => {
         if (err) throw err;
+        res.send(result);
       }
     );
   }

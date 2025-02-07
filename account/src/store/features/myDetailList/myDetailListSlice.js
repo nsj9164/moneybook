@@ -14,6 +14,7 @@ const myDetailList = createSlice({
       items: [],
       status: "idle",
       saveStatus: "idle",
+      deleteStatus: "idle",
       error: null,
     },
     categoryList: {

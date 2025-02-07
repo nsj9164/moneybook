@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Input } from "../../../components/EditableCell";
 import CustomSelect from "../../../components/SelectComponent/CustomSelect";
 import { date, nowCursor, restoreCursor, selectText } from "../../../util/util";
@@ -26,6 +26,10 @@ function MyFixedExpense({
     "expense_payment",
     "expense_cat_nm",
   ];
+  const deleteStatus = useSelector(
+    (state) => state.myDetailList["fixedItemList"].deleteStatus
+  );
+  console.log("deleteStatus 변경됨:", deleteStatus);
 
   useEffect(() => {
     if (fixedItemList.length > 0) {
@@ -60,10 +64,10 @@ function MyFixedExpense({
   const modifiedData = useMemo(() => {
     return fixedData.filter((item) => {
       const hasValidFields =
-        item.expense_amount !== 0 ||
-        item.expense_cat_nm !== "" ||
-        item.expense_payment !== "" ||
-        item.expense_desc !== "";
+        Boolean(item.expense_amount) ||
+        Boolean(item.expense_cat_nm) ||
+        Boolean(item.expense_payment) ||
+        Boolean(item.expense_desc);
 
       return (item.isModified || item.isNew) && hasValidFields;
     });
@@ -100,13 +104,11 @@ function MyFixedExpense({
   };
 
   const handleCheck = (id) => {
-    console.log("id.//////////////", id);
     setCheckedItems((prev) =>
       prev.includes(id)
         ? prev.filter((item_Id) => item_Id !== id)
         : [...prev, id]
     );
-    console.log("checkedItems:::", checkedItems);
   };
 
   const handleCheckedAll = () => {
@@ -115,7 +117,7 @@ function MyFixedExpense({
     } else {
       const allIds = fixedData
         .filter((item) => !item.isDisabled)
-        .map((item) => item.id);
+        .map((item) => item.expense_id);
       setCheckedItems(allIds);
     }
     setCheckedAll(!checkedAll);
@@ -127,8 +129,20 @@ function MyFixedExpense({
         fixedData.filter((item) => !item.isDisabled).length &&
         fixedData.length > 1
     );
-    console.log("checkedItems:::", checkedItems);
+    console.log("체크된거???", checkedItems);
   }, [checkedItems, fixedData]);
+
+  useEffect(() => {
+    console.log("deleteStatus?????????????????", deleteStatus);
+    if (deleteStatus === "succeeded") {
+      console.log("여기 탓니?");
+      setFixedData((prevData) =>
+        prevData.filter((item) => !checkedItems.includes(item.expense_id))
+      );
+      setCheckedItems([]);
+    }
+    console.log("없어졌니?", fixedData);
+  }, [deleteStatus]);
 
   useEffect(() => {
     if (focusedItemId !== null) {
@@ -180,7 +194,7 @@ function MyFixedExpense({
       }
     }
   };
-  console.log(date.slice(-2));
+
   return (
     <div className="modal-body">
       <h2 className="modal-title">고정항목 관리하기</h2>

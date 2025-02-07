@@ -23,6 +23,7 @@ export const createAsyncActions = (endpoint) => {
         `http://localhost:8009/${endpoint}/delete`,
         data
       );
+      return response.data;
     }),
   };
 };

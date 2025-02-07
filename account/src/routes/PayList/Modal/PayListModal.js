@@ -19,6 +19,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import tabConfigs from "../../../config/tabConfigs";
 import TabContent from "../../../components/Modal/TabContent";
 import AlertModal from "../../../components/AlertModal";
+import { updateItem } from "../../../store/features/myDetailList/myDetailListSlice";
 
 const PayListModal = ({ show, onClose }) => {
   // Modal hide일때 렌더링 방지
@@ -43,8 +44,37 @@ const PayListModal = ({ show, onClose }) => {
 
   const [visibleOverlay, setVisibleOverlay] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
-  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [showSaveAlertModal, setShowSaveAlertModal] = useState(false);
+  const [showDelAlertModal, setShowDelAlertModal] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
+
+  // 현재 활성화된 탭의 설정 가져오기
+  const currentTabConfigs = useMemo(() => {
+    return tabConfigs({
+      fixedItemListStatus,
+      categoryListStatus,
+      cardListStatus,
+      fixedItemListSaveStatus,
+      categoryListSaveStatus,
+      cardListSaveStatus,
+      fixedItemList,
+      categoryList,
+      cardList,
+      setFixedDataList,
+      setCatDataList,
+      setCardDataList,
+      checkedItems,
+      setCheckedItems,
+    });
+  }, [
+    fixedItemListStatus,
+    categoryListStatus,
+    cardListStatus,
+    fixedItemListSaveStatus,
+    categoryListSaveStatus,
+    cardListSaveStatus,
+    checkedItems,
+  ]);
 
   // 데이터 초기 로드
   useEffect(() => {
@@ -76,6 +106,8 @@ const PayListModal = ({ show, onClose }) => {
     };
 
     const { action, data } = dataMap[activeTab];
+    const idField = currentTabConfigs?.idField;
+    console.log(idField);
 
     console.log(`저장하기 버튼 클릭${activeTab}`, data);
     if (data.length > 0) {
@@ -83,10 +115,11 @@ const PayListModal = ({ show, onClose }) => {
       dispatch(action(data))
         .then((resultAction) => {
           if (resultAction.meta.requestStatus === "fulfilled") {
-            setShowAlertModal(true);
+            setShowSaveAlertModal(true);
 
             data.forEach((item) => {
-              dispatch(updateItem({ ...item, idField }));
+              console.log([idField], item[idField]);
+              dispatch(updateItem({ ...item, [idField]: item[idField] }));
             });
           }
         })
@@ -104,14 +137,7 @@ const PayListModal = ({ show, onClose }) => {
       dispatch(fixedItemListActions.deleteData(checkedItems))
         .then((resultAction) => {
           if (resultAction.meta.requestStatus === "fulfilled") {
-            console.log("여기 타는거니?");
-            setShowAlertModal(true);
-
-            setFixedDataList((prevList) => {
-              prevList.filter(
-                (item) => !checkedItems.includes(item.expense_id)
-              );
-            });
+            setShowDelAlertModal(true);
 
             setCheckedItems([]);
           }
@@ -131,34 +157,6 @@ const PayListModal = ({ show, onClose }) => {
       setVisibleOverlay(null);
     }
   }, [isButtonHovered]);
-
-  // 현재 활성화된 탭의 설정 가져오기
-  const currentTabConfigs = useMemo(() => {
-    return tabConfigs({
-      fixedItemListStatus,
-      categoryListStatus,
-      cardListStatus,
-      fixedItemListSaveStatus,
-      categoryListSaveStatus,
-      cardListSaveStatus,
-      fixedItemList,
-      categoryList,
-      cardList,
-      setFixedDataList,
-      setCatDataList,
-      setCardDataList,
-      checkedItems,
-      setCheckedItems,
-    });
-  }, [
-    fixedItemListStatus,
-    categoryListStatus,
-    cardListStatus,
-    fixedItemListSaveStatus,
-    categoryListSaveStatus,
-    cardListSaveStatus,
-    checkedItems,
-  ]);
 
   return (
     <div
@@ -195,7 +193,7 @@ const PayListModal = ({ show, onClose }) => {
         <div className="modal-body">
           <TabContent
             {...currentTabConfigs[activeTab]}
-            setShowAlertModal={setShowAlertModal}
+            setShowSaveAlertModal={setShowSaveAlertModal}
           />
         </div>
         <div className="modal-footer">
@@ -233,10 +231,10 @@ const PayListModal = ({ show, onClose }) => {
           </div>
         </div>
       </div>
-      {showAlertModal && (
+      {showSaveAlertModal && (
         <AlertModal
-          message="저장에 성공했습니다!"
-          onClose={() => setShowAlertModal(false)}
+          message="저장되었습니다!"
+          onClose={() => setShowSaveAlertModal(false)}
         />
       )}
     </div>
