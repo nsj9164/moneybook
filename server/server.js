@@ -204,14 +204,14 @@ app.post("/logout", (req, res) => {
 app.get("/fixedItemList", authenticateToken, function (req, res) {
   db.query(
     `SELECT expense_id
-                   , DATE_FORMAT(expense_date,"%Y-%m-%d") as expense_date
-                   , expense_desc
-                   , FORMAT(expense_amount,0) as expense_amount
-                   , expense_payment
-                   , expense_cat_nm
-                FROM FIXED_ITEM_LIST
-               WHERE USER_ID = ?
-               ORDER BY expense_date, expense_id`,
+          , expense_date
+          , expense_desc
+          , FORMAT(expense_amount,0) as expense_amount
+          , expense_payment
+          , expense_cat_nm
+      FROM FIXED_ITEM_LIST
+      WHERE USER_ID = ?
+      ORDER BY expense_date, expense_id`,
     [req.user.userId],
     function (err, results, fields) {
       if (err) throw err;

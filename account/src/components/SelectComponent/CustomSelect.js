@@ -11,9 +11,11 @@ const CustomSelect = ({
   noSelectValue,
   disabled,
 }) => {
+  console.log("##############################", value, options);
   const [selectedValue, setSelectedValue] = useState(value ?? "");
 
   useEffect(() => {
+    console.log("useEffect - value:", value);
     setSelectedValue(value ?? "");
   }, [value]);
 

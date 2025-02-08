@@ -190,12 +190,10 @@ const PayListModal = ({ show, onClose }) => {
             &times;
           </button>
         </div>
-        <div className="modal-body">
-          <TabContent
-            {...currentTabConfigs[activeTab]}
-            setShowSaveAlertModal={setShowSaveAlertModal}
-          />
-        </div>
+        <TabContent
+          {...currentTabConfigs[activeTab]}
+          setShowSaveAlertModal={setShowSaveAlertModal}
+        />
         <div className="modal-footer">
           <div className="modal-summary-group">
             <div className="modal-button-group-left">

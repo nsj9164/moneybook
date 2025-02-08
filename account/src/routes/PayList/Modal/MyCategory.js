@@ -109,7 +109,7 @@ function MyCategory({ setCatDataList, catList }) {
   return (
     <div className="modal-body">
       <h2 className="modal-title">분류 관리하기</h2>
-      <table className="table table-hover">
+      <table className="table table-hover table-sm" bordered hover>
         <colgroup>
           <col />
           <col width={"15%"} />

@@ -27,6 +27,9 @@ import PayListModal from "./Modal/PayListModal";
 import { Overlay } from "../../components/Overlay";
 import { Input } from "../../components/EditableCell";
 import { useAuth } from "../../hooks/useAuth";
+import CustomSelect from "../../components/SelectComponent/CustomSelect";
+import { fixedItemListActions } from "../../store/features/myDetailList/myDetailListActions";
+import { selectAllLists } from "../../store/features/myDetailList/myDetailListSelectors";
 
 function PayList() {
   const navigate = useNavigate();
@@ -55,6 +58,7 @@ function PayList() {
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
 
+  const { categoryList, cardList } = useSelector(selectAllLists);
   // payList 호출
   useEffect(() => {
     if (isLoggedIn && payListStatus === "idle") {
@@ -124,8 +128,7 @@ function PayList() {
   }, [startDate, endDate]);
 
   // 데이터 수정
-  const handleUpdate = (e, id, key) => {
-    const newItem = key === "date" ? e : e.target.innerText;
+  const handleUpdate = (newItem, id, key) => {
     setTempData((prevData) =>
       prevData.map((item) => {
         return item.id === id
@@ -398,55 +401,71 @@ function PayList() {
           )}
 
           {payListStatus === "succeeded" &&
-            tempData.map((item, i) =>
-              !item.isDeleted ? (
-                <tr key={i}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={checkedItems.includes(item.id)}
-                      onChange={() => handleCheck(item.id)}
-                      disabled={item.isDisabled}
-                    />
-                  </td>
-                  {columns.map((col, idx) =>
-                    col === "date" ? (
-                      <td key={col}>
-                        <DatePicker
-                          selected={
-                            item[col] ? new Date(item[col]) : new Date()
-                          }
-                          onKeyDown={(e) => e.preventDefault()}
-                          onChange={(date) =>
-                            handleUpdate(
-                              format(date, "yyyy-MM-dd"),
-                              item.id,
-                              col
-                            )
-                          }
-                          onFocus={(e) => setInitial(item, i * 7 + idx)}
-                          dateFormat="yyyy-MM-dd"
-                          className="input_date"
-                        />
-                      </td>
-                    ) : (
-                      <Input
-                        key={col}
-                        ref={(el) => (inputRefs.current[i * 7 + idx] = el)}
-                        onBlur={(e) => handleUpdate(e, item.id, col)}
-                        onKeyDown={(e) =>
-                          handleKeyDown(e, (i + 1) * 7 + idx, col)
+            tempData.map((item, i) => (
+              <tr key={i}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={checkedItems.includes(item.id)}
+                    onChange={() => handleCheck(item.id)}
+                    disabled={item.isDisabled}
+                  />
+                </td>
+                {columns.map((col, idx) =>
+                  col === "date" ? (
+                    <td key={col}>
+                      <DatePicker
+                        selected={item[col] ? new Date(item[col]) : new Date()}
+                        onKeyDown={(e) => e.preventDefault()}
+                        onChange={(date) =>
+                          handleUpdate(format(date, "yyyy-MM-dd"), item.id, col)
                         }
                         onFocus={(e) => setInitial(item, i * 7 + idx)}
-                        onInput={(e) => handleInput(e, col)}
-                      >
-                        {item[col]}
-                      </Input>
-                    )
-                  )}
-                </tr>
-              ) : null
-            )}
+                        dateFormat="yyyy-MM-dd"
+                        className="input_date"
+                      />
+                    </td>
+                  ) : col === "cat_nm" ? (
+                    <CustomSelect
+                      key={idx}
+                      value={item[col]}
+                      options={categoryList.map((list) => ({
+                        value: list.cat_id,
+                        label: list.category_nm,
+                      }))}
+                      noSelectValue="미분류"
+                      onChange={(value) => handleUpdate(value, item.id, col)}
+                    />
+                  ) : col === "payment" ? (
+                    <CustomSelect
+                      key={idx}
+                      value={item[col]}
+                      options={cardList.map((list) => ({
+                        value: list.card_id,
+                        label: list.card_name,
+                      }))}
+                      noSelectValue="선택없음"
+                      onChange={(value) => handleUpdate(value, item.id, col)}
+                    />
+                  ) : (
+                    <Input
+                      key={col}
+                      ref={(el) => (inputRefs.current[i * 7 + idx] = el)}
+                      onBlur={(e) =>
+                        handleUpdate(e.target.innerText, item.id, col)
+                      }
+                      onKeyDown={(e) =>
+                        handleKeyDown(e, (i + 1) * 7 + idx, col)
+                      }
+                      onFocus={(e) => setInitial(item, i * 7 + idx)}
+                      onInput={(e) => handleInput(e, col)}
+                    >
+                      {item[col]}
+                    </Input>
+                  )
+                )}
+              </tr>
+            ))}
 
           {payListStatus === "failed" && (
             <tr>
