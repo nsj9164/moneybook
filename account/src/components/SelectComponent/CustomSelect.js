@@ -11,11 +11,9 @@ const CustomSelect = ({
   noSelectValue,
   disabled,
 }) => {
-  console.log("##############################", value, options);
   const [selectedValue, setSelectedValue] = useState(value ?? "");
 
   useEffect(() => {
-    console.log("useEffect - value:", value);
     setSelectedValue(value ?? "");
   }, [value]);
 
@@ -28,7 +26,6 @@ const CustomSelect = ({
   };
 
   const handleSelectChange = (e) => {
-    console.log("customSelect:::", e.target.value);
     setSelectedValue(e.target.value);
     onChange(e.target.value);
   };

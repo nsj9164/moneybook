@@ -19,7 +19,10 @@ import { useAuth } from "../../../hooks/useAuth";
 import tabConfigs from "../../../config/tabConfigs";
 import TabContent from "../../../components/Modal/TabContent";
 import AlertModal from "../../../components/AlertModal";
-import { updateItem } from "../../../store/features/myDetailList/myDetailListSlice";
+import {
+  setFixedItemList,
+  updateItem,
+} from "../../../store/features/myDetailList/myDetailListSlice";
 
 const PayListModal = ({ show, onClose }) => {
   // Modal hide일때 렌더링 방지
@@ -29,10 +32,6 @@ const PayListModal = ({ show, onClose }) => {
   const { isLoggedIn } = useAuth();
 
   const [activeTab, setActiveTab] = useState(1);
-  const [fixedDataList, setFixedDataList] = useState([]);
-  const [catDataList, setCatDataList] = useState([]);
-  const [cardDataList, setCardDataList] = useState([]);
-
   const { fixedItemList, categoryList, cardList } = useSelector(selectAllLists);
   const { fixedItemListStatus, categoryListStatus, cardListStatus } =
     useSelector(selectAllStatuses);
@@ -41,6 +40,11 @@ const PayListModal = ({ show, onClose }) => {
     categoryListSaveStatus,
     cardListSaveStatus,
   } = useSelector(selectAllSaveStatuses);
+
+  // 저장용 data
+  const [fixedDataList, setFixedDataList] = useState([]);
+  const [catDataList, setCatDataList] = useState([]);
+  const [cardDataList, setCardDataList] = useState([]);
 
   const [visibleOverlay, setVisibleOverlay] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
@@ -150,6 +154,10 @@ const PayListModal = ({ show, onClose }) => {
       setVisibleOverlay(true);
     }
   };
+
+  useEffect(() => {
+    console.log("PayListModal?/////", checkedItems);
+  }, [checkedItems]);
 
   // 버튼 hover 상태에 따른 Overlay hide 처리
   useEffect(() => {

@@ -21,6 +21,12 @@ export const createAsyncReducers = (builder, actions, stateKey) => {
       console.error("Save Data Error: ", action.error);
     })
     .addCase(actions.deleteData.fulfilled, (state, action) => {
+      state[stateKey].deleteStatus = "succeeded";
       state[stateKey].items = action.payload;
+    })
+    .addCase(actions.deleteData.rejected, (state, action) => {
+      state[stateKey].deleteStatus = "failed";
+      state[stateKey].error = action.error.message;
+      console.error("Delete Data Error: ", action.error);
     });
 };

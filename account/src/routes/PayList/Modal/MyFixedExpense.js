@@ -32,6 +32,7 @@ function MyFixedExpense({
   console.log("deleteStatus 변경됨:", deleteStatus);
 
   useEffect(() => {
+    console.log("change??", fixedItemList);
     if (fixedItemList.length > 0) {
       setFixedData(
         fixedItemList.map((item) => ({
@@ -43,6 +44,7 @@ function MyFixedExpense({
     }
   }, [fixedItemList]);
 
+  // 한 줄 추가용
   useEffect(() => {
     if (fixedData.length === 0 || fixedData.every((item) => !item.isDisabled)) {
       setFixedData((prevData) => [
@@ -133,7 +135,7 @@ function MyFixedExpense({
   }, [checkedItems, fixedData]);
 
   useEffect(() => {
-    console.log("deleteStatus?????????????????", deleteStatus);
+    console.log("checkedItems?????????????????", checkedItems);
     if (deleteStatus === "succeeded") {
       console.log("여기 탓니?");
       setFixedData((prevData) =>
@@ -143,6 +145,10 @@ function MyFixedExpense({
     }
     console.log("없어졌니?", fixedData);
   }, [deleteStatus]);
+
+  useEffect(() => {
+    console.log("MyFixedExpense?/////", checkedItems);
+  }, [checkedItems]);
 
   useEffect(() => {
     if (focusedItemId !== null) {
