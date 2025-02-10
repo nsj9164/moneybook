@@ -29,10 +29,8 @@ function MyFixedExpense({
   const deleteStatus = useSelector(
     (state) => state.myDetailList["fixedItemList"].deleteStatus
   );
-  console.log("deleteStatus 변경됨:", deleteStatus);
 
   useEffect(() => {
-    console.log("change??", fixedItemList);
     if (fixedItemList.length > 0) {
       setFixedData(
         fixedItemList.map((item) => ({
@@ -59,7 +57,6 @@ function MyFixedExpense({
       ]);
       setFixedId((prevId) => prevId + 1);
     }
-    console.log("fixedData::::", fixedData);
   }, [fixedItemList, fixedData]);
 
   // 저장할 data
@@ -76,12 +73,10 @@ function MyFixedExpense({
   }, [fixedData]);
 
   useEffect(() => {
-    console.log("modifiedData::::", modifiedData);
     setFixedDataList(modifiedData);
   }, [modifiedData]);
 
   const handleUpdate = (newItem, id, key) => {
-    console.log("newItem:::", newItem, id, key);
     setFixedData((prevData) =>
       prevData.map((item) =>
         item.expense_id === id
@@ -131,24 +126,16 @@ function MyFixedExpense({
         fixedData.filter((item) => !item.isDisabled).length &&
         fixedData.length > 1
     );
-    console.log("체크된거???", checkedItems);
   }, [checkedItems, fixedData]);
 
   useEffect(() => {
-    console.log("checkedItems?????????????????", checkedItems);
     if (deleteStatus === "succeeded") {
-      console.log("여기 탓니?");
       setFixedData((prevData) =>
         prevData.filter((item) => !checkedItems.includes(item.expense_id))
       );
       setCheckedItems([]);
     }
-    console.log("없어졌니?", fixedData);
   }, [deleteStatus]);
-
-  useEffect(() => {
-    console.log("MyFixedExpense?/////", checkedItems);
-  }, [checkedItems]);
 
   useEffect(() => {
     if (focusedItemId !== null) {

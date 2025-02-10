@@ -32,22 +32,20 @@ const CustomSelect = ({
 
   return (
     <td key={key}>
-      <StyledWrapper>
-        <StyledSelect
-          value={selectedValue}
-          onFocus={handleSelectClick}
-          onChange={handleSelectChange}
-          disabled={disabled}
-        >
-          <option value="" disabled hidden></option>
-          {noSelectValue && <option value="0">{noSelectValue}</option>}
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </StyledSelect>
-      </StyledWrapper>
+      <StyledSelect
+        value={selectedValue}
+        onFocus={handleSelectClick}
+        onChange={handleSelectChange}
+        disabled={disabled}
+      >
+        <option value="" disabled hidden></option>
+        {noSelectValue && <option value="0">{noSelectValue}</option>}
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </StyledSelect>
     </td>
   );
 };

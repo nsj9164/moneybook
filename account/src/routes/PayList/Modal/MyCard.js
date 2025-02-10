@@ -69,7 +69,11 @@ function MyCard({ setCardDataList, cardList }) {
   }, [cardData, cardId]);
 
   const modifiedData = useMemo(() => {
-    return cardData.filter((item) => item.isModified || item.isNew);
+    return cardData.filter((item) => {
+      const hasValidFields =
+        Boolean(item.card_company) || Boolean(item.card_name);
+      return (item.isModified || item.isNew) && hasValidFields;
+    });
   }, [cardData]);
 
   useEffect(() => {

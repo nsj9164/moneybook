@@ -59,6 +59,7 @@ function PayList() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
 
   const { categoryList, cardList } = useSelector(selectAllLists);
+  console.log("categoryList:::", categoryList);
   // payList 호출
   useEffect(() => {
     if (isLoggedIn && payListStatus === "idle") {
