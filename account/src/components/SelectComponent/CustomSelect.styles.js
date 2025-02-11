@@ -22,6 +22,13 @@ export const StyledSelect = styled.select`
     border-color: #0078ff;
     box-shadow: 0 0 3px rgba(0, 120, 255, 0.5);
   }
+
+  &:disabled {
+    background-color: #f5f5f5;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 `;
 
 export const StyledWrapper = styled.div`

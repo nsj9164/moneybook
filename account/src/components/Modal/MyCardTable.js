@@ -1,9 +1,10 @@
 import classNames from "classnames";
 import { useRef } from "react";
 import { date } from "../../util/util";
-import { Input } from "../EditableCell";
-import { Overlay } from "../Overlay";
+import { Input } from "../common/EditableCell";
+import { Overlay } from "../common/Overlay";
 import CustomSelect from "../SelectComponent/CustomSelect";
+import CardPeriodSelect from "./CardPeriodSelect";
 
 const MyCardTable = ({
   fields,
@@ -67,6 +68,14 @@ const MyCardTable = ({
             disabled={item.card_type === "2"}
           />
         );
+      case "usage_period_start":
+        const periodStart = item["usage_period_start"];
+        const periodEnd = item["usage_period_end"];
+        return (
+          <td key={idx}>
+            전전월 {periodStart}일 ~ 전월 {periodEnd}일
+          </td>
+        );
       case "active_status":
         return (
           <>
@@ -105,14 +114,6 @@ const MyCardTable = ({
               </div>
             </td>
           </>
-        );
-      case "usage_period_start":
-        const periodStart = item["usage_period_start"];
-        const periodEnd = item["usage_period_end"];
-        return (
-          <td key={idx}>
-            전전월 {periodStart}일 ~ 전월 {periodEnd}일
-          </td>
         );
       default:
         null;

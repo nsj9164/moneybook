@@ -93,7 +93,7 @@ function MyCard({ setCardDataList, cardList }) {
     setCardData((prevData) =>
       prevData.map((item) =>
         item.card_id === id
-          ? { ...item, card_name: newItem, isDisabled: false, isModified: true }
+          ? { ...item, [col]: newItem, isDisabled: false, isModified: true }
           : item
       )
     );

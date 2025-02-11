@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import AlertModal from "../AlertModal";
+import AlertModal from "../common/AlertModal";
 
 const TabContent = React.memo(
-  ({ status, saveStatus, data, setData, component, errorMessage }) => {
+  ({ status, saveStatus, component, errorMessage }) => {
     if (status === "loading") return <div>Loading...</div>;
 
     if (status === "succeeded" || (saveStatus && saveStatus === "succeeded")) {

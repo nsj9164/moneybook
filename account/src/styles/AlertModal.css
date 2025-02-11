@@ -59,7 +59,7 @@
 }
 
 /* 애니메이션 */
-@keyframes fadeIn {
+@keyframes modalFadeIn {
   from {
     opacity: 0;
     transform: scale(0.9);
@@ -71,5 +71,5 @@
 }
 
 .alert-modal-content {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: modalFadeIn 0.3s ease-in-out;
 }

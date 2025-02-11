@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import "../styles/CustomOverlay.css";
+import "../../styles/CustomOverlay.css";
 
 export const Overlay = ({
   overlayHeader,
   overlayContent,
   setVisibleOverlay,
+  children,
 }) => {
   const overlayRef = useRef(null);
 
@@ -28,7 +29,8 @@ export const Overlay = ({
   return (
     <div ref={overlayRef} className="popover">
       {overlayHeader && <h3 className="popover-header">{overlayHeader}</h3>}
-      <p className="popover-body">{overlayContent}</p>
+      {overlayContent && <p className="popover-body">{overlayContent}</p>}
+      {children}
     </div>
   );
 };

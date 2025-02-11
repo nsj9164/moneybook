@@ -24,12 +24,15 @@ import {
   addMonths,
 } from "date-fns";
 import PayListModal from "./Modal/PayListModal";
-import { Overlay } from "../../components/Overlay";
-import { Input } from "../../components/EditableCell";
+import { Overlay } from "../../components/common/Overlay";
+import { Input } from "../../components/common/EditableCell";
 import { useAuth } from "../../hooks/useAuth";
 import CustomSelect from "../../components/SelectComponent/CustomSelect";
 import { fixedItemListActions } from "../../store/features/myDetailList/myDetailListActions";
 import { selectAllLists } from "../../store/features/myDetailList/myDetailListSelectors";
+import CardSelectOverlay from "../../components/payList/CardSelectOverlay";
+import useCardList from "../../hooks/useCardList";
+import useCategoryList from "../../hooks/useCategoryList";
 
 function PayList() {
   const navigate = useNavigate();
@@ -58,8 +61,9 @@ function PayList() {
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
 
-  const { categoryList, cardList } = useSelector(selectAllLists);
-  console.log("categoryList:::", categoryList);
+  const cardList = useCardList();
+  const categoryList = useCategoryList();
+
   // payList 호출
   useEffect(() => {
     if (isLoggedIn && payListStatus === "idle") {
@@ -494,10 +498,9 @@ function PayList() {
             </button>
 
             {visibleOverlay === "card-overlay" && (
-              <Overlay
-                overlayHeader="카드분류선택"
-                overlayContent={"Holy guacamole! Check this info."}
+              <CardSelectOverlay
                 setVisibleOverlay={setVisibleOverlay}
+                cardList={cardList}
               />
             )}
           </div>

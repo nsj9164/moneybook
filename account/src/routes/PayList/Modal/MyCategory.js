@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Input } from "../../../components/EditableCell";
+import { Input } from "../../../components/common/EditableCell";
 import { categoryListActions } from "../../../store/features/myDetailList/myDetailListActions";
 import { selectText } from "../../../util/util";
 import classNames from "classnames";
-import { Overlay } from "../../../components/Overlay";
+import { Overlay } from "../../../components/common/Overlay";
 
 function MyCategory({ setCatDataList, catList }) {
   const dispatch = useDispatch();

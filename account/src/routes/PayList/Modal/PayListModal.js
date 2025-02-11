@@ -14,11 +14,11 @@ import {
   selectAllSaveStatuses,
   selectAllStatuses,
 } from "../../../store/features/myDetailList/myDetailListSelectors";
-import { Overlay } from "../../../components/Overlay";
+import { Overlay } from "../../../components/common/Overlay";
 import { useAuth } from "../../../hooks/useAuth";
 import tabConfigs from "../../../config/tabConfigs";
 import TabContent from "../../../components/Modal/TabContent";
-import AlertModal from "../../../components/AlertModal";
+import AlertModal from "../../../components/common/AlertModal";
 import {
   setFixedItemList,
   updateItem,

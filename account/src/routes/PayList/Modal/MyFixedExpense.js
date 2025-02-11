@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Input } from "../../../components/EditableCell";
+import { Input } from "../../../components/common/EditableCell";
 import CustomSelect from "../../../components/SelectComponent/CustomSelect";
 import { date, nowCursor, restoreCursor, selectText } from "../../../util/util";
 
