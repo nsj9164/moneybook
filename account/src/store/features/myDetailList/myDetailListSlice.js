@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   fixedItemListActions,
   categoryListActions,
@@ -6,6 +6,22 @@ import {
   cardCompanyListActions,
 } from "./myDetailListActions";
 import { createAsyncReducers } from "./myDetailListReducer";
+
+export const fetchLists = createAsyncThunk(
+  "myDetailList/fetchLists",
+  async () => {
+    const [fixedItems, cards, categories] = await Promise.all([
+      fetch("/api/fixedItems").then((res) => res.json()),
+      fetch("/api/cards").then((res) => res.json()),
+      fetch("/api/categories").then((res) => res.json()),
+    ]);
+    return {
+      cardList: cards,
+      categoryList: categories,
+      fixedItemList: fixedItems,
+    };
+  }
+);
 
 const myDetailList = createSlice({
   name: "myDetailList",
@@ -51,6 +67,25 @@ const myDetailList = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder
+      .addCase(fetchLists.pending, (state) => {
+        Object.keys(state).forEach((key) => {
+          state[key].status = "loading";
+        });
+      })
+      .addCase(fetchLists.fulfilled, (state, action) => {
+        Object.keys(action.payload).forEach((key) => {
+          state[key].status = "succeeded";
+          state[key].items = action.payload[key];
+        });
+      })
+      .addCase(fetchLists.rejected, (state, action) => {
+        Object.keys(state).forEach((key) => {
+          state[key].status = "failed";
+          state[key].error = action.error.message;
+        });
+      });
+
     createAsyncReducers(builder, fixedItemListActions, "fixedItemList");
     createAsyncReducers(builder, categoryListActions, "categoryList");
     createAsyncReducers(builder, cardListActions, "cardList");
