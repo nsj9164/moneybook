@@ -11,9 +11,9 @@ export const fetchLists = createAsyncThunk(
   "myDetailList/fetchLists",
   async () => {
     const [fixedItems, cards, categories] = await Promise.all([
-      fetch("/api/fixedItems").then((res) => res.json()),
-      fetch("/api/cards").then((res) => res.json()),
-      fetch("/api/categories").then((res) => res.json()),
+      fetch("/fixedItemList").then((res) => res.json()),
+      fetch("/cardList").then((res) => res.json()),
+      fetch("/categoryList").then((res) => res.json()),
     ]);
     return {
       cardList: cards,

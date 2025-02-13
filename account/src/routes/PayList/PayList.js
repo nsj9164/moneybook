@@ -31,8 +31,7 @@ import CustomSelect from "../../components/SelectComponent/CustomSelect";
 import { fixedItemListActions } from "../../store/features/myDetailList/myDetailListActions";
 import { selectAllLists } from "../../store/features/myDetailList/myDetailListSelectors";
 import CardSelectOverlay from "../../components/payList/CardSelectOverlay";
-import useCardList from "../../hooks/useCardList";
-import useCategoryList from "../../hooks/useCategoryList";
+import useFetchLists from "../../hooks/useFetchLists";
 
 function PayList() {
   const navigate = useNavigate();
@@ -61,8 +60,7 @@ function PayList() {
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
 
-  const cardList = useCardList();
-  const categoryList = useCategoryList();
+  const { lists, statuses } = useFetchLists();
 
   // payList 호출
   useEffect(() => {
@@ -434,7 +432,7 @@ function PayList() {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={categoryList.map((list) => ({
+                      options={lists.categoryList.map((list) => ({
                         value: list.cat_id,
                         label: list.category_nm,
                       }))}
@@ -445,7 +443,7 @@ function PayList() {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={cardList.map((list) => ({
+                      options={lists.cardList.map((list) => ({
                         value: list.card_id,
                         label: list.card_name,
                       }))}
