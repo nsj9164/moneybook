@@ -60,7 +60,7 @@ function PayList() {
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
 
-  const { lists, statuses } = useFetchLists();
+  const { lists, statuses } = useFetchLists(["cardList", "categoryList"]);
 
   // payList 호출
   useEffect(() => {

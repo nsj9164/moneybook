@@ -27,19 +27,9 @@ import {
 const PayListModal = ({ show, onClose }) => {
   // Modal hide일때 렌더링 방지
   if (!show) return null;
-
   const dispatch = useDispatch();
   const { isLoggedIn } = useAuth();
-
   const [activeTab, setActiveTab] = useState(1);
-  const { fixedItemList, categoryList, cardList } = useSelector(selectAllLists);
-  const { fixedItemListStatus, categoryListStatus, cardListStatus } =
-    useSelector(selectAllStatuses);
-  const {
-    fixedItemListSaveStatus,
-    categoryListSaveStatus,
-    cardListSaveStatus,
-  } = useSelector(selectAllSaveStatuses);
 
   // 저장용 data
   const [fixedDataList, setFixedDataList] = useState([]);
@@ -55,51 +45,13 @@ const PayListModal = ({ show, onClose }) => {
   // 현재 활성화된 탭의 설정 가져오기
   const currentTabConfigs = useMemo(() => {
     return tabConfigs({
-      fixedItemListStatus,
-      categoryListStatus,
-      cardListStatus,
-      fixedItemListSaveStatus,
-      categoryListSaveStatus,
-      cardListSaveStatus,
-      fixedItemList,
-      categoryList,
-      cardList,
       setFixedDataList,
       setCatDataList,
       setCardDataList,
       checkedItems,
       setCheckedItems,
     });
-  }, [
-    fixedItemListStatus,
-    categoryListStatus,
-    cardListStatus,
-    fixedItemListSaveStatus,
-    categoryListSaveStatus,
-    cardListSaveStatus,
-    checkedItems,
-  ]);
-
-  // 데이터 초기 로드
-  useEffect(() => {
-    if (isLoggedIn) {
-      if (fixedItemListStatus === "idle") {
-        dispatch(fixedItemListActions.fetchData());
-      }
-      if (categoryListStatus === "idle") {
-        dispatch(categoryListActions.fetchData());
-      }
-      if (cardListStatus === "idle") {
-        dispatch(cardListActions.fetchData());
-      }
-    }
-  }, [
-    isLoggedIn,
-    fixedItemListStatus,
-    categoryListStatus,
-    cardListStatus,
-    dispatch,
-  ]);
+  }, [checkedItems]);
 
   // [저장 버튼 클릭 시] 데이터 저장
   const handleSave = () => {
@@ -154,10 +106,6 @@ const PayListModal = ({ show, onClose }) => {
       setVisibleOverlay(true);
     }
   };
-
-  useEffect(() => {
-    console.log("PayListModal?/////", checkedItems);
-  }, [checkedItems]);
 
   // 버튼 hover 상태에 따른 Overlay hide 처리
   useEffect(() => {

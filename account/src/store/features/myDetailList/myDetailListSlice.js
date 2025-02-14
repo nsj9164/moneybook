@@ -9,17 +9,21 @@ import { createAsyncReducers } from "./myDetailListReducer";
 
 export const fetchLists = createAsyncThunk(
   "myDetailList/fetchLists",
-  async () => {
-    const [fixedItems, cards, categories] = await Promise.all([
-      fetch("/fixedItemList").then((res) => res.json()),
-      fetch("/cardList").then((res) => res.json()),
-      fetch("/categoryList").then((res) => res.json()),
-    ]);
-    return {
-      cardList: cards,
-      categoryList: categories,
-      fixedItemList: fixedItems,
+  async (listTypes = ["fixedItemList", "cardList", "categoryList"]) => {
+    const fetchMap = {
+      fixedItemList: () => fetch("/fixedItemList").then((res) => res.json()),
+      cardList: () => fetch("/cardList").then((res) => res.json()),
+      categoryList: () => fetch("/categoryList").then((res) => res.json()),
     };
+
+    const fetchPromises = listTypes.map((type) => fetchMap[type]());
+    const results = await Promise.all(fetchPromises);
+
+    // 배열에서 꺼낸 데이터를 key로 매핑
+    return listTypes.reduce((acc, type, index) => {
+      acc[type] = results[index];
+      return acc;
+    }, {});
   }
 );
 

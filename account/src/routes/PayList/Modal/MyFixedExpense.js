@@ -1,18 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Input } from "../../../components/common/EditableCell";
+import TableEmptyRow from "../../../components/common/Table/TableEmptyRow";
 import CustomSelect from "../../../components/SelectComponent/CustomSelect";
+import useFetchLists from "../../../hooks/useFetchLists";
 import { date, nowCursor, restoreCursor, selectText } from "../../../util/util";
 
-function MyFixedExpense({
-  setFixedDataList,
-  fixedItemList,
-  catList,
-  cardList,
-  checkedItems,
-  setCheckedItems,
-}) {
+function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
   const dispatch = useDispatch();
+  const { lists, statuses } = useFetchLists(["fixedItemList", "cardList"]);
+  const fixedItemList = lists.fixedItemList;
+  const cardList = lists.cardList;
   const inputRefs = useRef([]);
   const [fixedData, setFixedData] = useState([]);
   const [fixedId, setFixedId] = useState(1);
@@ -217,7 +215,7 @@ function MyFixedExpense({
           </tr>
         </thead>
         <tbody>
-          {fixedData.length > 0 ? (
+          {statuses.fixedItemList === "succeeded" ? (
             fixedData.map((item, i) => (
               <tr key={item.expense_id}>
                 <td>
@@ -289,10 +287,10 @@ function MyFixedExpense({
                 )}
               </tr>
             ))
+          ) : statuses.fixedItemList === "failed" ? (
+            <TableEmptyRow colSpan={6} message="Error loading fixedItemList" />
           ) : (
-            <tr>
-              <td colSpan="6">No data available</td>
-            </tr>
+            <TableEmptyRow colSpan={6} message="No data available" />
           )}
         </tbody>
       </table>
