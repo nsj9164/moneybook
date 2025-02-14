@@ -8,9 +8,12 @@ import { date, nowCursor, restoreCursor, selectText } from "../../../util/util";
 
 function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
   const dispatch = useDispatch();
-  const { lists, statuses } = useFetchLists(["fixedItemList", "cardList"]);
+  const { lists, statuses } = useFetchLists([
+    "fixedItemList",
+    "cardList",
+    "categoryList",
+  ]);
   const fixedItemList = lists.fixedItemList;
-  const cardList = lists.cardList;
   const inputRefs = useRef([]);
   const [fixedData, setFixedData] = useState([]);
   const [fixedId, setFixedId] = useState(1);
@@ -215,7 +218,7 @@ function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
           </tr>
         </thead>
         <tbody>
-          {statuses.fixedItemList === "succeeded" ? (
+          {statuses.fixedItemListStatus === "succeeded" ? (
             fixedData.map((item, i) => (
               <tr key={item.expense_id}>
                 <td>
@@ -244,7 +247,7 @@ function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={cardList.map((list) => ({
+                      options={lists.cardList.map((list) => ({
                         value: list.card_id,
                         label: list.card_name,
                       }))}
@@ -257,7 +260,7 @@ function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={catList.map((list) => ({
+                      options={lists.categoryList.map((list) => ({
                         value: list.cat_id,
                         label: list.category_nm,
                       }))}
@@ -287,7 +290,7 @@ function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
                 )}
               </tr>
             ))
-          ) : statuses.fixedItemList === "failed" ? (
+          ) : statuses.fixedItemListStatus === "failed" ? (
             <TableEmptyRow colSpan={6} message="Error loading fixedItemList" />
           ) : (
             <TableEmptyRow colSpan={6} message="No data available" />

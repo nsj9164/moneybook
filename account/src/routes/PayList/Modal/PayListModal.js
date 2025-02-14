@@ -43,15 +43,13 @@ const PayListModal = ({ show, onClose }) => {
   const [checkedItems, setCheckedItems] = useState([]);
 
   // 현재 활성화된 탭의 설정 가져오기
-  const currentTabConfigs = useMemo(() => {
-    return tabConfigs({
-      setFixedDataList,
-      setCatDataList,
-      setCardDataList,
-      checkedItems,
-      setCheckedItems,
-    });
-  }, [checkedItems]);
+  const currentTabConfigs = tabConfigs({
+    setFixedDataList,
+    setCatDataList,
+    setCardDataList,
+    checkedItems,
+    setCheckedItems,
+  })[activeTab];
 
   // [저장 버튼 클릭 시] 데이터 저장
   const handleSave = () => {
@@ -147,7 +145,9 @@ const PayListModal = ({ show, onClose }) => {
           </button>
         </div>
         <TabContent
-          {...currentTabConfigs[activeTab]}
+          // {...currentTabConfigs[activeTab]}
+          // {...currentTabConfigs?.component}
+          component={currentTabConfigs.component}
           setShowSaveAlertModal={setShowSaveAlertModal}
         />
         <div className="modal-footer">

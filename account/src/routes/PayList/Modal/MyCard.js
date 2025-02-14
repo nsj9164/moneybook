@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MyCardTable from "../../../components/Modal/MyCardTable";
 import { useAuth } from "../../../hooks/useAuth";
+import useFetchLists from "../../../hooks/useFetchLists";
 import {
   cardCompanyListActions,
   cardListActions,
@@ -13,8 +14,11 @@ import {
 import { getCardBillingPeriod } from "../../../util/payDateUtils";
 import { date, selectText } from "../../../util/util";
 
-function MyCard({ setCardDataList, cardList }) {
+function MyCard({ setCardDataList }) {
   const dispatch = useDispatch();
+  const { lists: cardList, statuses: cardListStatus } = useFetchLists([
+    "cardList",
+  ]);
   const { isLoggedIn } = useAuth();
   const [cardData, setCardData] = useState([]);
   const [cardId, setCardId] = useState(1);

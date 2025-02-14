@@ -5,9 +5,12 @@ import { categoryListActions } from "../../../store/features/myDetailList/myDeta
 import { selectText } from "../../../util/util";
 import classNames from "classnames";
 import { Overlay } from "../../../components/common/Overlay";
+import useFetchLists from "../../../hooks/useFetchLists";
 
-function MyCategory({ setCatDataList, catList }) {
+function MyCategory({ setCatDataList }) {
   const dispatch = useDispatch();
+  const { lists, statuses } = useFetchLists(["categoryList"]);
+  const categoryList = lists.categoryList;
   const inputRefs = useRef([]);
   const [catData, setCatData] = useState([]);
   const [catId, setCatId] = useState(1);
@@ -17,16 +20,16 @@ function MyCategory({ setCatDataList, catList }) {
   const fields = ["category_nm"];
 
   useEffect(() => {
-    if (catList.length > 0) {
+    if (categoryList.length > 0) {
       setCatData(
-        catList.map((item) => ({
+        categoryList.map((item) => ({
           ...item,
           isDisabled: false,
           isModified: false,
         }))
       );
     }
-  }, [catList]);
+  }, [categoryList]);
 
   useEffect(() => {
     if (
@@ -41,7 +44,7 @@ function MyCategory({ setCatDataList, catList }) {
       ]);
       setCatId((id) => id + 1);
     }
-  }, [catList, catData]);
+  }, [categoryList, catData]);
 
   // 저장할 data
   const modifiedData = useMemo(() => {
@@ -88,7 +91,7 @@ function MyCategory({ setCatDataList, catList }) {
     if (isDisabled) {
       setVisibleOverlay(true);
     } else {
-      if (catList.some((item) => item.cat_id === id)) {
+      if (categoryList.some((item) => item.cat_id === id)) {
         dispatch(categoryListActions.deleteData([id]));
       }
       setCatData((prevData) => prevData.filter((item) => item.cat_id !== id));
