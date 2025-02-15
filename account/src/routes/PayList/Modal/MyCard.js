@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import TableEmptyRow from "../../../components/common/Table/TableEmptyRow";
 import MyCardTable from "../../../components/Modal/MyCardTable";
 import { useAuth } from "../../../hooks/useAuth";
 import useFetchLists from "../../../hooks/useFetchLists";
@@ -7,24 +8,19 @@ import {
   cardCompanyListActions,
   cardListActions,
 } from "../../../store/features/myDetailList/myDetailListActions";
-import {
-  selectAllLists,
-  selectAllStatuses,
-} from "../../../store/features/myDetailList/myDetailListSelectors";
 import { getCardBillingPeriod } from "../../../util/payDateUtils";
 import { date, selectText } from "../../../util/util";
 
 function MyCard({ setCardDataList }) {
   const dispatch = useDispatch();
-  const { lists: cardList, statuses: cardListStatus } = useFetchLists([
-    "cardList",
-  ]);
+  const {
+    lists: { cardList },
+    statuses: { cardListStatus },
+  } = useFetchLists(["cardList"]);
   const { isLoggedIn } = useAuth();
   const [cardData, setCardData] = useState([]);
   const [cardId, setCardId] = useState(1);
   const [focusedItemId, setFocusedItemId] = useState(null);
-  const { cardCompanyList } = useSelector(selectAllLists);
-  const { cardCompanyListStatus } = useSelector(selectAllStatuses);
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
 
@@ -55,7 +51,6 @@ function MyCard({ setCardDataList }) {
       cardData.length === 0 ||
       cardData.every((item) => item.card_name && item.card_name !== undefined)
     ) {
-      console.log("cardData::::::", cardData);
       setCardData((prevCardData) => [
         ...prevCardData,
         {
@@ -64,6 +59,7 @@ function MyCard({ setCardDataList }) {
           payment_due_date: "01",
           usage_period_start: "17",
           usage_period_end: "16",
+          active_status: 1,
           isDisabled: true,
           isNew: true,
         },
@@ -84,16 +80,7 @@ function MyCard({ setCardDataList }) {
     setCardDataList(modifiedData);
   }, [modifiedData]);
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      if (cardCompanyListStatus === "idle") {
-        dispatch(cardCompanyListActions.fetchData());
-      }
-    }
-  }, [isLoggedIn, cardCompanyListStatus, dispatch]);
-
   const handleUpdate = (newItem, id, col) => {
-    console.log("newItem:::", newItem);
     setCardData((prevData) =>
       prevData.map((item) =>
         item.card_id === id
@@ -114,7 +101,6 @@ function MyCard({ setCardDataList }) {
   }, [focusedItemId]);
 
   useEffect(() => {
-    console.log("isButtonHovered:::", isButtonHovered);
     if (!isButtonHovered && visibleOverlay) {
       setVisibleOverlay(null);
     }
@@ -182,7 +168,6 @@ function MyCard({ setCardDataList }) {
                     item={item}
                     handleUpdate={handleUpdate}
                     handlePaymentPeriod={handlePaymentPeriod}
-                    cardCompanyList={cardCompanyList}
                     visibleOverlay={visibleOverlay}
                     setVisibleOverlay={setVisibleOverlay}
                     handleDelete={handleDelete}
@@ -192,9 +177,7 @@ function MyCard({ setCardDataList }) {
               ) : null;
             })
           ) : (
-            <tr>
-              <td colSpan="7">No data available</td>
-            </tr>
+            <TableEmptyRow colSpan={7} message="No data available" />
           )}
         </tbody>
       </table>

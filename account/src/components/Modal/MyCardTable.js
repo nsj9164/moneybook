@@ -1,22 +1,33 @@
 import classNames from "classnames";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { cardCompanyListActions } from "../../store/features/myDetailList/myDetailListActions";
 import { date } from "../../util/util";
 import { Input } from "../common/EditableCell";
 import { Overlay } from "../common/Overlay";
 import CustomSelect from "../SelectComponent/CustomSelect";
-import CardPeriodSelect from "./CardPeriodSelect";
 
 const MyCardTable = ({
   fields,
   item,
   handleUpdate,
   handlePaymentPeriod,
-  cardCompanyList,
   visibleOverlay,
   setVisibleOverlay,
   handleDelete,
   setIsButtonHovered,
 }) => {
+  // cardCompanyList 호출
+  const dispatch = useDispatch();
+  const cardCompanyList = useSelector(
+    (state) => state.myDetailList["cardCompanyList"].items
+  );
+  useEffect(() => {
+    dispatch(cardCompanyListActions.fetchData());
+  }, [dispatch]);
+
+  const [activeStatus, setActiveStatus] = useState(true);
+
   const renderColumn = (col, idx, item) => {
     if (!item) return null;
     switch (col) {
@@ -80,7 +91,13 @@ const MyCardTable = ({
         return (
           <>
             <td key={idx}>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={item[col] === 1}
+                onChange={() =>
+                  handleUpdate(item[col] === 1 ? 0 : 1, item.card_id, col)
+                }
+              />
             </td>
             <td
               className="cursor_pointer"

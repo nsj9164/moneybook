@@ -288,7 +288,8 @@ app.get("/cardList", authenticateToken, function (req, res) {
         , card_name
         , card_type
         , payment_due_date
-        , usage_period_start + "-" + usage_period_end as usage_period
+        , usage_period_start
+        , usage_period_end
         , active_status
     FROM CARD_INFO
     WHERE USER_ID = ?
@@ -308,7 +309,7 @@ app.post("/cardList/insert", authenticateToken, function (req, res) {
   data.forEach((item) => {
     if (item.isNew) {
       db.query(
-        "INSERT INTO CARD_INFO (card_company, card_name, card_type, payment_due_date, usage_period_start, usage_period_end, active_status, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, SYSDATE(), ?)",
+        "INSERT INTO CARD_INFO (card_company, card_name, card_type, payment_due_date, usage_period_start, usage_period_end, active_status, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, ?, SYSDATE(), ?)",
         [
           item.card_company,
           item.card_name,

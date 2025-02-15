@@ -8,12 +8,10 @@ import { date, nowCursor, restoreCursor, selectText } from "../../../util/util";
 
 function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
   const dispatch = useDispatch();
-  const { lists, statuses } = useFetchLists([
-    "fixedItemList",
-    "cardList",
-    "categoryList",
-  ]);
-  const fixedItemList = lists.fixedItemList;
+  const {
+    lists: { fixedItemList, cardList, categoryList },
+    statuses: { fixedItemListStatus },
+  } = useFetchLists(["fixedItemList", "cardList", "categoryList"]);
   const inputRefs = useRef([]);
   const [fixedData, setFixedData] = useState([]);
   const [fixedId, setFixedId] = useState(1);
@@ -218,7 +216,7 @@ function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
           </tr>
         </thead>
         <tbody>
-          {statuses.fixedItemListStatus === "succeeded" ? (
+          {fixedItemListStatus === "succeeded" ? (
             fixedData.map((item, i) => (
               <tr key={item.expense_id}>
                 <td>
@@ -247,7 +245,7 @@ function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={lists.cardList.map((list) => ({
+                      options={cardList.map((list) => ({
                         value: list.card_id,
                         label: list.card_name,
                       }))}
@@ -260,7 +258,7 @@ function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={lists.categoryList.map((list) => ({
+                      options={categoryList.map((list) => ({
                         value: list.cat_id,
                         label: list.category_nm,
                       }))}
@@ -290,7 +288,7 @@ function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
                 )}
               </tr>
             ))
-          ) : statuses.fixedItemListStatus === "failed" ? (
+          ) : fixedItemListStatus === "failed" ? (
             <TableEmptyRow colSpan={6} message="Error loading fixedItemList" />
           ) : (
             <TableEmptyRow colSpan={6} message="No data available" />

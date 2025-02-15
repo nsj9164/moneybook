@@ -6,11 +6,14 @@ import { selectText } from "../../../util/util";
 import classNames from "classnames";
 import { Overlay } from "../../../components/common/Overlay";
 import useFetchLists from "../../../hooks/useFetchLists";
+import TableEmptyRow from "../../../components/common/Table/TableEmptyRow";
 
 function MyCategory({ setCatDataList }) {
   const dispatch = useDispatch();
-  const { lists, statuses } = useFetchLists(["categoryList"]);
-  const categoryList = lists.categoryList;
+  const {
+    lists: { categoryList },
+    statuses: { categoryListStatus },
+  } = useFetchLists(["categoryList"]);
   const inputRefs = useRef([]);
   const [catData, setCatData] = useState([]);
   const [catId, setCatId] = useState(1);
@@ -43,6 +46,8 @@ function MyCategory({ setCatDataList }) {
         { cat_id: `cat-${catId}`, isDisabled: true, isNew: true },
       ]);
       setCatId((id) => id + 1);
+      console.log("#categoryList:::", categoryList);
+      console.log("#catData:::", catData);
     }
   }, [categoryList, catData]);
 
@@ -172,9 +177,7 @@ function MyCategory({ setCatDataList }) {
               </tr>
             ))
           ) : (
-            <tr>
-              <td colSpan="3">No data available</td>
-            </tr>
+            <TableEmptyRow colSpan={3} message="No data available" />
           )}
         </tbody>
       </table>
