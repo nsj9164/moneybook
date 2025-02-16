@@ -436,3 +436,7 @@ td:has(select:disabled) {
   background-color: #f5f5f5;
   opacity: 0.6;
 }
+
+.no-margin {
+  margin: 0;
+}

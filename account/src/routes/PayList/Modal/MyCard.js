@@ -137,50 +137,52 @@ function MyCard({ setCardDataList }) {
   return (
     <div className="modal-body">
       <h2 className="modal-title">카드 관리하기</h2>
-      <table className="table table-hover table-sm" bordered hover>
-        <colgroup>
-          <col width={"12%"} />
-          <col />
-          <col width={"13%"} />
-          <col width={"10%"} />
-          <col width={"25%"} />
-          <col width={"10%"} />
-          <col width={"10%"} />
-        </colgroup>
-        <thead>
-          <tr>
-            <th>카드사</th>
-            <th>카드명</th>
-            <th>카드종류</th>
-            <th>결제일</th>
-            <th>이용기간</th>
-            <th>사용중</th>
-            <th>삭제</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cardData.length > 0 ? (
-            cardData.map((item, i) => {
-              return item ? (
-                <tr key={item.card_id}>
-                  <MyCardTable
-                    fields={fields}
-                    item={item}
-                    handleUpdate={handleUpdate}
-                    handlePaymentPeriod={handlePaymentPeriod}
-                    visibleOverlay={visibleOverlay}
-                    setVisibleOverlay={setVisibleOverlay}
-                    handleDelete={handleDelete}
-                    setIsButtonHovered={setIsButtonHovered}
-                  />
-                </tr>
-              ) : null;
-            })
-          ) : (
-            <TableEmptyRow colSpan={7} message="No data available" />
-          )}
-        </tbody>
-      </table>
+      <div className="table-container">
+        <table className="table table-hover table-sm no-margin" bordered hover>
+          <colgroup>
+            <col width="12%" />
+            <col />
+            <col width="13%" />
+            <col width="10%" />
+            <col width="25%" />
+            <col width="10%" />
+            <col width="10%" />
+          </colgroup>
+          <thead className="scrollable-thead">
+            <tr>
+              <th>카드사</th>
+              <th>카드명</th>
+              <th>카드종류</th>
+              <th>결제일</th>
+              <th>이용기간</th>
+              <th>사용중</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cardData.length > 0 ? (
+              cardData.map((item, i) =>
+                item ? (
+                  <tr key={item.card_id}>
+                    <MyCardTable
+                      fields={fields}
+                      item={item}
+                      handleUpdate={handleUpdate}
+                      handlePaymentPeriod={handlePaymentPeriod}
+                      visibleOverlay={visibleOverlay}
+                      setVisibleOverlay={setVisibleOverlay}
+                      handleDelete={handleDelete}
+                      setIsButtonHovered={setIsButtonHovered}
+                    />
+                  </tr>
+                ) : null
+              )
+            ) : (
+              <TableEmptyRow colSpan={7} message="No data available" />
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

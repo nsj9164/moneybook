@@ -34,20 +34,20 @@ const NoSelection = styled(ListItem)`
   }
 `;
 
-const CardSelectOverlay = ({ setVisibleOverlay, cardList }) => {
+const CardSelectOverlay = ({ cardList, changeSelectedCards }) => {
   return (
-    <Overlay overlayHeader="카드분류선택" setVisibleOverlay={setVisibleOverlay}>
+    <Overlay overlayHeader="카드분류선택">
       <List>
         {cardList.map((item) => (
           <ListItem
             key={item.card_id}
             value={item.card_id}
-            onClick={() => setVisibleOverlay(null)}
+            onClick={() => changeSelectedCards(item.card_id)}
           >
             {item.card_name}
           </ListItem>
         ))}
-        <NoSelection value="none" onClick={() => setVisibleOverlay(null)}>
+        <NoSelection value="none" onClick={() => changeSelectedCards("none")}>
           선택없음
         </NoSelection>
       </List>

@@ -62,7 +62,7 @@ function PayList() {
 
   const {
     lists: { cardList, categoryList },
-    statuses,
+    statuses: { cardListStatus, categoryListStatus },
   } = useFetchLists(["cardList", "categoryList"]);
 
   // payList 호출
@@ -329,6 +329,19 @@ function PayList() {
       : setVisibleOverlay(null);
   };
 
+  // 카드선택 버튼 클릭 시
+  const changeSelectedCards = (cardId) => {
+    setTempData((prevData) =>
+      prevData.map((item) =>
+        checkedItems.includes(item.id)
+          ? { ...item, payment: cardId, isModified: true }
+          : item
+      )
+    );
+    setCheckedItems([]);
+    setVisibleOverlay(null);
+  };
+
   const columns = [
     "date",
     "cat_nm",
@@ -435,10 +448,13 @@ function PayList() {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={categoryList.map((list) => ({
-                        value: list.cat_id,
-                        label: list.category_nm,
-                      }))}
+                      options={
+                        categoryList &&
+                        categoryList.map((list) => ({
+                          value: list.cat_id,
+                          label: list.category_nm,
+                        }))
+                      }
                       noSelectValue="미분류"
                       onChange={(value) => handleUpdate(value, item.id, col)}
                     />
@@ -446,10 +462,13 @@ function PayList() {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={cardList.map((list) => ({
-                        value: list.card_id,
-                        label: list.card_name,
-                      }))}
+                      options={
+                        cardList &&
+                        cardList.map((list) => ({
+                          value: list.card_id,
+                          label: list.card_name,
+                        }))
+                      }
                       noSelectValue="선택없음"
                       onChange={(value) => handleUpdate(value, item.id, col)}
                     />
@@ -500,8 +519,8 @@ function PayList() {
 
             {visibleOverlay === "card-overlay" && (
               <CardSelectOverlay
-                setVisibleOverlay={setVisibleOverlay}
                 cardList={cardList}
+                changeSelectedCards={changeSelectedCards}
               />
             )}
           </div>

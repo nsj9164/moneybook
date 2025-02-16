@@ -145,8 +145,6 @@ const PayListModal = ({ show, onClose }) => {
           </button>
         </div>
         <TabContent
-          // {...currentTabConfigs[activeTab]}
-          // {...currentTabConfigs?.component}
           component={currentTabConfigs.component}
           setShowSaveAlertModal={setShowSaveAlertModal}
         />

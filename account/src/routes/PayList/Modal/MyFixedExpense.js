@@ -190,111 +190,124 @@ function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
   return (
     <div className="modal-body">
       <h2 className="modal-title">고정항목 관리하기</h2>
-      <table className="table table-hover table-sm" bordered hover>
-        <colgroup>
-          <col width="8%" />
-          <col width="12%" />
-          <col />
-          <col width="15%" />
-          <col width="20%" />
-          <col width="20%" />
-        </colgroup>
-        <thead>
-          <tr>
-            <th>
-              <input
-                type="checkbox"
-                checked={checkedAll}
-                onChange={handleCheckedAll}
+      <div className="table-container">
+        <table className="table table-hover table-sm no-margin" bordered hover>
+          <colgroup>
+            <col width="8%" />
+            <col width="12%" />
+            <col />
+            <col width="15%" />
+            <col width="20%" />
+            <col width="20%" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>
+                <input
+                  type="checkbox"
+                  checked={checkedAll}
+                  onChange={handleCheckedAll}
+                />
+              </th>
+              <th>발생일</th>
+              <th>사용내역</th>
+              <th>결제금액</th>
+              <th>결제수단</th>
+              <th>분류</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fixedItemListStatus === "succeeded" ? (
+              fixedData.map((item, i) => (
+                <tr key={item.expense_id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={checkedItems.includes(item.expense_id)}
+                      onChange={() => handleCheck(item.expense_id)}
+                      disabled={item.isDisabled}
+                    />
+                  </td>
+                  {fields.map((col, idx) =>
+                    col === "expense_date" ? (
+                      <CustomSelect
+                        key={idx}
+                        value={item[col]}
+                        options={Array.from({ length: 31 }, (_, j) => ({
+                          value: String(j + 1).padStart(2, "0"),
+                          label: String(j + 1).padStart(2, "0"),
+                        }))}
+                        defaultValue={date.slice(-2)}
+                        onChange={(value) =>
+                          handleUpdate(value, item.expense_id, col)
+                        }
+                      />
+                    ) : col === "expense_payment" ? (
+                      <CustomSelect
+                        key={idx}
+                        value={item[col]}
+                        options={
+                          cardList &&
+                          cardList.map((list) => ({
+                            value: list.card_id,
+                            label: list.card_name,
+                          }))
+                        }
+                        noSelectValue="선택없음"
+                        onChange={(value) =>
+                          handleUpdate(value, item.expense_id, col)
+                        }
+                      />
+                    ) : col === "expense_cat_nm" ? (
+                      <CustomSelect
+                        key={idx}
+                        value={item[col]}
+                        options={
+                          categoryList &&
+                          categoryList.map((list) => ({
+                            value: list.cat_id,
+                            label: list.category_nm,
+                          }))
+                        }
+                        noSelectValue="미분류"
+                        onChange={(value) =>
+                          handleUpdate(value, item.expense_id, col)
+                        }
+                      />
+                    ) : (
+                      <Input
+                        key={idx}
+                        ref={(el) =>
+                          (inputRefs.current[i * fields.length + idx] = el)
+                        }
+                        onBlur={(e) =>
+                          handleUpdate(e.target.innerText, item.expense_id, col)
+                        }
+                        onKeyDown={(e) =>
+                          handleKeyDown(e, i * fields.length + idx, col)
+                        }
+                        onFocus={() =>
+                          setInitial(item, i * fields.length + idx)
+                        }
+                        onInput={(e) => handleInput(e, col)}
+                      >
+                        {item[col]}
+                      </Input>
+                    )
+                  )}
+                </tr>
+              ))
+            ) : fixedItemListStatus === "failed" ? (
+              <TableEmptyRow
+                colSpan={6}
+                message="Error loading fixedItemList"
               />
-            </th>
-            <th>발생일</th>
-            <th>사용내역</th>
-            <th>결제금액</th>
-            <th>결제수단</th>
-            <th>분류</th>
-          </tr>
-        </thead>
-        <tbody>
-          {fixedItemListStatus === "succeeded" ? (
-            fixedData.map((item, i) => (
-              <tr key={item.expense_id}>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={checkedItems.includes(item.expense_id)}
-                    onChange={() => handleCheck(item.expense_id)}
-                    disabled={item.isDisabled}
-                  />
-                </td>
-                {fields.map((col, idx) =>
-                  col === "expense_date" ? (
-                    <CustomSelect
-                      key={idx}
-                      value={item[col]}
-                      options={Array.from({ length: 31 }, (_, j) => ({
-                        value: String(j + 1).padStart(2, "0"),
-                        label: String(j + 1).padStart(2, "0"),
-                      }))}
-                      defaultValue={date.slice(-2)}
-                      onChange={(value) =>
-                        handleUpdate(value, item.expense_id, col)
-                      }
-                    />
-                  ) : col === "expense_payment" ? (
-                    <CustomSelect
-                      key={idx}
-                      value={item[col]}
-                      options={cardList.map((list) => ({
-                        value: list.card_id,
-                        label: list.card_name,
-                      }))}
-                      noSelectValue="선택없음"
-                      onChange={(value) =>
-                        handleUpdate(value, item.expense_id, col)
-                      }
-                    />
-                  ) : col === "expense_cat_nm" ? (
-                    <CustomSelect
-                      key={idx}
-                      value={item[col]}
-                      options={categoryList.map((list) => ({
-                        value: list.cat_id,
-                        label: list.category_nm,
-                      }))}
-                      noSelectValue="미분류"
-                      onChange={(value) =>
-                        handleUpdate(value, item.expense_id, col)
-                      }
-                    />
-                  ) : (
-                    <Input
-                      key={idx}
-                      ref={(el) =>
-                        (inputRefs.current[i * fields.length + idx] = el)
-                      }
-                      onBlur={(e) =>
-                        handleUpdate(e.target.innerText, item.expense_id, col)
-                      }
-                      onKeyDown={(e) =>
-                        handleKeyDown(e, i * fields.length + idx, col)
-                      }
-                      onFocus={() => setInitial(item, i * fields.length + idx)}
-                      onInput={(e) => handleInput(e, col)}
-                    >
-                      {item[col]}
-                    </Input>
-                  )
-                )}
-              </tr>
-            ))
-          ) : fixedItemListStatus === "failed" ? (
-            <TableEmptyRow colSpan={6} message="Error loading fixedItemList" />
-          ) : (
-            <TableEmptyRow colSpan={6} message="No data available" />
-          )}
-        </tbody>
-      </table>
+            ) : (
+              <TableEmptyRow colSpan={6} message="No data available" />
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

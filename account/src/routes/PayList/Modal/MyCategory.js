@@ -117,70 +117,74 @@ function MyCategory({ setCatDataList }) {
   return (
     <div className="modal-body">
       <h2 className="modal-title">분류 관리하기</h2>
-      <table className="table table-hover table-sm" bordered hover>
-        <colgroup>
-          <col />
-          <col width={"15%"} />
-          <col width={"15%"} />
-        </colgroup>
-        <thead>
-          <tr>
-            <th>분류명</th>
-            <th>순서</th>
-            <th>삭제</th>
-          </tr>
-        </thead>
-        <tbody>
-          {catData.length > 0 ? (
-            catData.map((item, i) => (
-              <tr key={i}>
-                <Input
-                  data-placeholder="클릭해서 추가"
-                  ref={(el) => (inputRefs.current[i] = el)}
-                  onInput={removePlaceholder}
-                  onBlur={(e) => handleUpdate(e, item.cat_id)}
-                >
-                  {item.category_nm}
-                </Input>
-                <td>≡</td>
+      <div className="table-container">
+        <table className="table table-hover table-sm no-margin" bordered hover>
+          <colgroup>
+            <col />
+            <col width={"15%"} />
+            <col width={"15%"} />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>분류명</th>
+              <th>순서</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+          <tbody>
+            {catData.length > 0 ? (
+              catData.map((item, i) => (
+                <tr key={i}>
+                  <Input
+                    data-placeholder="클릭해서 추가"
+                    ref={(el) => (inputRefs.current[i] = el)}
+                    onInput={removePlaceholder}
+                    onBlur={(e) => handleUpdate(e, item.cat_id)}
+                  >
+                    {item.category_nm}
+                  </Input>
+                  <td>≡</td>
 
-                <td key={i}>
-                  <div className="popover-wrapper w-100">
-                    <button
-                      className={classNames("btn-delete", {
-                        "btn-disabled": item.isDisabled,
-                      })}
-                      onClick={() => handleDelete(item.cat_id, item.isDisabled)}
-                      onMouseEnter={
-                        item.isDisabled
-                          ? () => setIsButtonHovered(true)
-                          : undefined
-                      }
-                      onMouseLeave={
-                        item.isDisabled
-                          ? () => setIsButtonHovered(false)
-                          : undefined
-                      }
-                    >
-                      X
-                    </button>
-                    {item.isDisabled && visibleOverlay && (
-                      <Overlay
-                        overlayContent={
-                          "분류명을 입력하기 전에는\n삭제할 수 없습니다."
+                  <td key={i}>
+                    <div className="popover-wrapper w-100">
+                      <button
+                        className={classNames("btn-delete", {
+                          "btn-disabled": item.isDisabled,
+                        })}
+                        onClick={() =>
+                          handleDelete(item.cat_id, item.isDisabled)
                         }
-                        setVisibleOverlay={setVisibleOverlay}
-                      />
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <TableEmptyRow colSpan={3} message="No data available" />
-          )}
-        </tbody>
-      </table>
+                        onMouseEnter={
+                          item.isDisabled
+                            ? () => setIsButtonHovered(true)
+                            : undefined
+                        }
+                        onMouseLeave={
+                          item.isDisabled
+                            ? () => setIsButtonHovered(false)
+                            : undefined
+                        }
+                      >
+                        X
+                      </button>
+                      {item.isDisabled && visibleOverlay && (
+                        <Overlay
+                          overlayContent={
+                            "분류명을 입력하기 전에는\n삭제할 수 없습니다."
+                          }
+                          setVisibleOverlay={setVisibleOverlay}
+                        />
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <TableEmptyRow colSpan={3} message="No data available" />
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
