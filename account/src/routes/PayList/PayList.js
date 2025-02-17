@@ -64,6 +64,7 @@ function PayList() {
     lists: { cardList, categoryList },
     statuses: { cardListStatus, categoryListStatus },
   } = useFetchLists(["cardList", "categoryList"]);
+  console.log("cardList:::::::", cardList, categoryList);
 
   // payList 호출
   useEffect(() => {
@@ -462,13 +463,10 @@ function PayList() {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={
-                        cardList &&
-                        cardList.map((list) => ({
-                          value: list.card_id,
-                          label: list.card_name,
-                        }))
-                      }
+                      options={cardList.map((list) => ({
+                        value: list.card_id,
+                        label: list.card_name,
+                      }))}
                       noSelectValue="선택없음"
                       onChange={(value) => handleUpdate(value, item.id, col)}
                     />

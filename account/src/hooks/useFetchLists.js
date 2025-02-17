@@ -14,7 +14,15 @@ const useFetchLists = (
   const statuses = useSelector(selectAllStatuses);
 
   useEffect(() => {
-    if (statuses !== "loading" && statuses !== "succeeded") {
+    console.log("lists.cardList 업데이트됨:", lists);
+  }, [lists]);
+
+  useEffect(() => {
+    const selectCond = listTypes.some(
+      (type) => statuses[type] !== "loading" && statuses[type] !== "succeeded"
+    );
+
+    if (selectCond) {
       dispatch(fetchLists(listTypes))
         .then((res) => console.log("fetchLists 결과:", res))
         .catch((err) => console.log("fetchLists 에러:", err));

@@ -306,45 +306,75 @@ app.post("/cardList/insert", authenticateToken, function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
 
-  data.forEach((item) => {
-    if (item.isNew) {
-      db.query(
-        "INSERT INTO CARD_INFO (card_company, card_name, card_type, payment_due_date, usage_period_start, usage_period_end, active_status, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, ?, SYSDATE(), ?)",
-        [
-          item.card_company,
-          item.card_name,
-          item.card_type,
-          item.payment_due_date,
-          item.usage_period_start,
-          item.usage_period_end,
-          item.active_status,
-          userId,
-        ],
-        (err, result) => {
-          if (err) throw err;
-        }
-      );
-    } else if (item.isModified) {
-      db.query(
-        "UPDATE CARD_INFO SET card_company = ?, card_name = ?, card_type = ?, payment_due_date = ?, usage_period_start = ?, usage_period_end = ?, active_status = ?, UPD_DT = SYSDATE() WHERE card_id = ?",
-        [
-          item.card_company,
-          item.card_name,
-          item.card_type,
-          item.payment_due_date,
-          item.usage_period_start,
-          item.usage_period_end,
-          item.active_status,
-          item.card_id,
-        ],
-        (err, result) => {
-          if (err) throw err;
-        }
-      );
-    }
+  let updatedCardIds = [];
+
+  const queries = data.map((item) => {
+    return new Promise((resolve, reject) => {
+      if (item.isNew) {
+        db.query(
+          "INSERT INTO CARD_INFO (card_company, card_name, card_type, payment_due_date, usage_period_start, usage_period_end, active_status, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, ?, SYSDATE(), ?)",
+          [
+            item.card_company,
+            item.card_name,
+            item.card_type,
+            item.payment_due_date,
+            item.usage_period_start,
+            item.usage_period_end,
+            item.active_status,
+            userId,
+          ],
+          (err, result) => {
+            if (err) return reject(err);
+            updatedCardIds.push(result.insertId);
+            resolve();
+          }
+        );
+      } else if (item.isModified) {
+        db.query(
+          "UPDATE CARD_INFO SET card_company = ?, card_name = ?, card_type = ?, payment_due_date = ?, usage_period_start = ?, usage_period_end = ?, active_status = ?, UPD_DT = SYSDATE() WHERE card_id = ?",
+          [
+            item.card_company,
+            item.card_name,
+            item.card_type,
+            item.payment_due_date,
+            item.usage_period_start,
+            item.usage_period_end,
+            item.active_status,
+            item.card_id,
+          ],
+          (err, result) => {
+            if (err) return reject(err);
+            updatedCardIds.push(item.card_id);
+            resolve();
+          }
+        );
+      } else {
+        resolve();
+      }
+    });
   });
 
-  res.send({ message: "Data saved successfully!" });
+  // ✅ 데이터 저장 후 최신 데이터를 다시 조회해서 반환
+  Promise.all(queries)
+    .then(() => {
+      if (updatedCardIds.length === 0) {
+        return res.send({ message: "No changes made." });
+      }
+
+      const placeholders = updatedCardIds.map(() => "?").join(",");
+      db.query(
+        `SELECT * FROM CARD_INFO WHERE CARD_ID IN (${placeholders})`,
+        updatedCardIds,
+        (err, results) => {
+          if (err) return res.status(500).send({ error: "DB 조회 오류" });
+          res.send(results);
+        }
+      );
+    })
+    .catch((err) => {
+      console.error("DB 저장 중 오류 발생:", err);
+      res.status(500).send({ error: "데이터 저장 오류" });
+    });
 });
 
 app.post("/cardList/delete", authenticateToken, function (req, res) {
@@ -416,7 +446,7 @@ app.post("/categoryList/insert", authenticateToken, function (req, res) {
     }
   });
 
-  res.send({ message: "Data saved successfully!" });
+  res.send(updatedResults);
 });
 
 app.post("/categoryList/delete", authenticateToken, function (req, res) {

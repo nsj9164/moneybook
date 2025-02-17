@@ -19,10 +19,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import tabConfigs from "../../../config/tabConfigs";
 import TabContent from "../../../components/Modal/TabContent";
 import AlertModal from "../../../components/common/AlertModal";
-import {
-  setFixedItemList,
-  updateItem,
-} from "../../../store/features/myDetailList/myDetailListSlice";
+import { updateItem } from "../../../store/features/myDetailList/myDetailListSlice";
 
 const PayListModal = ({ show, onClose }) => {
   // Modal hide일때 렌더링 방지
@@ -52,37 +49,42 @@ const PayListModal = ({ show, onClose }) => {
   })[activeTab];
 
   // [저장 버튼 클릭 시] 데이터 저장
-  const handleSave = () => {
-    const dataMap = {
-      1: { action: fixedItemListActions.saveData, data: fixedDataList },
-      2: { action: categoryListActions.saveData, data: catDataList },
-      3: { action: cardListActions.saveData, data: cardDataList },
-    };
+  const handleSave = async () => {
+    try {
+      const dataMap = {
+        1: { action: fixedItemListActions.saveData, data: fixedDataList },
+        2: { action: categoryListActions.saveData, data: catDataList },
+        3: { action: cardListActions.saveData, data: cardDataList },
+      };
 
-    const { action, data } = dataMap[activeTab];
-    const idField = currentTabConfigs?.idField;
-    console.log(idField);
+      const { action, data } = dataMap[activeTab];
+      const idField = currentTabConfigs?.idField;
 
-    console.log(`저장하기 버튼 클릭${activeTab}`, data);
-    if (data.length > 0) {
-      // 저장 처리 후 AlertModal 띄우기
-      dispatch(action(data))
-        .then((resultAction) => {
-          if (resultAction.meta.requestStatus === "fulfilled") {
-            setShowSaveAlertModal(true);
+      console.log(`저장하기 버튼 클릭${activeTab}`, data);
 
-            data.forEach((item) => {
-              console.log([idField], item[idField]);
-              dispatch(updateItem({ ...item, [idField]: item[idField] }));
-            });
-          }
-        })
-        .catch((error) => {
-          console.log("저장 실패:", error);
+      if (data.length === 0) {
+        console.log("저장할 데이터 없음");
+        setVisibleOverlay(true);
+        return;
+      }
+
+      const resultAction = await dispatch(action(data));
+
+      if (resultAction.meta.requestStatus === "fulfilled") {
+        console.log("✅ 저장 성공:", resultAction.payload);
+        setShowSaveAlertModal(true);
+
+        const updatedData = resultAction.payload.map((serverItem) => {
+          const localItem = data.find((item) => item.id === serverItem.id);
+          return { ...localItem, [idField]: serverItem[idField] };
         });
-    } else {
-      console.log("저장할 데이터 없음");
-      setVisibleOverlay(true);
+        console.log("여기니?");
+        // dispatch(updateItem({ listType: activeTab, items: updatedData }));
+      } else {
+        throw new Error("서버 저장 실패");
+      }
+    } catch (error) {
+      console.error("❌ 저장 실패:", error);
     }
   };
 
