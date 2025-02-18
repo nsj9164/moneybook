@@ -426,27 +426,56 @@ app.post("/categoryList/insert", authenticateToken, function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
 
-  data.forEach((item) => {
-    if (item.isNew) {
-      db.query(
-        "INSERT INTO CATEGORY_INFO (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
-        [item.category_nm, userId],
-        (err, result) => {
-          if (err) throw err;
-        }
-      );
-    } else if (item.isModified) {
-      db.query(
-        "UPDATE CATEGORY_INFO SET category_nm = ?, UPD_DT = SYSDATE() WHERE cat_id = ?",
-        [item.category_nm, item.cat_id],
-        (err, result) => {
-          if (err) throw err;
-        }
-      );
-    }
+  let updatedCardIds = [];
+
+  const queries = data.map((item) => {
+    return new Promise((resolve, reject) => {
+      if (item.isNew) {
+        db.query(
+          "INSERT INTO CATEGORY_INFO (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
+          [item.category_nm, userId],
+          (err, result) => {
+            if (err) return reject(err);
+            updatedCardIds.push(result.insertId); // auto_increase값
+            resolve();
+          }
+        );
+      } else if (item.isModified) {
+        db.query(
+          "UPDATE CATEGORY_INFO SET category_nm = ?, UPD_DT = SYSDATE() WHERE cat_id = ?",
+          [item.category_nm, item.cat_id],
+          (err, result) => {
+            if (err) return reject(err);
+            updatedCardIds.push(item.cat_id);
+            resolve();
+          }
+        );
+      } else {
+        resolve();
+      }
+    });
   });
 
-  res.send(updatedResults);
+  Promise.all(queries)
+    .then(() => {
+      if (updatedCardIds.length === 0) {
+        return res.send({ message: "No changes made." });
+      }
+
+      const placeholders = updatedCardIds.map(() => "?").join(",");
+      db.query(
+        `SELECT * FROM CATEGORY_INFO WHERE CAT_ID IN (${placeholders})`,
+        updatedCardIds,
+        (err, results) => {
+          if (err) return res.status(500).send({ error: "DB 조회 오류" });
+          res.send(results);
+        }
+      );
+    })
+    .catch((err) => {
+      console.error("DB 저장 중 오류 발생:", err);
+      res.status(500).send({ error: "데이터 저장 오류" });
+    });
 });
 
 app.post("/categoryList/delete", authenticateToken, function (req, res) {

@@ -20,6 +20,7 @@ function MyCategory({ setCatDataList }) {
   const [focusedItemId, setFocusedItemId] = useState(null);
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
   const fields = ["category_nm"];
 
   useEffect(() => {
@@ -97,7 +98,16 @@ function MyCategory({ setCatDataList }) {
       setVisibleOverlay(true);
     } else {
       if (categoryList.some((item) => item.cat_id === id)) {
-        dispatch(categoryListActions.deleteData([id]));
+        dispatch(categoryListActions.deleteData([id])).then((resultAction) => {
+          console.log(
+            "##########################",
+            resultAction.meta.requestStatus,
+            resultAction
+          );
+          if (resultAction.meta.requestStatus === "fulfilled") {
+            setShowAlertModal(true);
+          }
+        });
       }
       setCatData((prevData) => prevData.filter((item) => item.cat_id !== id));
     }
@@ -185,6 +195,12 @@ function MyCategory({ setCatDataList }) {
           </tbody>
         </table>
       </div>
+      {showAlertModal && (
+        <AlertModal
+          message="삭제되었습니다."
+          onClose={() => setShowAlertModal(false)}
+        />
+      )}
     </div>
   );
 }

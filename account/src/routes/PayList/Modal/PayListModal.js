@@ -35,8 +35,8 @@ const PayListModal = ({ show, onClose }) => {
 
   const [visibleOverlay, setVisibleOverlay] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
-  const [showSaveAlertModal, setShowSaveAlertModal] = useState(false);
-  const [showDelAlertModal, setShowDelAlertModal] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const [checkedItems, setCheckedItems] = useState([]);
 
   // 현재 활성화된 탭의 설정 가져오기
@@ -72,7 +72,8 @@ const PayListModal = ({ show, onClose }) => {
 
       if (resultAction.meta.requestStatus === "fulfilled") {
         console.log("✅ 저장 성공:", resultAction.payload);
-        setShowSaveAlertModal(true);
+        setShowAlertModal(true);
+        setAlertMessage("저장되었습니다.");
 
         const updatedData = resultAction.payload.map((serverItem) => {
           const localItem = data.find((item) => item.id === serverItem.id);
@@ -93,7 +94,8 @@ const PayListModal = ({ show, onClose }) => {
       dispatch(fixedItemListActions.deleteData(checkedItems))
         .then((resultAction) => {
           if (resultAction.meta.requestStatus === "fulfilled") {
-            setShowDelAlertModal(true);
+            setShowAlertModal(true);
+            setAlertMessage("삭제되었습니다.");
 
             setCheckedItems([]);
           }
@@ -148,7 +150,7 @@ const PayListModal = ({ show, onClose }) => {
         </div>
         <TabContent
           component={currentTabConfigs.component}
-          setShowSaveAlertModal={setShowSaveAlertModal}
+          setShowAlertModal={setShowAlertModal}
         />
         <div className="modal-footer">
           <div className="modal-summary-group">
@@ -185,10 +187,10 @@ const PayListModal = ({ show, onClose }) => {
           </div>
         </div>
       </div>
-      {showSaveAlertModal && (
+      {showAlertModal && (
         <AlertModal
-          message="저장되었습니다!"
-          onClose={() => setShowSaveAlertModal(false)}
+          message={alertMessage}
+          onClose={() => setShowAlertModal(false)}
         />
       )}
     </div>

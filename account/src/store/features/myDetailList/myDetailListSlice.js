@@ -38,11 +38,21 @@ export const fetchLists = createAsyncThunk(
   }
 );
 
+export const updateItemList = (existingList, updatedItems, idField) => {
+  console.log("###updatedItems::::::", updatedItems);
+  const updatedMap = new Map(updatedItems.map((item) => [item[idField], item]));
+
+  return existingList.map((item) =>
+    updatedMap.has(item[idField]) ? updatedMap.get(item[idField]) : item
+  );
+};
+
 const myDetailList = createSlice({
   name: "myDetailList",
   initialState: {
     fixedItemList: {
       items: [],
+      idField: "expense_id",
       status: "idle",
       saveStatus: "idle",
       deleteStatus: "idle",
@@ -50,12 +60,14 @@ const myDetailList = createSlice({
     },
     categoryList: {
       items: [],
+      idField: "cat_id",
       status: "idle",
       saveStatus: "idle",
       error: null,
     },
     cardList: {
       items: [],
+      idField: "card_id",
       status: "idle",
       saveStatus: "idle",
       error: null,

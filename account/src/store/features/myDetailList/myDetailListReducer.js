@@ -1,3 +1,5 @@
+import { updateItemList } from "./myDetailListSlice";
+
 export const createAsyncReducers = (builder, actions, stateKey) => {
   builder
     .addCase(actions.fetchData.pending, (state) => {
@@ -13,7 +15,12 @@ export const createAsyncReducers = (builder, actions, stateKey) => {
     })
     .addCase(actions.saveData.fulfilled, (state, action) => {
       state[stateKey].saveStatus = "succeeded";
-      state[stateKey].items = action.payload;
+      const idField = state[stateKey].idField;
+      state[stateKey].items = updateItemList(
+        state[stateKey].items,
+        action.payload,
+        idField
+      );
     })
     .addCase(actions.saveData.rejected, (state, action) => {
       state[stateKey].saveStatus = "failed";
