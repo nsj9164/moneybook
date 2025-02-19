@@ -17,10 +17,7 @@ export const fetchLists = createAsyncThunk(
       cardList: () => fetch("/cardList").then((res) => res.json()),
       categoryList: () =>
         fetch("/categoryList").then(async (res) => {
-          console.log("📌 cardList 응답 상태:", res.status);
-          console.log("📌 cardList 응답 헤더:", res.headers);
           const json = await res.json();
-          console.log("📌 cardList 응답 데이터:", json);
           return json;
         }),
     };
@@ -37,15 +34,6 @@ export const fetchLists = createAsyncThunk(
     }, {});
   }
 );
-
-export const updateItemList = (existingList, updatedItems, idField) => {
-  console.log("###updatedItems::::::", updatedItems);
-  const updatedMap = new Map(updatedItems.map((item) => [item[idField], item]));
-
-  return existingList.map((item) =>
-    updatedMap.has(item[idField]) ? updatedMap.get(item[idField]) : item
-  );
-};
 
 const myDetailList = createSlice({
   name: "myDetailList",

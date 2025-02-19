@@ -94,13 +94,14 @@ function MyCategory({ setCatDataList }) {
 
   // 삭제하기
   const handleDelete = (id, isDisabled) => {
+    console.log("여기 타니?????");
     if (isDisabled) {
       setVisibleOverlay(true);
     } else {
       if (categoryList.some((item) => item.cat_id === id)) {
         dispatch(categoryListActions.deleteData([id])).then((resultAction) => {
           console.log(
-            "##########################",
+            "??????????????????????????",
             resultAction.meta.requestStatus,
             resultAction
           );

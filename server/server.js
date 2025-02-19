@@ -357,15 +357,18 @@ app.post("/cardList/insert", authenticateToken, function (req, res) {
   // ✅ 데이터 저장 후 최신 데이터를 다시 조회해서 반환
   Promise.all(queries)
     .then(() => {
+      console.log("+++++++++++++++++", updatedCardIds);
       if (updatedCardIds.length === 0) {
         return res.send({ message: "No changes made." });
       }
 
       const placeholders = updatedCardIds.map(() => "?").join(",");
+      console.log("????????????", placeholders);
       db.query(
         `SELECT * FROM CARD_INFO WHERE CARD_ID IN (${placeholders})`,
         updatedCardIds,
         (err, results) => {
+          console.log("))))))))))", results);
           if (err) return res.status(500).send({ error: "DB 조회 오류" });
           res.send(results);
         }
@@ -426,7 +429,7 @@ app.post("/categoryList/insert", authenticateToken, function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
 
-  let updatedCardIds = [];
+  let updatedCatIds = [];
 
   const queries = data.map((item) => {
     return new Promise((resolve, reject) => {
@@ -436,7 +439,7 @@ app.post("/categoryList/insert", authenticateToken, function (req, res) {
           [item.category_nm, userId],
           (err, result) => {
             if (err) return reject(err);
-            updatedCardIds.push(result.insertId); // auto_increase값
+            updatedCatIds.push(result.insertId); // auto_increase값
             resolve();
           }
         );
@@ -446,7 +449,6 @@ app.post("/categoryList/insert", authenticateToken, function (req, res) {
           [item.category_nm, item.cat_id],
           (err, result) => {
             if (err) return reject(err);
-            updatedCardIds.push(item.cat_id);
             resolve();
           }
         );
@@ -458,14 +460,14 @@ app.post("/categoryList/insert", authenticateToken, function (req, res) {
 
   Promise.all(queries)
     .then(() => {
-      if (updatedCardIds.length === 0) {
+      if (updatedCatIds.length === 0) {
         return res.send({ message: "No changes made." });
       }
 
-      const placeholders = updatedCardIds.map(() => "?").join(",");
+      const placeholders = updatedCatIds.map(() => "?").join(",");
       db.query(
         `SELECT * FROM CATEGORY_INFO WHERE CAT_ID IN (${placeholders})`,
-        updatedCardIds,
+        updatedCatIds,
         (err, results) => {
           if (err) return res.status(500).send({ error: "DB 조회 오류" });
           res.send(results);

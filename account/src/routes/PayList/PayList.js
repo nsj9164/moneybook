@@ -64,7 +64,6 @@ function PayList() {
     lists: { cardList, categoryList },
     statuses: { cardListStatus, categoryListStatus },
   } = useFetchLists(["cardList", "categoryList"]);
-  console.log("cardList:::::::", cardList, categoryList);
 
   // payList 호출
   useEffect(() => {
@@ -109,8 +108,6 @@ function PayList() {
       .filter((item) => item.price2 && unformatNumber(item.price2) > 0)
       .reduce((sum, item) => sum + parseInt(unformatNumber(item.price2)), 0);
     setRealExpense(sumPrice2.toLocaleString("ko-KR"));
-
-    console.log("tempData:::", tempData);
   }, [tempData]);
 
   // datepicker - 이전/다음
@@ -159,7 +156,6 @@ function PayList() {
   const setInitial = (item, index) => {
     if (item.isDisabled) {
       const newData = tempData.map((i) => {
-        console.log("!!!!!!!!!!!!!", item, i, item.id, i.id);
         if (item.id === i.id) {
           setTempId((tempId) => tempId + 1);
           return {
@@ -216,8 +212,6 @@ function PayList() {
     const payListIds = new Set(
       payList.filter((item) => delCheckedIds.has(item.id))
     );
-    console.log("delCheckedIds:::", delCheckedIds);
-    console.log("payListIds:::", payListIds);
 
     if (delCheckedIds.size > 0) {
       dispatch(deleteData([...delCheckedIds]));
@@ -302,7 +296,7 @@ function PayList() {
     const modifiedData = tempData.filter(
       (item) => item.isModified || item.isNew
     );
-    console.log("modifiedData:::", modifiedData);
+
     if (modifiedData.length > 0) {
       dispatch(saveData(tempData));
       dispatch(
