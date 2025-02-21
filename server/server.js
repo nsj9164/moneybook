@@ -17,6 +17,7 @@ app.listen(PORT, (req, res) => {
 app.use(express.json());
 app.use(cookieParser());
 const cors = require("cors");
+const { resolve } = require("path");
 app.use(
   cors({
     origin: `http://localhost:3000`, // 클라이언트의 도메인
@@ -357,18 +358,16 @@ app.post("/cardList/insert", authenticateToken, function (req, res) {
   // ✅ 데이터 저장 후 최신 데이터를 다시 조회해서 반환
   Promise.all(queries)
     .then(() => {
-      console.log("+++++++++++++++++", updatedCardIds);
       if (updatedCardIds.length === 0) {
         return res.send({ message: "No changes made." });
       }
 
       const placeholders = updatedCardIds.map(() => "?").join(",");
-      console.log("????????????", placeholders);
+      console.log;
       db.query(
         `SELECT * FROM CARD_INFO WHERE CARD_ID IN (${placeholders})`,
         updatedCardIds,
         (err, results) => {
-          console.log("))))))))))", results);
           if (err) return res.status(500).send({ error: "DB 조회 오류" });
           res.send(results);
         }
@@ -425,59 +424,48 @@ app.get("/categoryList", authenticateToken, function (req, res) {
   );
 });
 
-app.post("/categoryList/insert", authenticateToken, function (req, res) {
+app.post("/categoryList/insert", authenticateToken, async function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
 
-  let updatedCatIds = [];
-
-  const queries = data.map((item) => {
-    return new Promise((resolve, reject) => {
+  try {
+    const promises = data.map(async (item) => {
       if (item.isNew) {
-        db.query(
-          "INSERT INTO CATEGORY_INFO (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
-          [item.category_nm, userId],
-          (err, result) => {
-            if (err) return reject(err);
-            updatedCatIds.push(result.insertId); // auto_increase값
-            resolve();
-          }
-        );
+        return new Promise((resolve, reject) => {
+          db.query(
+            "INSERT INTO CATEGORY_INFO (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
+            [item.category_nm, userId],
+            (err, result) => {
+              if (err) reject(err);
+              resolve({
+                tempId: item.cat_id,
+                insertId: result.insertId,
+              });
+            }
+          );
+        });
       } else if (item.isModified) {
-        db.query(
-          "UPDATE CATEGORY_INFO SET category_nm = ?, UPD_DT = SYSDATE() WHERE cat_id = ?",
-          [item.category_nm, item.cat_id],
-          (err, result) => {
-            if (err) return reject(err);
-            resolve();
-          }
-        );
-      } else {
-        resolve();
+        return new Promise((resolve, reject) => {
+          db.query(
+            "INSERT INTO CATEGORY_INFO (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
+            [item.category_nm, userId],
+            (err, result) => {
+              if (err) reject(err);
+              resolve(null);
+            }
+          );
+        });
       }
     });
-  });
 
-  Promise.all(queries)
-    .then(() => {
-      if (updatedCatIds.length === 0) {
-        return res.send({ message: "No changes made." });
-      }
-
-      const placeholders = updatedCatIds.map(() => "?").join(",");
-      db.query(
-        `SELECT * FROM CATEGORY_INFO WHERE CAT_ID IN (${placeholders})`,
-        updatedCatIds,
-        (err, results) => {
-          if (err) return res.status(500).send({ error: "DB 조회 오류" });
-          res.send(results);
-        }
-      );
-    })
-    .catch((err) => {
-      console.error("DB 저장 중 오류 발생:", err);
-      res.status(500).send({ error: "데이터 저장 오류" });
-    });
+    const savedData = await Promise.all(promises);
+    const filteredData = savedData.filter((item) => item !== null);
+    console.log("✅ 최종 응답 데이터:", filteredData);
+    res.json(filteredData);
+  } catch (error) {
+    console.error("❌ 데이터 저장 중 오류 발생:", error);
+    res.status(500).json({ message: "데이터 저장 실패", error });
+  }
 });
 
 app.post("/categoryList/delete", authenticateToken, function (req, res) {

@@ -7,8 +7,9 @@ import classNames from "classnames";
 import { Overlay } from "../../../components/common/Overlay";
 import useFetchLists from "../../../hooks/useFetchLists";
 import TableEmptyRow from "../../../components/common/Table/TableEmptyRow";
+import { saveData } from "../../../store/features/payList/payListActions";
 
-function MyCategory({ setCatDataList }) {
+function MyCategory({ catDataList, setCatDataList }) {
   const dispatch = useDispatch();
   const {
     lists: { categoryList },
@@ -47,10 +48,33 @@ function MyCategory({ setCatDataList }) {
         { cat_id: `cat-${catId}`, isDisabled: true, isNew: true },
       ]);
       setCatId((id) => id + 1);
-      console.log("#categoryList:::", categoryList);
-      console.log("#catData:::", catData);
     }
   }, [categoryList, catData]);
+
+  // 저장하기 후 update cat_id, isNew, isModified
+  useEffect(() => {
+    setCatData((prevData) => {
+      const newData = prevData.map((item) => {
+        const updatedItem = catDataList.find(
+          (cat) => cat.tempId === item.cat_id
+        );
+        return updatedItem
+          ? {
+              ...item,
+              cat_id: updatedItem.insertId,
+              isNew: false,
+              isModified: false,
+            }
+          : { ...item, isModified: false };
+      });
+
+      if (JSON.stringify(newData) !== JSON.stringify(prevData)) {
+        return newData;
+      }
+
+      return prevData;
+    });
+  }, [catDataList]);
 
   // 저장할 data
   const modifiedData = useMemo(() => {
@@ -62,10 +86,10 @@ function MyCategory({ setCatDataList }) {
   }, [catData]);
 
   useEffect(() => {
-    setCatDataList(modifiedData);
+    if (modifiedData.length > 0) {
+      setCatDataList(modifiedData);
+    }
   }, [modifiedData]);
-
-  useEffect(() => {}, [catData]);
 
   const handleUpdate = (e, id) => {
     const newItem = e.target.innerText;
@@ -94,17 +118,11 @@ function MyCategory({ setCatDataList }) {
 
   // 삭제하기
   const handleDelete = (id, isDisabled) => {
-    console.log("여기 타니?????");
     if (isDisabled) {
       setVisibleOverlay(true);
     } else {
       if (categoryList.some((item) => item.cat_id === id)) {
         dispatch(categoryListActions.deleteData([id])).then((resultAction) => {
-          console.log(
-            "??????????????????????????",
-            resultAction.meta.requestStatus,
-            resultAction
-          );
           if (resultAction.meta.requestStatus === "fulfilled") {
             setShowAlertModal(true);
           }

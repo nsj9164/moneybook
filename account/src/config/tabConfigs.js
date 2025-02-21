@@ -11,6 +11,7 @@ const tabConfigs = ({
   setFixedDataList,
   setCatDataList,
   setCardDataList,
+  catDataList,
   checkedItems,
   setCheckedItems,
 }) => ({
@@ -26,7 +27,9 @@ const tabConfigs = ({
     listType: "fixedItemList",
   },
   2: {
-    component: <MyCategory setCatDataList={setCatDataList} />,
+    component: (
+      <MyCategory catDataList={catDataList} setCatDataList={setCatDataList} />
+    ),
     idField: "cat_id",
     listType: "categoryList",
   },

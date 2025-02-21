@@ -44,6 +44,7 @@ const PayListModal = ({ show, onClose }) => {
     setFixedDataList,
     setCatDataList,
     setCardDataList,
+    catDataList,
     checkedItems,
     setCheckedItems,
   })[activeTab];
@@ -52,12 +53,24 @@ const PayListModal = ({ show, onClose }) => {
   const handleSave = async () => {
     try {
       const dataMap = {
-        1: { action: fixedItemListActions.saveData, data: fixedDataList },
-        2: { action: categoryListActions.saveData, data: catDataList },
-        3: { action: cardListActions.saveData, data: cardDataList },
+        1: {
+          action: fixedItemListActions.saveData,
+          data: fixedDataList,
+          setData: (updateItem) => setFixedDataList(updateItem),
+        },
+        2: {
+          action: categoryListActions.saveData,
+          data: catDataList,
+          setData: (updateItem) => setCatDataList(updateItem),
+        },
+        3: {
+          action: cardListActions.saveData,
+          data: cardDataList,
+          setData: (updateItem) => setCardDataList(updateItem),
+        },
       };
 
-      const { action, data } = dataMap[activeTab];
+      const { action, data, setData } = dataMap[activeTab];
       const idField = currentTabConfigs?.idField;
 
       console.log(`저장하기 버튼 클릭${activeTab}`, data);
@@ -72,14 +85,9 @@ const PayListModal = ({ show, onClose }) => {
 
       if (resultAction.meta.requestStatus === "fulfilled") {
         console.log("✅ 저장 성공:", resultAction.payload);
+        setData(resultAction.payload);
         setShowAlertModal(true);
         setAlertMessage("저장되었습니다.");
-
-        const updatedData = resultAction.payload.map((serverItem) => {
-          const localItem = data.find((item) => item.id === serverItem.id);
-          return { ...localItem, [idField]: serverItem[idField] };
-        });
-        console.log("여기니?");
         // dispatch(updateItem({ listType: activeTab, items: updatedData }));
       } else {
         throw new Error("서버 저장 실패");
