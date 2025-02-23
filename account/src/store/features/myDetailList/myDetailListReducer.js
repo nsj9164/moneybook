@@ -15,9 +15,6 @@ export const createAsyncReducers = (builder, actions, stateKey) => {
     })
     .addCase(actions.saveData.fulfilled, (state, action) => {
       state[stateKey].saveStatus = "succeeded";
-      state[stateKey].items = action.payload;
-      console.log("🚗action.payload:::", state[stateKey].catDataList);
-      console.log("🚗action.payload:::", action.payload);
     })
     .addCase(actions.saveData.rejected, (state, action) => {
       state[stateKey].saveStatus = "failed";

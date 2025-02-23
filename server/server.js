@@ -48,6 +48,66 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+// 저장하기 공통 모듈
+async function saveData(
+  tableName,
+  data,
+  userId,
+  insertFields,
+  updateFields,
+  idField
+) {
+  try {
+    const promises = data.map(async (item) => {
+      if (item.isNew) {
+        return new Promise((resolve, reject) => {
+          const fieldNames = [...insertFields, "REG_DT", "USER_ID"];
+          const placeholders = insertFields.map(() => "?").join(", ");
+          const values = insertFields
+            .map((field) => item[field] ?? null)
+            .concat([userId]);
+
+          db.query(
+            `INSERT INTO ${tableName} (${fieldNames.join(
+              ", "
+            )}) VALUES (${placeholders}, SYSDATE(), ?)`,
+            values,
+            (err, result) => {
+              if (err) reject(err);
+              resolve({
+                tempId: item[idField],
+                insertId: result.insertId,
+              });
+            }
+          );
+        });
+      } else if (item.isModified) {
+        return new Promise((resolve, reject) => {
+          const setClause = updateFields
+            .map((field) => `${field} = ?`)
+            .join(", ");
+          const values = updateFields
+            .map((field) => item[field])
+            .concat(["SYSDATE()", item[idField]]);
+          db.query(
+            `UPDATE ${tableName} SET ${setClause}, UPD_DT = ? WHERE ${idField} = ?`,
+            values,
+            (err) => {
+              if (err) reject(err);
+              resolve(null);
+            }
+          );
+        });
+      }
+    });
+
+    const savedData = await Promise.all(promises);
+    return savedData.filter((item) => item !== null);
+  } catch (error) {
+    throw error;
+  }
+}
+
 // API 라우트
 app.post("/payList", authenticateToken, function (req, res) {
   db.query(
@@ -72,9 +132,42 @@ app.post("/payList", authenticateToken, function (req, res) {
   );
 });
 
-app.post("/payList/insert", authenticateToken, function (req, res) {
+app.post("/payList/insert", authenticateToken, async function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
+
+  try {
+    const filteredData = await saveData(
+      "PAYLIST",
+      data,
+      userId,
+      [
+        item.date.replace(/-/g, ""),
+        item.cat_nm,
+        item.content,
+        item.price1.replace(/,/g, ""),
+        item.price2.replace(/,/g, ""),
+        item.payment,
+        item.remark,
+        userId,
+      ],
+      [
+        item.date.replace(/-/g, ""),
+        item.cat_nm,
+        item.content,
+        item.price1.replace(/,/g, ""),
+        item.price2.replace(/,/g, ""),
+        item.payment,
+        item.remark,
+        item.id,
+      ],
+      "id"
+    );
+    res.json(filteredData);
+  } catch (error) {
+    console.error("❌ 데이터 저장 중 오류 발생:", error);
+    res.status(500).json({ message: "데이터 저장 실패", error });
+  }
 
   data.forEach((item) => {
     if (item.isNew) {
@@ -221,45 +314,35 @@ app.get("/fixedItemList", authenticateToken, function (req, res) {
   );
 });
 
-app.post("/fixedItemList/insert", authenticateToken, function (req, res) {
+app.post("/fixedItemList/insert", authenticateToken, async function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
 
-  data.forEach((item) => {
-    if (item.isNew) {
-      db.query(
-        "INSERT INTO FIXED_ITEM_LIST (expense_date, expense_desc, expense_amount, expense_payment, expense_cat_nm, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, SYSDATE(), ?)",
-        [
-          item.expense_date,
-          item.expense_desc,
-          item.expense_amount,
-          item.expense_payment,
-          item.expense_cat_nm,
-          userId,
-        ],
-        (err, result) => {
-          if (err) throw err;
-        }
-      );
-    } else if (item.isModified) {
-      db.query(
-        "UPDATE FIXED_ITEM_LIST SET expense_date = ?, expense_desc = ?, expense_amount = ?, expense_payment = ?, expense_cat_nm = ?, UPD_DT = SYSDATE() WHERE expense_id = ?",
-        [
-          item.expense_date,
-          item.expense_desc,
-          item.expense_amount,
-          item.expense_payment,
-          item.expense_cat_nm,
-          item.expense_id,
-        ],
-        (err, result) => {
-          if (err) throw err;
-        }
-      );
-    }
-  });
-
-  res.send({ message: "Data saved successfully!" });
+  try {
+    const filteredData = await saveData(
+      "FIXED_ITEM_LIST",
+      data,
+      userId,
+      [
+        "expense_date",
+        "expense_desc",
+        "expense_amount",
+        "expense_payment",
+        "expense_cat_nm",
+      ],
+      [
+        "expense_date",
+        "expense_desc",
+        "expense_amount",
+        "expense_payment",
+        "expense_cat_nm",
+      ]
+    );
+    res.json(filteredData);
+  } catch (error) {
+    console.error("❌ 데이터 저장 중 오류 발생:", error);
+    res.status(500).json({ message: "데이터 저장 실패", error });
+  }
 });
 
 app.post("/fixedItemList/delete", authenticateToken, function (req, res) {
@@ -303,80 +386,41 @@ app.get("/cardList", authenticateToken, function (req, res) {
   );
 });
 
-app.post("/cardList/insert", authenticateToken, function (req, res) {
+app.post("/cardList/insert", authenticateToken, async function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
 
-  let updatedCardIds = [];
-
-  const queries = data.map((item) => {
-    return new Promise((resolve, reject) => {
-      if (item.isNew) {
-        db.query(
-          "INSERT INTO CARD_INFO (card_company, card_name, card_type, payment_due_date, usage_period_start, usage_period_end, active_status, reg_dt, USER_ID) VALUES (?, ?, ?, ?, ?, ?, ?, SYSDATE(), ?)",
-          [
-            item.card_company,
-            item.card_name,
-            item.card_type,
-            item.payment_due_date,
-            item.usage_period_start,
-            item.usage_period_end,
-            item.active_status,
-            userId,
-          ],
-          (err, result) => {
-            if (err) return reject(err);
-            updatedCardIds.push(result.insertId);
-            resolve();
-          }
-        );
-      } else if (item.isModified) {
-        db.query(
-          "UPDATE CARD_INFO SET card_company = ?, card_name = ?, card_type = ?, payment_due_date = ?, usage_period_start = ?, usage_period_end = ?, active_status = ?, UPD_DT = SYSDATE() WHERE card_id = ?",
-          [
-            item.card_company,
-            item.card_name,
-            item.card_type,
-            item.payment_due_date,
-            item.usage_period_start,
-            item.usage_period_end,
-            item.active_status,
-            item.card_id,
-          ],
-          (err, result) => {
-            if (err) return reject(err);
-            updatedCardIds.push(item.card_id);
-            resolve();
-          }
-        );
-      } else {
-        resolve();
-      }
-    });
-  });
-
-  // ✅ 데이터 저장 후 최신 데이터를 다시 조회해서 반환
-  Promise.all(queries)
-    .then(() => {
-      if (updatedCardIds.length === 0) {
-        return res.send({ message: "No changes made." });
-      }
-
-      const placeholders = updatedCardIds.map(() => "?").join(",");
-      console.log;
-      db.query(
-        `SELECT * FROM CARD_INFO WHERE CARD_ID IN (${placeholders})`,
-        updatedCardIds,
-        (err, results) => {
-          if (err) return res.status(500).send({ error: "DB 조회 오류" });
-          res.send(results);
-        }
-      );
-    })
-    .catch((err) => {
-      console.error("DB 저장 중 오류 발생:", err);
-      res.status(500).send({ error: "데이터 저장 오류" });
-    });
+  try {
+    const filteredData = await saveData(
+      "CARD_INFO",
+      data,
+      userId,
+      [
+        "card_company",
+        "card_name",
+        "card_type",
+        "payment_due_date",
+        "usage_period_start",
+        "usage_period_end",
+        "active_status",
+      ],
+      [
+        "card_company",
+        "card_name",
+        "card_type",
+        "payment_due_date",
+        "usage_period_start",
+        "usage_period_end",
+        "active_status",
+      ],
+      "card_id"
+    );
+    console.log("✅ 최종 응답 데이터:", filteredData);
+    res.json(filteredData);
+  } catch (error) {
+    console.error("❌ 데이터 저장 중 오류 발생:", error);
+    res.status(500).json({ message: "데이터 저장 실패", error });
+  }
 });
 
 app.post("/cardList/delete", authenticateToken, function (req, res) {
@@ -429,37 +473,14 @@ app.post("/categoryList/insert", authenticateToken, async function (req, res) {
   const data = req.body;
 
   try {
-    const promises = data.map(async (item) => {
-      if (item.isNew) {
-        return new Promise((resolve, reject) => {
-          db.query(
-            "INSERT INTO CATEGORY_INFO (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
-            [item.category_nm, userId],
-            (err, result) => {
-              if (err) reject(err);
-              resolve({
-                tempId: item.cat_id,
-                insertId: result.insertId,
-              });
-            }
-          );
-        });
-      } else if (item.isModified) {
-        return new Promise((resolve, reject) => {
-          db.query(
-            "INSERT INTO CATEGORY_INFO (category_nm, reg_dt, USER_ID) VALUES (?, SYSDATE(), ?)",
-            [item.category_nm, userId],
-            (err, result) => {
-              if (err) reject(err);
-              resolve(null);
-            }
-          );
-        });
-      }
-    });
-
-    const savedData = await Promise.all(promises);
-    const filteredData = savedData.filter((item) => item !== null);
+    const filteredData = await saveData(
+      "CATEGORY_INFO",
+      data,
+      userId,
+      ["category_nm"],
+      ["category_nm"],
+      "cat_id"
+    );
     console.log("✅ 최종 응답 데이터:", filteredData);
     res.json(filteredData);
   } catch (error) {
