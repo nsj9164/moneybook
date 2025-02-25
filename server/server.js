@@ -66,7 +66,6 @@ async function saveData(
           const values = insertFields
             .map((field) => item[field] ?? null)
             .concat([userId]);
-
           db.query(
             `INSERT INTO ${tableName} (${fieldNames.join(
               ", "
@@ -88,9 +87,9 @@ async function saveData(
             .join(", ");
           const values = updateFields
             .map((field) => item[field])
-            .concat(["SYSDATE()", item[idField]]);
+            .concat([item[idField]]);
           db.query(
-            `UPDATE ${tableName} SET ${setClause}, UPD_DT = ? WHERE ${idField} = ?`,
+            `UPDATE ${tableName} SET ${setClause}, UPD_DT = SYSDATE() WHERE ${idField} = ?`,
             values,
             (err) => {
               if (err) reject(err);
@@ -112,18 +111,22 @@ async function saveData(
 app.post("/payList", authenticateToken, function (req, res) {
   db.query(
     `SELECT id
-                   , DATE_FORMAT(date,"%Y-%m-%d") as date
-                   , cat_nm
-                   , content
-                   , FORMAT(price1,0) as price1
-                   , FORMAT(price2,0) as price2
-                   , payment
-                   , remark 
-                FROM PAYLIST
-               WHERE USER_ID = ?
-                 AND DATE >= ?
-                 AND DATE <= ?
-               ORDER BY DATE, ID`,
+          , DATE_FORMAT(date,"%Y-%m-%d") as date
+          , A.cat_id
+          , B.category_nm
+          , content
+          , FORMAT(price1,0) as price1
+          , FORMAT(price2,0) as price2
+          , A.card_id
+          , C.card_name
+          , remark
+       FROM PAYLIST A
+       LEFT JOIN CATEGORY_INFO B ON A.cat_id  = B.cat_id
+       LEFT JOIN CARD_INFO C     ON A.card_id = C.card_id
+      WHERE A.USER_ID = ?
+        AND DATE >= ?
+        AND DATE <= ?
+      ORDER BY DATE, ID`,
     [req.user.userId, req.body.start, req.body.end],
     function (err, results, fields) {
       if (err) throw err;
@@ -139,28 +142,15 @@ app.post("/payList/insert", authenticateToken, async function (req, res) {
   try {
     const filteredData = await saveData(
       "PAYLIST",
-      data,
+      data.map((item) => ({
+        ...item,
+        date: item.date ? item.date.replace(/-/g, "") : null,
+        price1: item.price1 ? item.price1.replace(/,/g, "") : null,
+        price2: item.price2 ? item.price2.replace(/,/g, "") : null,
+      })),
       userId,
-      [
-        item.date.replace(/-/g, ""),
-        item.cat_nm,
-        item.content,
-        item.price1.replace(/,/g, ""),
-        item.price2.replace(/,/g, ""),
-        item.payment,
-        item.remark,
-        userId,
-      ],
-      [
-        item.date.replace(/-/g, ""),
-        item.cat_nm,
-        item.content,
-        item.price1.replace(/,/g, ""),
-        item.price2.replace(/,/g, ""),
-        item.payment,
-        item.remark,
-        item.id,
-      ],
+      ["date", "cat_id", "content", "price1", "price2", "card_id", "remark"],
+      ["date", "cat_id", "content", "price1", "price2", "card_id", "remark"],
       "id"
     );
     res.json(filteredData);
@@ -168,46 +158,6 @@ app.post("/payList/insert", authenticateToken, async function (req, res) {
     console.error("❌ 데이터 저장 중 오류 발생:", error);
     res.status(500).json({ message: "데이터 저장 실패", error });
   }
-
-  data.forEach((item) => {
-    if (item.isNew) {
-      db.query(
-        "INSERT INTO PAYLIST (date, cat_nm, content, price1, price2, payment, remark, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-          item.date.replace(/-/g, ""),
-          item.cat_nm,
-          item.content,
-          item.price1.replace(/,/g, ""),
-          item.price2.replace(/,/g, ""),
-          item.payment,
-          item.remark,
-          userId,
-        ],
-        (err, result) => {
-          if (err) throw err;
-        }
-      );
-    } else if (item.isModified) {
-      db.query(
-        "UPDATE PAYLIST SET date = ?, cat_nm = ?, content = ?, price1 = ?, price2 = ?, payment = ?, remark = ? WHERE id = ?",
-        [
-          item.date.replace(/-/g, ""),
-          item.cat_nm,
-          item.content,
-          item.price1.replace(/,/g, ""),
-          item.price2.replace(/,/g, ""),
-          item.payment,
-          item.remark,
-          item.id,
-        ],
-        (err, result) => {
-          if (err) throw err;
-        }
-      );
-    }
-  });
-
-  res.send({ message: "Data saved successfully!" });
 });
 
 app.post("/payList/delete", authenticateToken, function (req, res) {
@@ -336,7 +286,8 @@ app.post("/fixedItemList/insert", authenticateToken, async function (req, res) {
         "expense_amount",
         "expense_payment",
         "expense_cat_nm",
-      ]
+      ],
+      "expense_id"
     );
     res.json(filteredData);
   } catch (error) {

@@ -292,19 +292,24 @@ function PayList() {
   };
 
   // 저장하기
-  const handleSave = () => {
-    const modifiedData = tempData.filter(
-      (item) => item.isModified || item.isNew
-    );
+  const handleSave = async () => {
+    const modifiedData = tempData.filter((item) => {
+      const hasValidFields =
+        Boolean(item.cat_nm) ||
+        Boolean(item.content) ||
+        Boolean(item.price1) ||
+        Boolean(item.price2) ||
+        Boolean(item.payment) ||
+        Boolean(item.remark);
+      return (item.isModified || item.isNew) && hasValidFields;
+    });
 
     if (modifiedData.length > 0) {
-      dispatch(saveData(tempData));
-      dispatch(
-        fetchData({
-          start: format(startDate, "yyyyMMdd"),
-          end: format(endDate, "yyyyMMdd"),
-        })
-      );
+      const resultAction = await dispatch(saveData(modifiedData));
+      console.log(resultAction.meta.requestStatus, resultAction);
+      if (resultAction.meta.requestStatus === "fulfilled") {
+        console.log("✅ 저장 성공:", resultAction.payload);
+      }
     } else {
       if (visibleOverlay !== "save-overlay") {
         setVisibleOverlay("save-overlay");
@@ -443,26 +448,29 @@ function PayList() {
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={
-                        categoryList &&
-                        categoryList.map((list) => ({
-                          value: list.cat_id,
-                          label: list.category_nm,
-                        }))
-                      }
+                      options={categoryList?.map((list) => ({
+                        value: list.cat_id,
+                        label: list.category_nm,
+                      }))}
                       noSelectValue="미분류"
-                      onChange={(value) => handleUpdate(value, item.id, col)}
+                      onFocus={(e) => setInitial(item, i * 7 + idx)}
+                      onChange={(value) =>
+                        handleUpdate(value, item.id, "cat_id")
+                      }
                     />
                   ) : col === "payment" ? (
                     <CustomSelect
                       key={idx}
                       value={item[col]}
-                      options={cardList.map((list) => ({
+                      options={cardList?.map((list) => ({
                         value: list.card_id,
                         label: list.card_name,
                       }))}
                       noSelectValue="선택없음"
-                      onChange={(value) => handleUpdate(value, item.id, col)}
+                      onFocus={(e) => setInitial(item, i * 7 + idx)}
+                      onChange={(value) =>
+                        handleUpdate(value, item.id, "card_id")
+                      }
                     />
                   ) : (
                     <Input
@@ -486,7 +494,9 @@ function PayList() {
 
           {payListStatus === "failed" && (
             <tr>
-              <td colSpan="8">Error</td>
+              <td colSpan="8">
+                오류가 발생하였습니다. 잠시 후 다시 시도해주세요.
+              </td>
             </tr>
           )}
         </tbody>
