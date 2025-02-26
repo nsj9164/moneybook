@@ -309,6 +309,24 @@ function PayList() {
       console.log(resultAction.meta.requestStatus, resultAction);
       if (resultAction.meta.requestStatus === "fulfilled") {
         console.log("✅ 저장 성공:", resultAction.payload);
+
+        const insertIds = resultAction.payload;
+
+        setTempData((prevData) => {
+          const newData = prevData.map((item) => {
+            const updatedItem = insertIds.find(
+              (insert) => insert.tempId === item.id
+            );
+            return updatedItem
+              ? {
+                  ...item,
+                  id: updatedItem.insertId,
+                  isNew: false,
+                  isModified: false,
+                }
+              : { ...item, isModified: false };
+          });
+        });
       }
     } else {
       if (visibleOverlay !== "save-overlay") {
