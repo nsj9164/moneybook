@@ -32,6 +32,7 @@ import { fixedItemListActions } from "../../store/features/myDetailList/myDetail
 import { selectAllLists } from "../../store/features/myDetailList/myDetailListSelectors";
 import CardSelectOverlay from "../../components/payList/CardSelectOverlay";
 import useFetchLists from "../../hooks/useFetchLists";
+import PayListFilters from "../../components/payList/PayListFilters";
 
 function PayList() {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ function PayList() {
   const [focusedItemId, setFocusedItemId] = useState(null);
   const [tempId, setTempId] = useState(1);
   const [startDate, setStartDate] = useState(startOfMonth(new Date()));
-  const [endDate, setEndDate] = useState(endOfMonth(new Date()));
+
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
 
@@ -109,27 +110,6 @@ function PayList() {
       .reduce((sum, item) => sum + parseInt(unformatNumber(item.price2)), 0);
     setRealExpense(sumPrice2.toLocaleString("ko-KR"));
   }, [tempData]);
-
-  // datepicker - 이전/다음
-  const handleDate = (btn) => {
-    if (btn === "prev") {
-      setStartDate(startOfMonth(subMonths(startDate, 1)));
-      setEndDate(endOfMonth(subMonths(endDate, 1)));
-    } else if (btn === "next") {
-      setStartDate(startOfMonth(addMonths(startDate, 1)));
-      setEndDate(endOfMonth(addMonths(endDate, 1)));
-    }
-  };
-
-  // datepicker - 재조회
-  useEffect(() => {
-    dispatch(
-      fetchData({
-        start: format(startDate, "yyyyMMdd"),
-        end: format(endDate, "yyyyMMdd"),
-      })
-    );
-  }, [startDate, endDate]);
 
   // 데이터 수정
   const handleUpdate = (newItem, id, key) => {
@@ -306,17 +286,14 @@ function PayList() {
 
     if (modifiedData.length > 0) {
       const resultAction = await dispatch(saveData(modifiedData));
-      console.log(resultAction.meta.requestStatus, resultAction);
       if (resultAction.meta.requestStatus === "fulfilled") {
-        console.log("✅ 저장 성공:", resultAction.payload);
-
         const insertIds = resultAction.payload;
-
         setTempData((prevData) => {
           const newData = prevData.map((item) => {
             const updatedItem = insertIds.find(
               (insert) => insert.tempId === item.id
             );
+
             return updatedItem
               ? {
                   ...item,
@@ -326,6 +303,8 @@ function PayList() {
                 }
               : { ...item, isModified: false };
           });
+
+          return newData;
         });
       }
     } else {
@@ -372,35 +351,7 @@ function PayList() {
 
   return (
     <div className="payList_contents">
-      <div className="date_wrap">
-        <button className="square_button" onClick={() => handleDate("prev")}>
-          <span>&lt;</span>
-        </button>
-
-        <DatePicker
-          selected={startDate}
-          onChange={(date) => {
-            setStartDate(date);
-            if (endDate && date > endDate) setEndDate(addMonths(date, 1));
-          }}
-          dateFormat="yyyy.MM.dd"
-          className="date_picker"
-          disableTextInput
-        />
-        <span className="hyphen"></span>
-        <DatePicker
-          selected={endDate}
-          onChange={(date) => setEndDate(date)}
-          dateFormat="yyyy.MM.dd"
-          minDate={startDate}
-          className="date_picker"
-          disableTextInput
-        />
-        <button className="square_button" onClick={() => handleDate("next")}>
-          <span>&gt;</span>
-        </button>
-      </div>
-
+      <PayListFilters />
       <table className="table table-hover">
         <colgroup>
           <col style={{ width: "5%" }} />

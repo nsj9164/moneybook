@@ -23,7 +23,7 @@ const payList = createSlice({
         state.error = action.error.message;
       })
       .addCase(saveData.fulfilled, (state, action) => {
-        state.items = action.payload;
+        state.saveStatus = "succeeded";
       })
       .addCase(deleteData.fulfilled, (state, action) => {
         state.items = action.payload;
