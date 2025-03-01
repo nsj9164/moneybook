@@ -1,6 +1,15 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { logout } from "../login/loginActions";
 import { deleteData, fetchData, saveData } from "./payListActions";
+
+export const fetchPayList = createAsyncThunk(
+  "payList/fetchPayList",
+  async () => {
+    const response = await fetch("/payList");
+    const data = await response.json();
+    return { payList: data };
+  }
+);
 
 const payList = createSlice({
   name: "payList",

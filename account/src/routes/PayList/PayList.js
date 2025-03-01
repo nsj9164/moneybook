@@ -47,7 +47,7 @@ function PayList() {
   const inputRefs = useRef([]);
   const payList = useSelector((state) => state.payList.items);
   const payListStatus = useSelector((state) => state.payList.status);
-  let [tempData, setTempData] = useState([]);
+  const [tempData, setTempData] = useState([]);
   const [checkedItems, setCheckedItems] = useState([]);
   const [checkedAll, setCheckedAll] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,6 +57,7 @@ function PayList() {
   const [focusedItemId, setFocusedItemId] = useState(null);
   const [tempId, setTempId] = useState(1);
   const [startDate, setStartDate] = useState(startOfMonth(new Date()));
+  const [endDate, setEndDate] = useState(endOfMonth(new Date()));
 
   const [visibleOverlay, setVisibleOverlay] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
@@ -351,7 +352,12 @@ function PayList() {
 
   return (
     <div className="payList_contents">
-      <PayListFilters />
+      <PayListFilters
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
       <table className="table table-hover">
         <colgroup>
           <col style={{ width: "5%" }} />

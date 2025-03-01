@@ -1,8 +1,6 @@
 import { addMonths } from "date-fns";
 
 function PayListFilters() {
-  const [endDate, setEndDate] = useState(endOfMonth(new Date()));
-
   // datepicker - 이전/다음
   const handleDate = (btn) => {
     if (btn === "prev") {

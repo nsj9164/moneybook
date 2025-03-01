@@ -11,8 +11,16 @@ export const fetchLists = createAsyncThunk(
   "myDetailList/fetchLists",
   async (listTypes = ["fixedItemList", "cardList", "categoryList"]) => {
     const fetchMap = {
-      fixedItemList: () => fetch("/fixedItemList").then((res) => res.json()),
-      cardList: () => fetch("/cardList").then((res) => res.json()),
+      fixedItemList: () =>
+        fetch("/fixedItemList").then(async (res) => {
+          const json = await res.json();
+          return json;
+        }),
+      cardList: () =>
+        fetch("/cardList").then(async (res) => {
+          const json = await res.json();
+          return json;
+        }),
       categoryList: () =>
         fetch("/categoryList").then(async (res) => {
           const json = await res.json();
