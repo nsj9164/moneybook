@@ -1,6 +1,7 @@
-import { addMonths } from "date-fns";
+import { addMonths, endOfMonth, startOfMonth } from "date-fns";
+import DatePicker from "react-datepicker";
 
-function PayListFilters() {
+function PayListFilters({ startDate, setStartDate, endDate, setEndDate }) {
   // datepicker - 이전/다음
   const handleDate = (btn) => {
     if (btn === "prev") {
@@ -11,16 +12,6 @@ function PayListFilters() {
       setEndDate(endOfMonth(addMonths(endDate, 1)));
     }
   };
-
-  // datepicker - 재조회
-  useEffect(() => {
-    dispatch(
-      fetchData({
-        start: format(startDate, "yyyyMMdd"),
-        end: format(endDate, "yyyyMMdd"),
-      })
-    );
-  }, [startDate, endDate]);
 
   return (
     <div className="date_wrap">

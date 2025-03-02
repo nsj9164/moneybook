@@ -30,9 +30,13 @@ import { useAuth } from "../../hooks/useAuth";
 import CustomSelect from "../../components/SelectComponent/CustomSelect";
 import { fixedItemListActions } from "../../store/features/myDetailList/myDetailListActions";
 import { selectAllLists } from "../../store/features/myDetailList/myDetailListSelectors";
-import CardSelectOverlay from "../../components/payList/CardSelectOverlay";
+import CardSelectOverlay from "../../components/PayList/CardSelectOverlay";
 import useFetchLists from "../../hooks/useFetchLists";
-import PayListFilters from "../../components/payList/PayListFilters";
+import PayListFilters from "../../components/PayList/PayListFilters";
+import TableWrapper from "../../components/common/TableWrapper";
+import SaveButtonWrapper from "../../components/PayList/Summary/SaveButtonWrapper";
+import ButtonGroup from "../../components/PayList/Summary/ButtonGroup";
+import SummaryInfo from "../../components/PayList/Summary/SummaryInfo";
 
 function PayList() {
   const navigate = useNavigate();
@@ -44,13 +48,11 @@ function PayList() {
   }, [isLoggedIn, navigate]);
 
   let dispatch = useDispatch();
-  const inputRefs = useRef([]);
+
   const payList = useSelector((state) => state.payList.items);
   const payListStatus = useSelector((state) => state.payList.status);
   const [tempData, setTempData] = useState([]);
-  const [checkedItems, setCheckedItems] = useState([]);
-  const [checkedAll, setCheckedAll] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [price, setPrice] = useState("");
   const [expense, setExpense] = useState(0);
   const [realExpense, setRealExpense] = useState(0);
@@ -60,12 +62,10 @@ function PayList() {
   const [endDate, setEndDate] = useState(endOfMonth(new Date()));
 
   const [visibleOverlay, setVisibleOverlay] = useState(null);
-  const [isButtonHovered, setIsButtonHovered] = useState(false);
 
-  const {
-    lists: { cardList, categoryList },
-    statuses: { cardListStatus, categoryListStatus },
-  } = useFetchLists(["cardList", "categoryList"]);
+  const inputRefs = useRef([]);
+  const [checkedItems, setCheckedItems] = useState([]);
+  const [checkedAll, setCheckedAll] = useState(false);
 
   // payList 호출
   useEffect(() => {
@@ -112,16 +112,15 @@ function PayList() {
     setRealExpense(sumPrice2.toLocaleString("ko-KR"));
   }, [tempData]);
 
-  // 데이터 수정
-  const handleUpdate = (newItem, id, key) => {
-    setTempData((prevData) =>
-      prevData.map((item) => {
-        return item.id === id
-          ? { ...item, [key]: newItem, isModified: true }
-          : item;
+  // datepicker - 재조회
+  useEffect(() => {
+    dispatch(
+      fetchData({
+        start: format(startDate, "yyyyMMdd"),
+        end: format(endDate, "yyyyMMdd"),
       })
     );
-  };
+  }, [startDate, endDate]);
 
   // selectText() 호출
   useEffect(() => {
@@ -132,6 +131,25 @@ function PayList() {
       }
     }
   }, [focusedItemId]);
+
+  // 전체선택/해제
+  useEffect(() => {
+    checkedItems.length ===
+      tempData.filter((item) => !item.isDisabled).length && tempData.length > 1
+      ? setCheckedAll(true)
+      : setCheckedAll(false);
+  }, [checkedItems, tempData]);
+
+  // 데이터 수정
+  const handleUpdate = (newItem, id, key) => {
+    setTempData((prevData) =>
+      prevData.map((item) => {
+        return item.id === id
+          ? { ...item, [key]: newItem, isModified: true }
+          : item;
+      })
+    );
+  };
 
   // 추가 입력란 클릭시 초기값 세팅
   const setInitial = (item, index) => {
@@ -159,13 +177,6 @@ function PayList() {
     }
   };
 
-  // 체크항목
-  const handleCheck = (id) => {
-    setCheckedItems((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
-    );
-  };
-
   // 전체선택/해제
   const handleCheckedAll = () => {
     if (checkedAll) {
@@ -179,97 +190,11 @@ function PayList() {
     setCheckedAll(!checkedAll);
   };
 
-  // 전체선택/해제
-  useEffect(() => {
-    checkedItems.length ===
-      tempData.filter((item) => !item.isDisabled).length && tempData.length > 1
-      ? setCheckedAll(true)
-      : setCheckedAll(false);
-  }, [checkedItems, tempData]);
-
-  // 삭제
-  const handleDelete = () => {
-    const delCheckedIds = new Set(checkedItems);
-    const payListIds = new Set(
-      payList.filter((item) => delCheckedIds.has(item.id))
+  // 체크항목
+  const handleCheck = (id) => {
+    setCheckedItems((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
     );
-
-    if (delCheckedIds.size > 0) {
-      dispatch(deleteData([...delCheckedIds]));
-    }
-
-    setTempData((prevData) =>
-      prevData.filter((item) => !delCheckedIds.has(item.id))
-    );
-    setCheckedItems([]);
-  };
-
-  // 데이터 복사
-  const handleCopy = () => {
-    const copyCheckedList = tempData
-      .filter((item) => checkedItems.includes(item.id))
-      .map((item) => ({ ...item, isNew: true }));
-    copyCheckedList.map((item) => {
-      setTempId((prevTempId) => {
-        item.id = `${date}-${prevTempId}`;
-        return prevTempId + 1;
-      });
-    });
-    setTempData([
-      ...tempData.slice(0, tempData.length - 1),
-      ...copyCheckedList,
-      ...tempData.slice(-1),
-    ]);
-    setCheckedItems([]);
-  };
-
-  // modal control
-  const handleModal = () => setIsModalOpen(!isModalOpen);
-
-  // Enter - 입력
-  const handleKeyDown = (e, i, col) => {
-    if (e.key === "Enter") {
-      // 엔터로 줄바꿈 방지
-      e.preventDefault();
-      if (inputRefs.current[i]) {
-        inputRefs.current[i].focus();
-      }
-    }
-
-    if (col.includes("price")) {
-      setPrice(e.target.innerText);
-      const blockedRegex = /^[a-zA-Z~!@#$%^&*()_\-+=\[\]{}|\\;:'",.<>?/가-힣]$/;
-      if (
-        (/\d/.test(e.key) && e.target.innerText.length > 12) ||
-        blockedRegex.test(e.key)
-      ) {
-        e.preventDefault();
-      }
-    }
-  };
-
-  // 입력type
-  const handleInput = (e, col) => {
-    if (col.includes("price")) {
-      const value = e.target.innerText;
-      if (e.target.innerText !== "\n") {
-        const cursor = nowCursor();
-        const onlyNum = value.replace(/[^0-9]/g, "");
-        const formattedValue = Number(onlyNum).toLocaleString("ko-KR");
-        e.target.innerText = formattedValue;
-
-        const diffLength = formattedValue.length - value.length;
-        let adjustedStartOffset =
-          price === formattedValue && !/[ㄱ-ㅎ가-힣]/.test(value)
-            ? cursor.startOffset
-            : cursor.startOffset + diffLength;
-
-        restoreCursor(
-          e.target,
-          adjustedStartOffset >= 0 ? adjustedStartOffset : 0
-        );
-      }
-    }
   };
 
   // 저장하기
@@ -315,18 +240,6 @@ function PayList() {
     }
   };
 
-  useEffect(() => {
-    if (!isButtonHovered && visibleOverlay === "save-overlay") {
-      setVisibleOverlay(null);
-    }
-  }, [isButtonHovered]);
-
-  const handleOverlay = (overlay) => {
-    visibleOverlay === null
-      ? setVisibleOverlay(overlay)
-      : setVisibleOverlay(null);
-  };
-
   // 카드선택 버튼 클릭 시
   const changeSelectedCards = (cardId) => {
     setTempData((prevData) =>
@@ -340,15 +253,18 @@ function PayList() {
     setVisibleOverlay(null);
   };
 
-  const columns = [
-    "date",
-    "cat_nm",
-    "content",
-    "price1",
-    "price2",
-    "payment",
-    "remark",
-  ];
+  const columns = {
+    checkbox: "",
+    date: "날짜",
+    cat_nm: "분류",
+    content: "항목",
+    price1: "지출금액",
+    price2: "실지출금액",
+    payment: "결제수단",
+    remark: "비고",
+  };
+
+  const colWidths = ["5%", "10%", "10%", "auto", "12%", "12%", "15%", "15%"];
 
   return (
     <div className="payList_contents">
@@ -358,179 +274,22 @@ function PayList() {
         endDate={endDate}
         setEndDate={setEndDate}
       />
-      <table className="table table-hover">
-        <colgroup>
-          <col style={{ width: "5%" }} />
-          <col style={{ width: "10%" }} />
-          <col style={{ width: "10%" }} />
-          <col />
-          <col style={{ width: "12%" }} />
-          <col style={{ width: "12%" }} />
-          <col style={{ width: "15%" }} />
-          <col style={{ width: "15%" }} />
-        </colgroup>
-        <thead>
-          <tr>
-            <th>
-              <input
-                type="checkbox"
-                checked={checkedAll}
-                onChange={handleCheckedAll}
-              />
-            </th>
-            <th>날짜</th>
-            <th>분류</th>
-            <th>항목</th>
-            <th>지출금액</th>
-            <th>실지출금액</th>
-            <th>결제수단</th>
-            <th>비고</th>
-          </tr>
-        </thead>
-        <tbody>
-          {payListStatus === "loading" && (
-            <tr>
-              <td colSpan="8">Loading...</td>
-            </tr>
-          )}
 
-          {payListStatus === "succeeded" &&
-            tempData.map((item, i) => (
-              <tr key={i}>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={checkedItems.includes(item.id)}
-                    onChange={() => handleCheck(item.id)}
-                    disabled={item.isDisabled}
-                  />
-                </td>
-                {columns.map((col, idx) =>
-                  col === "date" ? (
-                    <td key={col}>
-                      <DatePicker
-                        selected={item[col] ? new Date(item[col]) : new Date()}
-                        onKeyDown={(e) => e.preventDefault()}
-                        onChange={(date) =>
-                          handleUpdate(format(date, "yyyy-MM-dd"), item.id, col)
-                        }
-                        onFocus={(e) => setInitial(item, i * 7 + idx)}
-                        dateFormat="yyyy-MM-dd"
-                        className="input_date"
-                      />
-                    </td>
-                  ) : col === "cat_nm" ? (
-                    <CustomSelect
-                      key={idx}
-                      value={item[col]}
-                      options={categoryList?.map((list) => ({
-                        value: list.cat_id,
-                        label: list.category_nm,
-                      }))}
-                      noSelectValue="미분류"
-                      onFocus={(e) => setInitial(item, i * 7 + idx)}
-                      onChange={(value) =>
-                        handleUpdate(value, item.id, "cat_id")
-                      }
-                    />
-                  ) : col === "payment" ? (
-                    <CustomSelect
-                      key={idx}
-                      value={item[col]}
-                      options={cardList?.map((list) => ({
-                        value: list.card_id,
-                        label: list.card_name,
-                      }))}
-                      noSelectValue="선택없음"
-                      onFocus={(e) => setInitial(item, i * 7 + idx)}
-                      onChange={(value) =>
-                        handleUpdate(value, item.id, "card_id")
-                      }
-                    />
-                  ) : (
-                    <Input
-                      key={col}
-                      ref={(el) => (inputRefs.current[i * 7 + idx] = el)}
-                      onBlur={(e) =>
-                        handleUpdate(e.target.innerText, item.id, col)
-                      }
-                      onKeyDown={(e) =>
-                        handleKeyDown(e, (i + 1) * 7 + idx, col)
-                      }
-                      onFocus={(e) => setInitial(item, i * 7 + idx)}
-                      onInput={(e) => handleInput(e, col)}
-                    >
-                      {item[col]}
-                    </Input>
-                  )
-                )}
-              </tr>
-            ))}
-
-          {payListStatus === "failed" && (
-            <tr>
-              <td colSpan="8">
-                오류가 발생하였습니다. 잠시 후 다시 시도해주세요.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <TableWrapper
+        columns={columns}
+        colWidths={colWidths}
+        data={tempData}
+        status={payListStatus}
+        handleUpdate={handleUpdate}
+        setInitial={setInitial}
+        handleCheckedAll={handleCheckedAll}
+        handleCheck={handleCheck}
+      />
 
       <div className="summary-group">
-        <div className="button-group">
-          <button disabled={checkedItems.length === 0} onClick={handleDelete}>
-            선택삭제
-          </button>
-          <button disabled={checkedItems.length === 0} onClick={handleCopy}>
-            선택복사
-          </button>
-          <div className="popover-wrapper">
-            <button
-              className="button-group-btns"
-              disabled={checkedItems.length === 0}
-              onClick={() => handleOverlay("card-overlay")}
-            >
-              카드선택
-            </button>
-
-            {visibleOverlay === "card-overlay" && (
-              <CardSelectOverlay
-                cardList={cardList}
-                changeSelectedCards={changeSelectedCards}
-              />
-            )}
-          </div>
-          <button onClick={handleModal}>고정금액</button>
-          <PayListModal show={isModalOpen} onClose={handleModal} />
-        </div>
-        <div className="summary-item item1">
-          <div>지출합계</div>
-          <div className="font-bold">{expense}</div>
-        </div>
-        <div className="summary-item item2">
-          <div>실지출합계</div>
-          <div className="font-bold">{realExpense}</div>
-        </div>
-
-        <div className="summary-item item3">
-          <div className="popover-wrapper">
-            <button
-              onClick={handleSave}
-              onMouseEnter={() => setIsButtonHovered(true)}
-              onMouseLeave={() => setIsButtonHovered(false)}
-            >
-              저장하기
-            </button>
-
-            {visibleOverlay === "save-overlay" && (
-              <Overlay
-                overlayContent={"저장할 내용이 없습니다."}
-                setVisibleOverlay={setVisibleOverlay}
-              />
-            )}
-          </div>
-        </div>
+        <ButtonGroup />
+        <SummaryInfo expense={expense} realExpense={realExpense} />
+        <SaveButtonWrapper onClick={handleSave} />
       </div>
     </div>
   );

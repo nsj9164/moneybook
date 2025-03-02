@@ -5,49 +5,28 @@ import {
   selectAllStatuses,
 } from "../store/features/myDetailList/myDetailListSelectors";
 import { fetchLists } from "../store/features/myDetailList/myDetailListSlice";
-import { fetchPayList } from "../store/features/payList/payListSlice";
+import { fetchPayList } from "../store/features/payList/payListReducer";
 
 const useFetchLists = (
-  mode = "list",
   listTypes = ["fixedItemList", "cardList", "categoryList"]
 ) => {
   const dispatch = useDispatch();
   const lists = useSelector(selectAllLists);
   const statuses = useSelector(selectAllStatuses);
 
-  const payList = useSelector((state) => state.payList.items);
-  const payListStatus = useSelector((state) => state.payList.status);
-
-  const memoizedListTypes = useMemo(
-    () => JSON.stringify(listTypes),
-    [listTypes]
-  );
-
   useEffect(() => {
-    if (mode === "list") {
-      const shouldFetchLists = listTypes.some(
-        (type) => statuses[type] !== "loading" && statuses[type] !== "succeeded"
-      );
+    const selectCond = listTypes.some(
+      (type) => statuses[type] !== "loading" && statuses[type] !== "succeeded"
+    );
 
-      if (shouldFetchLists) {
-        dispatch(fetchLists(listTypes))
-          .then((res) => console.log("fetchLists 결과:", res))
-          .catch((err) => console.log("fetchLists 에러:", err));
-      }
+    if (selectCond) {
+      dispatch(fetchLists(listTypes))
+        .then((res) => console.log("fetchLists 결과:", res))
+        .catch((err) => console.log("fetchLists 에러:", err));
     }
+  }, [dispatch, JSON.stringify(listTypes)]);
 
-    if (
-      mode === "pay" &&
-      payListStatus !== "loading" &&
-      payListStatus !== "succeeded"
-    ) {
-      dispatch(fetchPayList())
-        .then((res) => console.log("fetchPayList 결과:", res))
-        .catch((err) => console.log("fetchPayList 에러:", err));
-    }
-  }, [dispatch, mode, memoizedListTypes, payListStatus]);
-
-  return mode === "list" ? { lists, statuses } : { payList, payListStatus };
+  return { lists, statuses };
 };
 
 export default useFetchLists;

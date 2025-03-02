@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPayList } from "../store/features/payList/payListSlice";
+import { fetchPayList } from "../store/features/payList/payListReducer";
 
 const usePayList = () => {
   const dispatch = useDispatch();
