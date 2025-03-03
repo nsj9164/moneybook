@@ -1,5 +1,11 @@
-function ButtonGroup() {
+import { useState } from "react";
+import OptionButton from "../../../components/Button/OptionButton";
+import CardSelectOverlay from "../CardSelectOverlay";
+import PayListModal from "../Modal/PayListModal";
+
+function ButtonGroup({ checkedItems }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [visibleOverlay, setVisibleOverlay] = useState(false);
 
   // modal control
   const handleModal = () => setIsModalOpen(!isModalOpen);
@@ -12,7 +18,7 @@ function ButtonGroup() {
       {
         label: "카드선택",
         disabled: isDisabled,
-        onClick: () => handleOverlay("card-overlay"),
+        onClick: () => setVisibleOverlay(true),
         hasOverlay: true,
       },
       { label: "고정금액", onClick: handleModal },
@@ -55,12 +61,6 @@ function ButtonGroup() {
     setCheckedItems([]);
   };
 
-  const handleOverlay = (overlay) => {
-    visibleOverlay === null
-      ? setVisibleOverlay(overlay)
-      : setVisibleOverlay(null);
-  };
-
   return (
     <div className="button-group">
       {optionButtons().map((btn, index) =>
@@ -69,7 +69,7 @@ function ButtonGroup() {
             <OptionButton disabled={btn.disabled} onClick={btn.onClick}>
               {btn.label}
             </OptionButton>
-            {btn.hasOverlay && visibleOverlay === "card-overlay" && (
+            {btn.hasOverlay && visibleOverlay && (
               <CardSelectOverlay
                 cardList={cardList}
                 changeSelectedCards={changeSelectedCards}

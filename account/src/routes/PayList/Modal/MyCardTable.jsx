@@ -1,11 +1,10 @@
 import classNames from "classnames";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { cardCompanyListActions } from "../../store/features/myDetailList/myDetailListActions";
-import { date } from "../../util/util";
-import { Input } from "../common/EditableCell";
-import { Overlay } from "../common/Overlay";
-import CustomSelect from "../SelectComponent/CustomSelect";
+import { Overlay } from "../../../components/Overlay";
+import CustomSelect from "../../../components/SelectComponent/CustomSelect";
+import { Input } from "../../../components/Table/EditableCell";
+import { cardCompanyListActions } from "../../../store/features/myDetailList/myDetailListActions";
 
 const MyCardTable = ({
   fields,

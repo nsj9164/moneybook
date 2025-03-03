@@ -1,5 +1,5 @@
 import styled from "styled-components";
-const { Overlay } = require("../common/Overlay");
+import { Overlay } from "../../components/Overlay";
 
 const List = styled.ul`
   padding: 8px;

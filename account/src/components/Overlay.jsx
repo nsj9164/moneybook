@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import "../../styles/CustomOverlay.css";
+import { useEffect, useRef } from "react";
+import "../styles/CustomOverlay.css";
 
 export const Overlay = ({
   overlayHeader,
@@ -16,7 +16,6 @@ export const Overlay = ({
         !overlayRef.current.contains(event.target) &&
         !event.target.closest(".popover-wrapper")
       ) {
-        console.log("바껴라!!!!!!");
         setVisibleOverlay(null);
       }
     };

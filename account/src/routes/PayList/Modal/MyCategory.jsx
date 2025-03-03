@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Input } from "../../../components/common/EditableCell";
-import { categoryListActions } from "../../../store/features/myDetailList/myDetailListActions";
 import { selectText } from "../../../util/util";
 import classNames from "classnames";
-import { Overlay } from "../../../components/common/Overlay";
 import useFetchLists from "../../../hooks/useFetchLists";
-import TableEmptyRow from "../../../components/common/Table/TableEmptyRow";
+import TableEmptyRow from "../../../components/Table/TableEmptyRow";
 import { saveData } from "../../../store/features/payList/payListActions";
+import { Input } from "../../../components/Table/EditableCell";
+import { Overlay } from "../../../components/Overlay";
+import { categoryListActions } from "../../../store/features/myDetailList/myDetailListActions";
 
 function MyCategory({ catDataList, setCatDataList }) {
   const dispatch = useDispatch();

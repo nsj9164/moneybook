@@ -1,13 +1,14 @@
 import { useRef, useState } from "react";
 import DatePicker from "react-datepicker";
+import CustomSelect from "../../components/SelectComponent/CustomSelect";
+import { Input } from "../../components/Table/EditableCell";
 import useFetchLists from "../../hooks/useFetchLists";
-import { Input } from "../common/EditableCell";
-import CustomSelect from "../SelectComponent/CustomSelect";
 
 function PayListRow({
   item,
   columns,
   index,
+  checkedItems,
   handleUpdate,
   setInitial,
   handleCheck,
@@ -74,47 +75,47 @@ function PayListRow({
           disabled={item.isDisabled}
         />
       </td>
-      {Object.keys(columns).map((col, idx) =>
-        col === "date" ? (
-          <td key={col}>
-            <DatePicker
-              selected={item[col] ? new Date(item[col]) : new Date()}
-              onKeyDown={(e) => e.preventDefault()}
-              onChange={(date) =>
-                handleUpdate(format(date, "yyyy-MM-dd"), item.id, col)
-              }
+      {Object.keys(columns)
+        .filter((col) => col !== "")
+        .map((col, idx) =>
+          col === "date" ? (
+            <td key={col}>
+              <DatePicker
+                selected={item[col] ? new Date(item[col]) : new Date()}
+                onKeyDown={(e) => e.preventDefault()}
+                onChange={(date) =>
+                  handleUpdate(format(date, "yyyy-MM-dd"), item.id, col)
+                }
+                onFocus={(e) => setInitial(item, index * 7 + idx)}
+                dateFormat="yyyy-MM-dd"
+                className="input_date"
+              />
+            </td>
+          ) : col === "cat_nm" ? (
+            <CustomSelect
+              key={idx}
+              value={item[col]}
+              options={categoryList?.map((list) => ({
+                value: list.cat_id,
+                label: list.category_nm,
+              }))}
+              noSelectValue="미분류"
               onFocus={(e) => setInitial(item, index * 7 + idx)}
-              dateFormat="yyyy-MM-dd"
-              className="input_date"
+              onChange={(value) => handleUpdate(value, item.id, "cat_id")}
             />
-          </td>
-        ) : col === "cat_nm" ? (
-          <CustomSelect
-            key={idx}
-            value={item[col]}
-            options={categoryList?.map((list) => ({
-              value: list.cat_id,
-              label: list.category_nm,
-            }))}
-            noSelectValue="미분류"
-            onFocus={(e) => setInitial(item, index * 7 + idx)}
-            onChange={(value) => handleUpdate(value, item.id, "cat_id")}
-          />
-        ) : col === "payment" ? (
-          <CustomSelect
-            key={idx}
-            value={item[col]}
-            options={cardList?.map((list) => ({
-              value: list.card_id,
-              label: list.card_name,
-            }))}
-            noSelectValue="선택없음"
-            onFocus={(e) => setInitial(item, index * 7 + idx)}
-            onChange={(value) => handleUpdate(value, item.id, "card_id")}
-          />
-        ) : (
-          col !==
-          ""(
+          ) : col === "payment" ? (
+            <CustomSelect
+              key={idx}
+              value={item[col]}
+              options={cardList?.map((list) => ({
+                value: list.card_id,
+                label: list.card_name,
+              }))}
+              noSelectValue="선택없음"
+              onFocus={(e) => setInitial(item, index * 7 + idx)}
+              onChange={(value) => handleUpdate(value, item.id, "card_id")}
+            />
+          ) : (
             <Input
               key={col}
               ref={(el) => (inputRefs.current[index * 7 + idx] = el)}
@@ -126,8 +127,7 @@ function PayListRow({
               {item[col]}
             </Input>
           )
-        )
-      )}
+        )}
     </tr>
   );
 }

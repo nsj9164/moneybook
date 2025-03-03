@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { createPortal } from "react-dom";
-import "../../styles/AlertModal.css";
+import "../styles/AlertModal.css";
 const AlertModal = ({ message, onClose }) => {
   return createPortal(
     <div className="alert-modal-overlay" onClick={onClose}>

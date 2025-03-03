@@ -96,11 +96,6 @@ const myDetailList = createSlice({
         Object.keys(action.payload).forEach((key) => {
           state[key].status = "succeeded";
           state[key].items = action.payload[key];
-          console.log(
-            "#####################################",
-            key,
-            state[key].items
-          );
         });
       })
       .addCase(fetchLists.rejected, (state, action) => {

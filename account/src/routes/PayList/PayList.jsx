@@ -3,40 +3,18 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchData,
-  deleteData,
   saveData,
 } from "../../store/features/payList/payListActions";
-import {
-  date,
-  nowCursor,
-  restoreCursor,
-  selectText,
-  unformatNumber,
-} from "../../util/util";
+import { date, selectText, unformatNumber } from "../../util/util";
 import { useNavigate } from "react-router-dom";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {
-  startOfMonth,
-  endOfMonth,
-  format,
-  subMonths,
-  addMonths,
-} from "date-fns";
-import PayListModal from "./Modal/PayListModal";
-import { Overlay } from "../../components/common/Overlay";
-import { Input } from "../../components/common/EditableCell";
+import { startOfMonth, endOfMonth, format } from "date-fns";
 import { useAuth } from "../../hooks/useAuth";
-import CustomSelect from "../../components/SelectComponent/CustomSelect";
-import { fixedItemListActions } from "../../store/features/myDetailList/myDetailListActions";
-import { selectAllLists } from "../../store/features/myDetailList/myDetailListSelectors";
-import CardSelectOverlay from "../../components/PayList/CardSelectOverlay";
-import useFetchLists from "../../hooks/useFetchLists";
-import PayListFilters from "../../components/PayList/PayListFilters";
-import TableWrapper from "../../components/common/TableWrapper";
-import SaveButtonWrapper from "../../components/PayList/Summary/SaveButtonWrapper";
-import ButtonGroup from "../../components/PayList/Summary/ButtonGroup";
-import SummaryInfo from "../../components/PayList/Summary/SummaryInfo";
+import TableWrapper from "../../components/Table/TableWrapper";
+import ButtonGroup from "./Summary/ButtonGroup";
+import SummaryInfo from "./Summary/SummaryInfo";
+import SaveButtonWrapper from "./Summary/SaveButtonWrapper";
+import PayListFilters from "./PayListFilters";
 
 function PayList() {
   const navigate = useNavigate();
@@ -254,7 +232,7 @@ function PayList() {
   };
 
   const columns = {
-    checkbox: "",
+    "": "checkbox",
     date: "날짜",
     cat_nm: "분류",
     content: "항목",
@@ -280,6 +258,8 @@ function PayList() {
         colWidths={colWidths}
         data={tempData}
         status={payListStatus}
+        checkedItems={checkedItems}
+        checkedAll={checkedAll}
         handleUpdate={handleUpdate}
         setInitial={setInitial}
         handleCheckedAll={handleCheckedAll}
@@ -287,7 +267,7 @@ function PayList() {
       />
 
       <div className="summary-group">
-        <ButtonGroup />
+        <ButtonGroup checkedItems={checkedItems} />
         <SummaryInfo expense={expense} realExpense={realExpense} />
         <SaveButtonWrapper onClick={handleSave} />
       </div>

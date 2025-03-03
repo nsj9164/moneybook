@@ -1,17 +1,14 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import useFetchLists from "../../hooks/useFetchLists";
-import PayListRow from "../PayList/PayListRow";
+import PayListRow from "../../routes/PayList/PayListRow";
 
 function TableWrapper({
   columns,
-  headerTitles,
   colWidths,
   data,
   status,
   handleUpdate,
   setInitial,
+  checkedItems,
+  checkedAll,
   handleCheckedAll,
   handleCheck,
 }) {
@@ -19,18 +16,20 @@ function TableWrapper({
     <table className="table table-hover">
       <colgroup>
         {colWidths.map((width, index) => (
-          <col key={index} style={{ width: { width } }} />
+          <col key={index} style={{ width }} />
         ))}
       </colgroup>
       <thead>
         <tr>
           {Object.values(columns).map((title, index) =>
             title === "checkbox" ? (
-              <input
-                type="checkbox"
-                checked={checkedAll}
-                onChange={handleCheckedAll}
-              />
+              <th key={index}>
+                <input
+                  type="checkbox"
+                  checked={checkedAll}
+                  onChange={handleCheckedAll}
+                />
+              </th>
             ) : (
               <th key={index}>{title}</th>
             )
@@ -51,6 +50,7 @@ function TableWrapper({
               item={item}
               columns={columns}
               index={index}
+              checkedItems={checkedItems}
               handleUpdate={handleUpdate}
               setInitial={setInitial}
               handleCheck={handleCheck}

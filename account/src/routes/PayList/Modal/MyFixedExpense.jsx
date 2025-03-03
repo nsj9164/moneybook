@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Input } from "../../../components/common/EditableCell";
-import TableEmptyRow from "../../../components/common/Table/TableEmptyRow";
 import CustomSelect from "../../../components/SelectComponent/CustomSelect";
+import { Input } from "../../../components/Table/EditableCell";
+import TableEmptyRow from "../../../components/Table/TableEmptyRow";
 import useFetchLists from "../../../hooks/useFetchLists";
 import { date, nowCursor, restoreCursor, selectText } from "../../../util/util";
 
