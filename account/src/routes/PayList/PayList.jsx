@@ -31,15 +31,12 @@ function PayList() {
   const payListStatus = useSelector((state) => state.payList.status);
   const [tempData, setTempData] = useState([]);
 
-  const [price, setPrice] = useState("");
   const [expense, setExpense] = useState(0);
   const [realExpense, setRealExpense] = useState(0);
   const [focusedItemId, setFocusedItemId] = useState(null);
   const [tempId, setTempId] = useState(1);
   const [startDate, setStartDate] = useState(startOfMonth(new Date()));
   const [endDate, setEndDate] = useState(endOfMonth(new Date()));
-
-  const [visibleOverlay, setVisibleOverlay] = useState(null);
 
   const inputRefs = useRef([]);
   const [checkedItems, setCheckedItems] = useState([]);
@@ -192,8 +189,8 @@ function PayList() {
       const resultAction = await dispatch(saveData(modifiedData));
       if (resultAction.meta.requestStatus === "fulfilled") {
         const insertIds = resultAction.payload;
-        setTempData((prevData) => {
-          const newData = prevData.map((item) => {
+        setTempData((prevData) =>
+          prevData.map((item) => {
             const updatedItem = insertIds.find(
               (insert) => insert.tempId === item.id
             );
@@ -206,15 +203,12 @@ function PayList() {
                   isModified: false,
                 }
               : { ...item, isModified: false };
-          });
-
-          return newData;
-        });
+          })
+        );
       }
+      return true;
     } else {
-      if (visibleOverlay !== "save-overlay") {
-        setVisibleOverlay("save-overlay");
-      }
+      return false;
     }
   };
 
@@ -269,7 +263,7 @@ function PayList() {
       <div className="summary-group">
         <ButtonGroup checkedItems={checkedItems} />
         <SummaryInfo expense={expense} realExpense={realExpense} />
-        <SaveButtonWrapper onClick={handleSave} />
+        <SaveButtonWrapper onSave={handleSave} />
       </div>
     </div>
   );

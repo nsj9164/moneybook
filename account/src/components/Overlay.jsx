@@ -16,13 +16,13 @@ export const Overlay = ({
         !overlayRef.current.contains(event.target) &&
         !event.target.closest(".popover-wrapper")
       ) {
-        setVisibleOverlay(null);
+        setVisibleOverlay(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [setVisibleOverlay]);
   return (

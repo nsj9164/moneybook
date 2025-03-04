@@ -18,6 +18,7 @@ function PayListRow({
     lists: { cardList, categoryList },
     statuses: { cardListStatus, categoryListStatus },
   } = useFetchLists(["cardList", "categoryList"]);
+  const [price, setPrice] = useState("");
 
   // Enter - 입력
   const handleKeyDown = (e, i, col) => {
