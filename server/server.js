@@ -66,6 +66,7 @@ async function saveData(
           const values = insertFields
             .map((field) => item[field] ?? null)
             .concat([userId]);
+
           db.query(
             `INSERT INTO ${tableName} (${fieldNames.join(
               ", "
@@ -88,6 +89,7 @@ async function saveData(
           const values = updateFields
             .map((field) => item[field])
             .concat([item[idField]]);
+
           db.query(
             `UPDATE ${tableName} SET ${setClause}, UPD_DT = SYSDATE() WHERE ${idField} = ?`,
             values,
@@ -112,18 +114,14 @@ app.post("/payList", authenticateToken, function (req, res) {
   db.query(
     `SELECT id
           , DATE_FORMAT(date,"%Y-%m-%d") as date
-          , A.cat_id
-          , B.category_nm
+          , cat_id
           , content
           , FORMAT(price1,0) as price1
           , FORMAT(price2,0) as price2
-          , A.card_id
-          , C.card_name
+          , card_id
           , remark
-       FROM PAYLIST A
-       LEFT JOIN CATEGORY_INFO B ON A.cat_id  = B.cat_id
-       LEFT JOIN CARD_INFO C     ON A.card_id = C.card_id
-      WHERE A.USER_ID = ?
+       FROM PAYLIST
+      WHERE USER_ID = ?
         AND DATE >= ?
         AND DATE <= ?
       ORDER BY DATE, ID`,
@@ -138,7 +136,7 @@ app.post("/payList", authenticateToken, function (req, res) {
 app.post("/payList/insert", authenticateToken, async function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
-
+  console.log("%%%%%%%%%%%%", data);
   try {
     const filteredData = await saveData(
       "PAYLIST",
@@ -153,6 +151,7 @@ app.post("/payList/insert", authenticateToken, async function (req, res) {
       ["date", "cat_id", "content", "price1", "price2", "card_id", "remark"],
       "id"
     );
+    console.log(filteredData);
     res.json(filteredData);
   } catch (error) {
     console.error("❌ 데이터 저장 중 오류 발생:", error);
@@ -168,8 +167,8 @@ app.post("/payList/delete", authenticateToken, function (req, res) {
     db.query(
       `DELETE FROM PAYLIST
                    WHERE user_id = ?
-                     AND id = ?`,
-      [userId, item.id],
+                     AND id in [?]`,
+      [userId, item.id.join(",")],
       (err, result) => {
         if (err) throw err;
       }
@@ -299,7 +298,7 @@ app.post("/fixedItemList/insert", authenticateToken, async function (req, res) {
 app.post("/fixedItemList/delete", authenticateToken, function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
-  console.log("data///////", data);
+
   if (data.length > 0) {
     const placeholders = data.map(() => "?").join(", ");
 

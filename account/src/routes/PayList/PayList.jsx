@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  deleteData,
   fetchData,
   saveData,
 } from "../../store/features/payList/payListActions";
@@ -41,6 +42,8 @@ function PayList() {
   const inputRefs = useRef([]);
   const [checkedItems, setCheckedItems] = useState([]);
   const [checkedAll, setCheckedAll] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showAlertModal, setShowAlertModal] = useState(false);
 
   // payList 호출
   useEffect(() => {
@@ -85,6 +88,7 @@ function PayList() {
       .filter((item) => item.price2 && unformatNumber(item.price2) > 0)
       .reduce((sum, item) => sum + parseInt(unformatNumber(item.price2)), 0);
     setRealExpense(sumPrice2.toLocaleString("ko-KR"));
+    console.log("###################", tempData);
   }, [tempData]);
 
   // datepicker - 재조회
@@ -96,16 +100,6 @@ function PayList() {
       })
     );
   }, [startDate, endDate]);
-
-  // selectText() 호출
-  useEffect(() => {
-    if (focusedItemId !== null) {
-      const focusedElement = inputRefs.current[focusedItemId];
-      if (focusedElement) {
-        selectText({ target: focusedElement });
-      }
-    }
-  }, [focusedItemId]);
 
   // 전체선택/해제
   useEffect(() => {
@@ -136,8 +130,8 @@ function PayList() {
             ...i,
             id: `${date}-${tempId}`,
             date,
-            price1: 0,
-            price2: 0,
+            price1: "0",
+            price2: "0",
             isDisabled: false,
             isNew: true,
           };
@@ -146,10 +140,11 @@ function PayList() {
         }
       });
       setTempData(newData);
-      setTimeout(() => setFocusedItemId(index), 0);
+      // setTimeout(() => setFocusedItemId(index), 0);
     } else {
-      setFocusedItemId(index);
+      // setFocusedItemId(index);
     }
+    setFocusedItemId(index);
   };
 
   // 전체선택/해제
@@ -176,15 +171,15 @@ function PayList() {
   const handleSave = async () => {
     const modifiedData = tempData.filter((item) => {
       const hasValidFields =
-        Boolean(item.cat_nm) ||
+        Boolean(item.cat_id) ||
         Boolean(item.content) ||
         Boolean(item.price1) ||
         Boolean(item.price2) ||
-        Boolean(item.payment) ||
+        Boolean(item.card_id) ||
         Boolean(item.remark);
       return (item.isModified || item.isNew) && hasValidFields;
     });
-
+    console.log("@@@@@@@@@@@@@", modifiedData);
     if (modifiedData.length > 0) {
       const resultAction = await dispatch(saveData(modifiedData));
       if (resultAction.meta.requestStatus === "fulfilled") {
@@ -212,6 +207,52 @@ function PayList() {
     }
   };
 
+  // 삭제
+  const handleDelete = async () => {
+    const delCheckedIds = new Set(checkedItems);
+    const payListIds = payList
+      .filter((item) => delCheckedIds.has(item.id))
+      .map((item) => item.id);
+    console.log("✴payListIds✴", payListIds);
+    if (payListIds.size > 0) {
+      const deleteAction = await dispatch(deleteData(payListIds));
+      console.log(deleteAction.meta.requestStatus);
+      if (deleteAction.meta.requestStatus === "fulfilled") {
+        setAlertMessage("삭제되었습니다.");
+        setShowAlertModal(true);
+      } else {
+        setAlertMessage("처리 중 오류가 발생하였습니다.");
+        setShowAlertModal(true);
+      }
+    }
+
+    setTempData((prevData) =>
+      prevData.filter((item) => !delCheckedIds.has(item.id))
+    );
+    setCheckedItems([]);
+  };
+
+  // 데이터 복사
+  const handleCopy = () => {
+    const copyCheckedList = tempData
+      .filter((item) => checkedItems.includes(item.id))
+      .map((item) => ({ ...item, isNew: true }));
+
+    copyCheckedList.map((item) => {
+      setTempId((prevTempId) => {
+        item.id = `${date}-${prevTempId}`;
+        return prevTempId + 1;
+      });
+    });
+
+    setTempData([
+      ...tempData.slice(0, tempData.length - 1),
+      ...copyCheckedList,
+      ...tempData.slice(-1),
+    ]);
+    setCheckedItems([]);
+  };
+
   // 카드선택 버튼 클릭 시
   const changeSelectedCards = (cardId) => {
     setTempData((prevData) =>
@@ -228,11 +269,11 @@ function PayList() {
   const columns = {
     "": "checkbox",
     date: "날짜",
-    cat_nm: "분류",
+    cat_id: "분류",
     content: "항목",
     price1: "지출금액",
     price2: "실지출금액",
-    payment: "결제수단",
+    card_id: "결제수단",
     remark: "비고",
   };
 
@@ -258,13 +299,25 @@ function PayList() {
         setInitial={setInitial}
         handleCheckedAll={handleCheckedAll}
         handleCheck={handleCheck}
+        setFocusedItemId={setFocusedItemId}
       />
 
       <div className="summary-group">
-        <ButtonGroup checkedItems={checkedItems} />
+        <ButtonGroup
+          checkedItems={checkedItems}
+          handleDelete={handleDelete}
+          handleCopy={handleCopy}
+        />
         <SummaryInfo expense={expense} realExpense={realExpense} />
         <SaveButtonWrapper onSave={handleSave} />
       </div>
+
+      {showAlertModal && (
+        <AlertModal
+          message={alertMessage}
+          onClose={() => setShowAlertModal(false)}
+        />
+      )}
     </div>
   );
 }

@@ -5,7 +5,6 @@ import {
   selectAllStatuses,
 } from "../store/features/myDetailList/myDetailListSelectors";
 import { fetchLists } from "../store/features/myDetailList/myDetailListSlice";
-import { fetchPayList } from "../store/features/payList/payListReducer";
 
 const useFetchLists = (
   listTypes = ["fixedItemList", "cardList", "categoryList"]

@@ -11,6 +11,7 @@ function TableWrapper({
   checkedAll,
   handleCheckedAll,
   handleCheck,
+  setFocusedItemId,
 }) {
   return (
     <table className="table table-hover">
@@ -54,6 +55,7 @@ function TableWrapper({
               handleUpdate={handleUpdate}
               setInitial={setInitial}
               handleCheck={handleCheck}
+              setFocusedItemId={setFocusedItemId}
             />
           ))}
 

@@ -3,7 +3,7 @@ import OptionButton from "../../../components/Button/OptionButton";
 import CardSelectOverlay from "../CardSelectOverlay";
 import PayListModal from "../Modal/PayListModal";
 
-function ButtonGroup({ checkedItems }) {
+function ButtonGroup({ checkedItems, handleDelete, handleCopy }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visibleOverlay, setVisibleOverlay] = useState(false);
 
@@ -23,42 +23,6 @@ function ButtonGroup({ checkedItems }) {
       },
       { label: "고정금액", onClick: handleModal },
     ];
-  };
-
-  // 삭제
-  const handleDelete = () => {
-    const delCheckedIds = new Set(checkedItems);
-    const payListIds = new Set(
-      payList.filter((item) => delCheckedIds.has(item.id))
-    );
-
-    if (delCheckedIds.size > 0) {
-      dispatch(deleteData([...delCheckedIds]));
-    }
-
-    setTempData((prevData) =>
-      prevData.filter((item) => !delCheckedIds.has(item.id))
-    );
-    setCheckedItems([]);
-  };
-
-  // 데이터 복사
-  const handleCopy = () => {
-    const copyCheckedList = tempData
-      .filter((item) => checkedItems.includes(item.id))
-      .map((item) => ({ ...item, isNew: true }));
-    copyCheckedList.map((item) => {
-      setTempId((prevTempId) => {
-        item.id = `${date}-${prevTempId}`;
-        return prevTempId + 1;
-      });
-    });
-    setTempData([
-      ...tempData.slice(0, tempData.length - 1),
-      ...copyCheckedList,
-      ...tempData.slice(-1),
-    ]);
-    setCheckedItems([]);
   };
 
   return (

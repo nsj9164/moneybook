@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import CustomSelect from "../../components/SelectComponent/CustomSelect";
 import { Input } from "../../components/Table/EditableCell";
 import useFetchLists from "../../hooks/useFetchLists";
+import { nowCursor, restoreCursor, selectText } from "../../util/util";
 
 function PayListRow({
   item,
@@ -19,6 +20,17 @@ function PayListRow({
     statuses: { cardListStatus, categoryListStatus },
   } = useFetchLists(["cardList", "categoryList"]);
   const [price, setPrice] = useState("");
+  const [focusedItemId, setFocusedItemId] = useState(null);
+
+  // selectText() 호출
+  useEffect(() => {
+    if (focusedItemId !== null) {
+      const focusedElement = inputRefs.current[focusedItemId];
+      if (focusedElement) {
+        selectText({ target: focusedElement });
+      }
+    }
+  }, [focusedItemId]);
 
   // Enter - 입력
   const handleKeyDown = (e, i, col) => {
@@ -92,7 +104,7 @@ function PayListRow({
                 className="input_date"
               />
             </td>
-          ) : col === "cat_nm" ? (
+          ) : col === "cat_id" ? (
             <CustomSelect
               key={idx}
               value={item[col]}
@@ -104,7 +116,7 @@ function PayListRow({
               onFocus={(e) => setInitial(item, index * 7 + idx)}
               onChange={(value) => handleUpdate(value, item.id, "cat_id")}
             />
-          ) : col === "payment" ? (
+          ) : col === "card_id" ? (
             <CustomSelect
               key={idx}
               value={item[col]}
