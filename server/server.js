@@ -136,7 +136,7 @@ app.post("/payList", authenticateToken, function (req, res) {
 app.post("/payList/insert", authenticateToken, async function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
-  console.log("%%%%%%%%%%%%", data);
+
   try {
     const filteredData = await saveData(
       "PAYLIST",
@@ -163,17 +163,25 @@ app.post("/payList/delete", authenticateToken, function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
 
-  data.forEach((item) => {
-    db.query(
-      `DELETE FROM PAYLIST
-                   WHERE user_id = ?
-                     AND id in [?]`,
-      [userId, item.id.join(",")],
-      (err, result) => {
-        if (err) throw err;
+  db.query(
+    `DELETE FROM PAYLIST
+                 WHERE user_id = ?
+                   AND id in (?)`,
+    [userId, data],
+    (err, result) => {
+      if (err) {
+        console.error("저장 중 오류 발생:", error);
+        res
+          .status(500)
+          .json({ status: 500, message: "삭제 중 오류가 발생했습니다." });
+      } else {
+        console.log("삭제 완료:", data);
+        res
+          .status(200)
+          .json({ status: 200, message: "삭제되었습니다.", deletedIds: data });
       }
-    );
-  });
+    }
+  );
 });
 
 app.post("/loginCheck", function (req, res) {

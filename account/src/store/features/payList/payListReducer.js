@@ -15,7 +15,9 @@ const payList = createSlice({
   name: "payList",
   initialState: {
     items: [],
-    status: "idle",
+    fetchStatus: "idle",
+    saveStatus: "idle",
+    deleteStatus: "idle",
     error: null,
   },
   extraReducers: (builder) => {
@@ -34,8 +36,18 @@ const payList = createSlice({
       .addCase(saveData.fulfilled, (state, action) => {
         state.saveStatus = "succeeded";
       })
+      .addCase(deleteData.pending, (state) => {
+        state.deleteStatus = "loading";
+      })
       .addCase(deleteData.fulfilled, (state, action) => {
-        state.items = action.payload;
+        const deletedIds = action.payload.deletedIds;\
+        state.items = state.items.filter(
+          (item) => !deletedIds.includes(item.id)
+        );
+      })
+      .addCase(deleteData.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       })
       .addCase(logout.fulfilled, (state) => {
         state.items = [];

@@ -26,5 +26,6 @@ export const deleteData = createAsyncThunk(
       "http://localhost:8009/payList/delete",
       data
     );
+    return response.data;
   }
 );

@@ -16,6 +16,7 @@ import ButtonGroup from "./Summary/ButtonGroup";
 import SummaryInfo from "./Summary/SummaryInfo";
 import SaveButtonWrapper from "./Summary/SaveButtonWrapper";
 import PayListFilters from "./PayListFilters";
+import AlertModal from "../../components/AlertModal";
 
 function PayList() {
   const navigate = useNavigate();
@@ -57,13 +58,31 @@ function PayList() {
   // tempData - payList 복제
   useEffect(() => {
     if (payListStatus === "succeeded" && payList.length > 0) {
-      setTempData(
-        payList.map((item) => ({
-          ...item,
-          isDisabled: false,
-          isModified: false,
-        }))
-      );
+      setTempData((prevTempData) => {
+        const payListIds = new Set(payList.map((item) => item.id));
+
+        if (prevTempData.length === 0) {
+          return payList.map((item) => ({
+            ...item,
+            isDisabled: false,
+            isModified: false,
+          }));
+        }
+
+        const filteredTempData = prevTempData.filter(
+          (item) => payListIds.has(item.id) || isNaN(item.id)
+        );
+
+        return [
+          ...filteredTempData.map((item) => {
+            const updatedItem = payList.find((p) => p.id === item.id);
+            return updatedItem ? { ...item, ...updatedItem } : item;
+          }),
+          ...payList.filter(
+            (item) => !filteredTempData.some((t) => t.id === item.id)
+          ),
+        ];
+      });
     } else {
       setTempData([{ isDisabled: true }]);
     }
@@ -179,7 +198,7 @@ function PayList() {
         Boolean(item.remark);
       return (item.isModified || item.isNew) && hasValidFields;
     });
-    console.log("@@@@@@@@@@@@@", modifiedData);
+
     if (modifiedData.length > 0) {
       const resultAction = await dispatch(saveData(modifiedData));
       if (resultAction.meta.requestStatus === "fulfilled") {
@@ -207,28 +226,45 @@ function PayList() {
     }
   };
 
-  // 삭제
+  // 데이터 삭제
   const handleDelete = async () => {
     const delCheckedIds = new Set(checkedItems);
     const payListIds = payList
       .filter((item) => delCheckedIds.has(item.id))
       .map((item) => item.id);
-    console.log("✴payListIds✴", payListIds);
-    if (payListIds.size > 0) {
-      const deleteAction = await dispatch(deleteData(payListIds));
-      console.log(deleteAction.meta.requestStatus);
-      if (deleteAction.meta.requestStatus === "fulfilled") {
-        setAlertMessage("삭제되었습니다.");
-        setShowAlertModal(true);
-      } else {
-        setAlertMessage("처리 중 오류가 발생하였습니다.");
-        setShowAlertModal(true);
+    const tempDataIds = tempData
+      .filter((item) => delCheckedIds.has(item.id))
+      .map((item) => item.id);
+
+    let message = "";
+
+    try {
+      if (payListIds.length > 0) {
+        const deleteAction = await dispatch(deleteData(payListIds));
+        const status = deleteAction.payload?.status;
+        if (status === 200) {
+          message = deleteAction.payload.message || "삭제되었습니다.";
+        } else {
+          message = "삭제 중 오류가 발생했습니다";
+        }
       }
+
+      if (tempDataIds.length > 0) {
+        setTempData((prevData) =>
+          prevData.filter((item) => !tempDataIds.includes(item.id))
+        );
+        if (!message) message = "삭제되었습니다.";
+      }
+    } catch (error) {
+      console.error("Error details:", error);
+      message = "삭제 중 오류가 발생했습니다.";
     }
 
-    setTempData((prevData) =>
-      prevData.filter((item) => !delCheckedIds.has(item.id))
-    );
+    if (message) {
+      setAlertMessage(message);
+      setShowAlertModal(true);
+    }
+
     setCheckedItems([]);
   };
 
