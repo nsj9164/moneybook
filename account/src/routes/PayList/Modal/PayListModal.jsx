@@ -7,7 +7,7 @@ import {
   fixedItemListActions,
 } from "../../../store/features/myDetailList/myDetailListActions";
 import { Overlay } from "../../../components/Overlay";
-import { useAuth } from "../../../hooks/useAuth";
+import { useAuth } from "../../../hooks/auth/useAuth";
 import tabConfigs from "../../../config/tabConfigs";
 import TabContent from "./TabContent";
 import AlertModal from "../../../components/AlertModal";

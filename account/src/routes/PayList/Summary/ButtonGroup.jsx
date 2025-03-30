@@ -3,7 +3,12 @@ import OptionButton from "../../../components/Button/OptionButton";
 import CardSelectOverlay from "../CardSelectOverlay";
 import PayListModal from "../Modal/PayListModal";
 
-function ButtonGroup({ checkedItems, handleDelete, handleCopy }) {
+function ButtonGroup({
+  checkedItems,
+  handleDelete,
+  handleCopy,
+  changeSelectedCards,
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visibleOverlay, setVisibleOverlay] = useState(false);
 

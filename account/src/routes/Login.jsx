@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginData } from "../store/features/login/loginActions";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../hooks/auth/useAuth";
 
 export const Login = () => {
   const dispatch = useDispatch();

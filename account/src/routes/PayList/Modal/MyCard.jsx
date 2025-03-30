@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TableEmptyRow from "../../../components/Table/TableEmptyRow";
-import { useAuth } from "../../../hooks/useAuth";
+import { useAuth } from "../../../hooks/auth/useAuth";
 import useFetchLists from "../../../hooks/useFetchLists";
 import { cardListActions } from "../../../store/features/myDetailList/myDetailListActions";
 import { getCardBillingPeriod } from "../../../util/payDateUtils";
