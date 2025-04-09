@@ -1,4 +1,4 @@
-import PayListRow from "../../routes/PayList/PayListRow";
+import PayListRow from "@/routes/PayList/PayListRow";
 
 function TableWrapper({
   columns,

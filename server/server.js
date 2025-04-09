@@ -151,7 +151,6 @@ app.post("/payList/insert", authenticateToken, async function (req, res) {
       ["date", "cat_id", "content", "price1", "price2", "card_id", "remark"],
       "id"
     );
-    console.log(filteredData);
     res.json(filteredData);
   } catch (error) {
     console.error("❌ 데이터 저장 중 오류 발생:", error);
@@ -373,7 +372,6 @@ app.post("/cardList/insert", authenticateToken, async function (req, res) {
       ],
       "card_id"
     );
-    console.log("✅ 최종 응답 데이터:", filteredData);
     res.json(filteredData);
   } catch (error) {
     console.error("❌ 데이터 저장 중 오류 발생:", error);
@@ -439,7 +437,6 @@ app.post("/categoryList/insert", authenticateToken, async function (req, res) {
       ["category_nm"],
       "cat_id"
     );
-    console.log("✅ 최종 응답 데이터:", filteredData);
     res.json(filteredData);
   } catch (error) {
     console.error("❌ 데이터 저장 중 오류 발생:", error);
@@ -450,7 +447,6 @@ app.post("/categoryList/insert", authenticateToken, async function (req, res) {
 app.post("/categoryList/delete", authenticateToken, function (req, res) {
   const userId = req.user.userId;
   const data = req.body;
-  console.log("호출", data);
   db.query(
     `DELETE FROM CATEGORY_INFO
       WHERE user_id = ?

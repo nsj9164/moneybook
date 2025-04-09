@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import TableEmptyRow from "../../../components/Table/TableEmptyRow";
-import { useAuth } from "../../../hooks/auth/useAuth";
-import useFetchLists from "../../../hooks/useFetchLists";
-import { cardListActions } from "../../../store/features/myDetailList/myDetailListActions";
-import { getCardBillingPeriod } from "../../../util/payDateUtils";
-import { date, selectText } from "../../../util/util";
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
+import TableEmptyRow from "@/components/Table/TableEmptyRow";
+import { useAuth } from "@/hooks/auth/useAuth";
+import useFetchLists from "@/hooks/data/useFetchLists";
+import { cardListActions } from "@/store/features/myDetailList/myDetailListActions";
+import { getCardBillingPeriod } from "@/util/payDateUtils";
+import { selectText } from "@/util/util";
 import MyCardTable from "./MyCardTable";
 
 function MyCard({ setCardDataList }) {

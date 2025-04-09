@@ -30,11 +30,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "watch-save": "chokidar \"src/**/*\" -c \"npm run build\""
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [
@@ -49,8 +48,8 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "chokidar-cli": "^3.0.0",
-    "typescript": "^5.8.2",
     "webpack-dev-server": "^5.1.0"
   },
   "proxy": "http://apis.data.go.kr"

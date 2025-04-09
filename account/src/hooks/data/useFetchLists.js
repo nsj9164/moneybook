@@ -1,10 +1,10 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectAllLists,
   selectAllStatuses,
-} from "../store/features/myDetailList/myDetailListSelectors";
-import { fetchLists } from "../store/features/myDetailList/myDetailListSlice";
+} from "@/store/features/myDetailList/myDetailListSelectors";
+import { fetchLists } from "@/store/features/myDetailList/myDetailListSlice";
 
 const useFetchLists = (
   listTypes = ["fixedItemList", "cardList", "categoryList"]

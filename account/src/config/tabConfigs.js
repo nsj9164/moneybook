@@ -1,11 +1,7 @@
-import MyCard from "../routes/PayList/Modal/MyCard";
-import MyCategory from "../routes/PayList/Modal/MyCategory";
-import MyFixedExpense from "../routes/PayList/Modal/MyFixedExpense";
-import {
-  cardListActions,
-  categoryListActions,
-  fixedItemListActions,
-} from "../store/features/myDetailList/myDetailListActions";
+import MyCard from "@/routes/PayList/Modal/MyCard";
+import MyCategory from "@/routes/PayList/Modal/MyCategory";
+import MyFixedExpense from "@/routes/PayList/Modal/MyFixedExpense";
+import { cardListActions } from "@/store/features/myDetailList/myDetailListActions";
 
 const tabConfigs = ({
   setFixedDataList,

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import "../styles/CustomOverlay.css";
+import "@/styles/CustomOverlay.css";
 
 export const Overlay = ({
   overlayHeader,

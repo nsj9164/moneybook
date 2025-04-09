@@ -1,21 +1,12 @@
-import styled from "styled-components";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  deleteData,
-  fetchData,
-  saveData,
-} from "../../store/features/payList/payListActions";
-import { date } from "../../util/util";
 import "react-datepicker/dist/react-datepicker.css";
-import { format } from "date-fns";
-import TableWrapper from "../../components/Table/TableWrapper";
+import TableWrapper from "@/components/Table/TableWrapper";
 import ButtonGroup from "./Summary/ButtonGroup";
 import SummaryInfo from "./Summary/SummaryInfo";
 import SaveButtonWrapper from "./Summary/SaveButtonWrapper";
 import PayListFilters from "./PayListFilters";
-import AlertModal from "../../components/AlertModal";
-import { useAuthRedirect } from "../../hooks/auth/useAuthRedirect";
+import AlertModal from "@/components/AlertModal";
+import { useAuthRedirect } from "@/hooks/auth/useAuthRedirect";
+import { usePayList } from "@/hooks/payList/usePayList";
 
 function PayList() {
   useAuthRedirect();

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import OptionButton from "../../../components/Button/OptionButton";
+import OptionButton from "@/components/Button/OptionButton";
 import CardSelectOverlay from "../CardSelectOverlay";
 import PayListModal from "../Modal/PayListModal";
 

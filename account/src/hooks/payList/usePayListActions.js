@@ -1,7 +1,7 @@
-import {
-  deleteData,
-  saveData,
-} from "../../store/features/payList/payListActions";
+import { deleteData, saveData } from "@/store/features/payList/payListActions";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export const usePayListActions = (
   tempData,

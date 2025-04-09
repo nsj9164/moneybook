@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import "../../../styles/App.modal.css";
+import "@/styles/App.modal.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
   cardListActions,
   categoryListActions,
   fixedItemListActions,
-} from "../../../store/features/myDetailList/myDetailListActions";
-import { Overlay } from "../../../components/Overlay";
-import { useAuth } from "../../../hooks/auth/useAuth";
-import tabConfigs from "../../../config/tabConfigs";
+} from "@/store/features/myDetailList/myDetailListActions";
+import { Overlay } from "@/components/Overlay";
+import { useAuth } from "@/hooks/auth/useAuth";
+import tabConfigs from "@/config/tabConfigs";
 import TabContent from "./TabContent";
-import AlertModal from "../../../components/AlertModal";
+import AlertModal from "@/components/AlertModal";
 
 const PayListModal = ({ show, onClose }) => {
   // Modal hide일때 렌더링 방지

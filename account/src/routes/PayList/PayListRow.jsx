@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
-import CustomSelect from "../../components/SelectComponent/CustomSelect";
-import { Input } from "../../components/Table/EditableCell";
-import useFetchLists from "../../hooks/useFetchLists";
-import { nowCursor, restoreCursor, selectText } from "../../util/util";
+import CustomSelect from "@/components/SelectComponent/CustomSelect";
+import { Input } from "@/components/Table/EditableCell";
+import useFetchLists from "@/hooks/data/useFetchLists";
+import { nowCursor, restoreCursor, selectText } from "@/util/util";
 
 function PayListRow({
   item,

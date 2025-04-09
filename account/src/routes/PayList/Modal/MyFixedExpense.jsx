@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import CustomSelect from "../../../components/SelectComponent/CustomSelect";
-import { Input } from "../../../components/Table/EditableCell";
-import TableEmptyRow from "../../../components/Table/TableEmptyRow";
-import useFetchLists from "../../../hooks/useFetchLists";
-import { date, nowCursor, restoreCursor, selectText } from "../../../util/util";
+import { useSelector } from "react-redux";
+import CustomSelect from "@/components/SelectComponent/CustomSelect";
+import { Input } from "@/components/Table/EditableCell";
+import TableEmptyRow from "@/components/Table/TableEmptyRow";
+import useFetchLists from "@/hooks/data/useFetchLists";
+import { date, nowCursor, restoreCursor, selectText } from "@/util/util";
 
 function MyFixedExpense({ setFixedDataList, checkedItems, setCheckedItems }) {
-  const dispatch = useDispatch();
   const {
     lists: { fixedItemList, cardList, categoryList },
     statuses: { fixedItemListStatus },

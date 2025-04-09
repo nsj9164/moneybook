@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Overlay } from "../../../components/Overlay";
-import SaveButton from "../../../components/Button/SaveButton";
-import AlertModal from "../../../components/AlertModal";
+import { Overlay } from "@/components/Overlay";
+import SaveButton from "@/components/Button/SaveButton";
+import AlertModal from "@/components/AlertModal";
 
 function SaveButtonWrapper({ onSave }) {
   const [isButtonHovered, setIsButtonHovered] = useState(false);

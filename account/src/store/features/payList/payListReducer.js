@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { logout } from "../login/loginActions";
+import { logout } from "@/store/features/login/loginActions.js";
 import { deleteData, fetchData, saveData } from "./payListActions";
 
 export const fetchPayList = createAsyncThunk(
@@ -40,7 +40,7 @@ const payList = createSlice({
         state.deleteStatus = "loading";
       })
       .addCase(deleteData.fulfilled, (state, action) => {
-        const deletedIds = action.payload.deletedIds;\
+        const deletedIds = action.payload.deletedIds;
         state.items = state.items.filter(
           (item) => !deletedIds.includes(item.id)
         );
