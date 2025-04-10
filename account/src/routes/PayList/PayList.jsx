@@ -7,6 +7,9 @@ import PayListFilters from "./PayListFilters";
 import AlertModal from "@/components/AlertModal";
 import { useAuthRedirect } from "@/hooks/auth/useAuthRedirect";
 import { usePayList } from "@/hooks/payList/usePayList";
+import PayListChart from "./PayListChart";
+import { useChartData } from "@/hooks/payList/useChartData";
+import useFetchLists from "@/hooks/data/useFetchLists";
 
 function PayList() {
   useAuthRedirect();
@@ -35,6 +38,12 @@ function PayList() {
     setFocusedItemId,
   } = usePayList();
 
+  const {
+    lists: { categoryList },
+    statuses: { categoryListStatus },
+  } = useFetchLists(["categoryList"]);
+  const { chartData, chartLabels } = useChartData(tempData, categoryList);
+
   const columns = {
     "": "checkbox",
     date: "날짜",
@@ -56,6 +65,8 @@ function PayList() {
         endDate={endDate}
         setEndDate={setEndDate}
       />
+
+      <PayListChart chartData={chartData} chartLabels={chartLabels} />
 
       <TableWrapper
         columns={columns}

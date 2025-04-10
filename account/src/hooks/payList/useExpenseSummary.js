@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { unformatNumber } from "@/util/util";
 
-export const useExpenseSummary = (tempData) => {
+export const useExpenseSummary = (tempData, setTempData) => {
   const [expense, setExpense] = useState(0);
   const [realExpense, setRealExpense] = useState(0);
 
@@ -26,4 +26,6 @@ export const useExpenseSummary = (tempData) => {
     setExpense(sum("price1").toLocaleString("ko-KR"));
     setRealExpense(sum("price2").toLocaleString("ko-KR"));
   }, [tempData]);
+
+  return { expense, realExpense };
 };

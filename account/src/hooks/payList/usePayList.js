@@ -54,7 +54,7 @@ export const usePayList = () => {
   }, [startDate, endDate]);
 
   const selection = useSelection(tempData);
-  const summary = useExpenseSummary(tempData);
+  const summary = useExpenseSummary(tempData, setTempData);
   const actions = usePayListActions(tempData, setTempData, selection);
 
   return {
