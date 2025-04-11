@@ -10,6 +10,7 @@ import { usePayList } from "@/hooks/payList/usePayList";
 import PayListChart from "./PayListChart";
 import { useChartData } from "@/hooks/payList/useChartData";
 import useFetchLists from "@/hooks/data/useFetchLists";
+import { useState } from "react";
 
 function PayList() {
   useAuthRedirect();
@@ -42,7 +43,13 @@ function PayList() {
     lists: { categoryList },
     statuses: { categoryListStatus },
   } = useFetchLists(["categoryList"]);
-  const { chartData, chartLabels } = useChartData(tempData, categoryList);
+  const [showOnlyUsed, setShowOnlyUsed] = useState(false);
+  const { chartData, chartLabels } = useChartData(
+    tempData,
+    categoryList,
+    "price1",
+    showOnlyUsed
+  );
 
   const columns = {
     "": "checkbox",
@@ -66,7 +73,11 @@ function PayList() {
         setEndDate={setEndDate}
       />
 
-      <PayListChart chartData={chartData} chartLabels={chartLabels} />
+      <PayListChart
+        chartData={chartData}
+        chartLabels={chartLabels}
+        showOnlyUsed={showOnlyUsed}
+      />
 
       <TableWrapper
         columns={columns}

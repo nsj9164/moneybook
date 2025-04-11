@@ -7,6 +7,7 @@ import TableEmptyRow from "@/components/Table/TableEmptyRow";
 import { Input } from "@/components/Table/EditableCell";
 import { Overlay } from "@/components/Overlay";
 import { categoryListActions } from "@/store/features/myDetailList/myDetailListActions";
+import AlertModal from "@/components/AlertModal";
 
 function MyCategory({ catDataList, setCatDataList }) {
   const dispatch = useDispatch();
@@ -116,17 +117,31 @@ function MyCategory({ catDataList, setCatDataList }) {
   }, [focusedItemId]);
 
   // 삭제하기
-  const handleDelete = (id, isDisabled) => {
+  const handleDelete = async (id, isDisabled) => {
     if (isDisabled) {
       setVisibleOverlay(true);
-    } else {
-      if (categoryList.some((item) => item.cat_id === id)) {
-        dispatch(categoryListActions.deleteData([id])).then((resultAction) => {
-          if (resultAction.meta.requestStatus === "fulfilled") {
-            setShowAlertModal(true);
-          }
-        });
+      return;
+    }
+
+    const isInDB = categoryList.some((item) => item.cat_id === id);
+    if (isInDB) {
+      try {
+        const resultAction = await dispatch(
+          categoryListActions.deleteData([id])
+        );
+
+        if (resultAction.meta.requestStatus === "fulfilled") {
+          setShowAlertModal(true);
+          setCatData((prevData) => {
+            const newData = prevData.filter((item) => item.cat_id !== id);
+            setCatDataList(newData); // 상위도 같이 업데이트
+            return newData;
+          });
+        }
+      } catch (err) {
+        console.error("삭제 실패:", err);
       }
+    } else {
       setCatData((prevData) => prevData.filter((item) => item.cat_id !== id));
     }
   };
@@ -162,7 +177,7 @@ function MyCategory({ catDataList, setCatDataList }) {
           <tbody>
             {catData.length > 0 ? (
               catData.map((item, i) => (
-                <tr key={i}>
+                <tr key={item.cat_id}>
                   <Input
                     data-placeholder="클릭해서 추가"
                     ref={(el) => (inputRefs.current[i] = el)}
@@ -173,7 +188,7 @@ function MyCategory({ catDataList, setCatDataList }) {
                   </Input>
                   <td>≡</td>
 
-                  <td key={i}>
+                  <td>
                     <div className="popover-wrapper w-100">
                       <button
                         className={classNames("btn-delete", {

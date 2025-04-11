@@ -55,6 +55,7 @@ const myDetailList = createSlice({
       idField: "cat_id",
       status: "idle",
       saveStatus: "idle",
+      deleteStatus: "idle",
       error: null,
     },
     cardList: {
@@ -62,6 +63,7 @@ const myDetailList = createSlice({
       idField: "card_id",
       status: "idle",
       saveStatus: "idle",
+      deleteStatus: "idle",
       error: null,
     },
     cardCompanyList: {

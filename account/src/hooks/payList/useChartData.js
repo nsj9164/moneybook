@@ -1,30 +1,36 @@
 import { unformatNumber } from "@/util/util";
 import { useMemo } from "react";
 
-export const useChartData = (tempData, categoryList) => {
+export const useChartData = (
+  tempData,
+  categoryList,
+  priceKey = "price1",
+  onlyUsed = false
+) => {
   return useMemo(() => {
-    if (!categoryList) return { charData: [], chartLabels: [] };
+    if (!categoryList || !Array.isArray(categoryList))
+      return { chartData: [], chartLabels: [] };
 
     const map = {};
     categoryList.forEach((cat) => {
-      map[cat.id] = cat.categoryNm;
+      map[cat.cat_id] = cat.category_nm;
     });
 
     const sums = {};
-    tempData.forEach((item) => {
-      if (item.cat_id && item.price1) {
-        const price = parseInt(unformatNumber(item.price1));
+    tempData
+      .filter((item) => !item.isDisabled && item.cat_id && item[priceKey])
+      .forEach((item) => {
+        const price = parseInt(unformatNumber(item[priceKey]));
         sums[item.cat_id] = (sums[item.cat_id] || 0) + price;
-      }
-    });
+      });
 
-    const labels = [];
-    const data = [];
-    Object.keys(sums).forEach((id) => {
-      labels.push(map[id] || "미분류");
-      data.push(sums[id]);
-    });
+    const filteredCategories = onlyUsed
+      ? categoryList.filter((cat) => sums[cat.cat_id])
+      : categoryList;
 
-    return { chartData: data, chartLabels: labels };
-  }, [tempData, categoryList]);
+    const chartLabels = filteredCategories.map((cat) => cat.category_nm);
+    const chartData = filteredCategories.map((cat) => sums[cat.cat_id] || 0);
+
+    return { chartData, chartLabels };
+  }, [tempData, categoryList, priceKey, onlyUsed]);
 };

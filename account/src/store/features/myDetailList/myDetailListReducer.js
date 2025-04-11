@@ -23,7 +23,28 @@ export const createAsyncReducers = (builder, actions, stateKey) => {
     })
     .addCase(actions.deleteData.fulfilled, (state, action) => {
       state[stateKey].deleteStatus = "succeeded";
-      state[stateKey].items = action.payload;
+
+      const idField = state[stateKey].idField;
+      const payload = action.payload;
+
+      if (Array.isArray(payload)) {
+        const deletedIds = payload.map((item) =>
+          typeof item === "object" ? item[idField] : item
+        );
+
+        state[stateKey].items = state[stateKey].items.filter(
+          (item) => !deletedIds.includes(item[idField])
+        );
+      } else {
+        const deletedId =
+          typeof payload === "object" && payload !== null
+            ? payload[idField]
+            : payload;
+
+        state[stateKey].items = state[stateKey].items.filter(
+          (item) => item[idField] !== deletedId
+        );
+      }
     })
     .addCase(actions.deleteData.rejected, (state, action) => {
       state[stateKey].deleteStatus = "failed";

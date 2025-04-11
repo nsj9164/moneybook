@@ -454,6 +454,7 @@ app.post("/categoryList/delete", authenticateToken, function (req, res) {
     [userId, data],
     (err, result) => {
       if (err) throw err;
+      res.send(result);
     }
   );
 });
