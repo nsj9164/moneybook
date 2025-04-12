@@ -316,7 +316,7 @@ app.post("/fixedItemList/delete", authenticateToken, function (req, res) {
       [userId, ...data],
       (err, result) => {
         if (err) throw err;
-        res.send(result);
+        res.send(data);
       }
     );
   }
@@ -391,6 +391,7 @@ app.post("/cardList/delete", authenticateToken, function (req, res) {
       [userId, item.card_id],
       (err, result) => {
         if (err) throw err;
+        res.send(data);
       }
     );
   });
@@ -454,7 +455,7 @@ app.post("/categoryList/delete", authenticateToken, function (req, res) {
     [userId, data],
     (err, result) => {
       if (err) throw err;
-      res.send(result);
+      res.send(data);
     }
   );
 });

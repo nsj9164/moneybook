@@ -13,7 +13,7 @@ export const selectText = (e) => {
   selection.addRange(range);
 };
 
-const generateTempId = (type) =>
+export const generateTempId = (type) =>
   `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
 // (숫자) 쉼표 제거

@@ -129,14 +129,11 @@ function MyCategory({ catDataList, setCatDataList }) {
         const resultAction = await dispatch(
           categoryListActions.deleteData([id])
         );
-
         if (resultAction.meta.requestStatus === "fulfilled") {
           setShowAlertModal(true);
-          setCatData((prevData) => {
-            const newData = prevData.filter((item) => item.cat_id !== id);
-            setCatDataList(newData); // 상위도 같이 업데이트
-            return newData;
-          });
+          setCatData((prevData) =>
+            prevData.filter((item) => item.cat_id !== id)
+          );
         }
       } catch (err) {
         console.error("삭제 실패:", err);
