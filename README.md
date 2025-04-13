@@ -35,14 +35,3 @@
 
 ## 📺 화면 구성
 <img src="https://github.com/user-attachments/assets/ec74f044-3f0a-47ae-8597-34f910010c31" width="600" /><br><br>
-
-## ✏️ Code Convention
-- **🚨 Fix**: 버그 수정 시 사용 (`[수정 대상] - [수정 내용]`)
-- **✨ Feat**: 새로운 기능 추가, 사용자 입장에서 변화가 있을 경우
-- **🎉 Init**: 프로젝트 초기 생성
-- **📝 Chore**: 주석, 의존성 설치, README 수정 등 사소한 작업
-- **💄 Style**: 스타일(CSS, Styled-Components 등) 관련 변경
-- **🔨 Refactor**: 리팩토링 (기능 변경 없이 코드 구조 개선)
-- **🗑️ Remove**: 파일 삭제 작업만 수행할 경우
-- **♻️ Format**: 코드 포맷팅(정렬, 들여쓰기 등) 관련 변경
-- **🎨 Improve**: 코드 구조, 사용자 경험 개선 목적의 변경
