@@ -1,8 +1,5 @@
 ## 💻 Tech Stack
 
-### 🛠 Project Setting  
-![Create React App](https://img.shields.io/badge/Create%20React%20App-09D3AC?style=for-the-badge&logo=react)
-
 ### 🎨 Design & Styling  
 <p>
   <img src="https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white" />
