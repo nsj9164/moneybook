@@ -10,11 +10,6 @@
 </p>
 
 ### ⚛️ React Ecosystem  
-![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)  
-![React Router](https://img.shields.io/badge/React%20Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)  
-![Redux Toolkit](https://img.shields.io/badge/Redux%20Toolkit-764ABC?style=for-the-badge&logo=redux&logoColor=white)  
-![React Redux](https://img.shields.io/badge/React%20Redux-764ABC?style=for-the-badge&logo=redux&logoColor=white)
-
 <p>
   <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
   <img src="https://img.shields.io/badge/React%20Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white" />
@@ -29,13 +24,8 @@
 </p>
 
 ### 📚 Libraries  
-![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)<br><br> 
 
-  
-## 📺 화면 구성
-<img src="https://github.com/user-attachments/assets/ec74f044-3f0a-47ae-8597-34f910010c31" width="600" />
-
-  
 ## 📦 주요 기능
 - **지출 입력 및 수정**
     - 항목별 날짜, 금액, 카테고리, 결제수단 등 상세 기록 가능
@@ -44,4 +34,18 @@
 - **실제 지출 금액 반영**
     - 지출 금액과 실지출 금액을 별도로 입력할 수 있어, 더치페이(1/n 정산)한 금액까지 고려하여 한 달간의 정확한 지출 내역을 확인 가능합니다.
 - **카테고리별 통계 시각화**
-    - Bar 차트를 통해 카테고리/기간별 소비 현황 시각화
+    - Bar 차트를 통해 카테고리/기간별 소비 현황 시각화<br><br>
+
+## 📺 화면 구성
+<img src="https://github.com/user-attachments/assets/ec74f044-3f0a-47ae-8597-34f910010c31" width="600" /><br><br>
+
+## ✏️ Code Convention
+- **🚨 Fix**: 버그 수정 시 사용 (`[수정 대상] - [수정 내용]`)
+- **✨ Feat**: 새로운 기능 추가, 사용자 입장에서 변화가 있을 경우
+- **🎉 Init**: 프로젝트 초기 생성
+- **📝 Chore**: 주석, 의존성 설치, README 수정 등 사소한 작업
+- **💄 Style**: 스타일(CSS, Styled-Components 등) 관련 변경
+- **🔨 Refactor**: 리팩토링 (기능 변경 없이 코드 구조 개선)
+- **🗑️ Remove**: 파일 삭제 작업만 수행할 경우
+- **♻️ Format**: 코드 포맷팅(정렬, 들여쓰기 등) 관련 변경
+- **🎨 Improve**: 코드 구조, 사용자 경험 개선 목적의 변경
